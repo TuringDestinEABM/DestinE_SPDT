@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="wrapper">
+    <h2>Temporary page</h2>
+
+    <p>This page is a temporary page and should be replaced before production. If you're seeing this outside of production, something has gone wrong. </p>
+    <br>
+    <p> <a href="/home">Return home</a>.</p>
+
+
+    <a href="/">
+        <picture>
+            <source media="(min-width: 768px)" srcset="{{ url_for('static', filename='img/placeholder.jpg') }}">
+            <img class="resp" alt="Placeholder" src="{{ url_for('static', filename='img/logo.png') }}" width = "500">
+        </picture>
+    </a>
+</div>
+
+
+{% endblock %}
