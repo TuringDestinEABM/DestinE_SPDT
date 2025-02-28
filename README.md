@@ -3,13 +3,14 @@ Github for the ESA Scenario-planning Digital Twin
 
 ## Quick start
 1. Ensure that `docker` and `docker compose` (or the [older](https://stackoverflow.com/questions/66514436/difference-between-docker-compose-and-docker-compose) `docker-compose`) are both installed
+Ensure Node.js is installed
 2. Create a new docker volume named `RedisDB'. This can be done in docker desktop or using the command:
 ```bash 
 docker volume create RedisDB
 ```
 3. Build the app image from the dockerfile
 ```bash
-docker build -t wl_tpdt -f Dockerfile  .
+docker build -t spdt -f Dockerfile  .
 ```
 4. Run the `compose.yaml` file
 ```bash
