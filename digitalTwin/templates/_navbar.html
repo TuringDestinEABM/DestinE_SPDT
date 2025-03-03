@@ -1,0 +1,38 @@
+<!-- Navigation bar -->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <!-- Click logo to return home-->
+        <a class="navbar-brand" href="/home">
+            <img class="resp" alt="Mimick Logo" src="{{ url_for('static', filename='img/logo.png') }}"
+                width="130">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+            data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Buttons -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/home">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/live_data">Live view</a>
+                </li>
+
+            </ul>s
+
+            <!-- Search bar-->
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+
+        </div>
+    </div>
+</nav>

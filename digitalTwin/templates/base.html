@@ -8,7 +8,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>{% block title %}{% endblock %}DestinE_SPDT</title>
+    <title>{% block title %}DestinE_SPDT{% endblock %}</title>
 
     {% block styles %}
     <!-- Bootstrap CSS -->
@@ -32,65 +32,25 @@
 </head>
 
 <body class="d-flex flex-column vh-100">
-    <!-- <body>-->
-    <!-- Nav Bar -->
-    <!-- <section class="container-fluid" id="top-bar">-->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/home">
-                <img class="resp" alt="Mimick Logo" src="{{ url_for('static', filename='img/logo.png') }}"
-                    width="130">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/live_data">Live view</a>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    {% include "_navbar.html" %}
 
     <!--</section>-->
 
-    </div>-->
+
 
     <!-- Containers for main page content -->
 
     <section class="container-fluid flex-fill" id="main-content">
         <div class="container">
             <!-- Each page content -->
-            {% block content %}{% endblock %}
+            {% block content %}
+            {% endblock %}
         </div>
     </section>
 
     <!-- footer -->
-    <footer
-        class="d-flex flex-wrap justify-content-between align-items-center py-1 px-2 border-top bg-body-tertiary static-bottom">
-
-        <p class="col-md-6 mb-0 justify-content-start text-body-secondary">&copy; 2024 Mimick</p>
-
-        <ul class="nav col-md-6 justify-content-end">
-            <li class="nav-item"><a href="https://github.com/Digital-Twin-Operational-Platform/Cristallo"
-                    class="nav-link px-2 text-body-secondary" data-toggle="tooltip" data-placement="top"
-                    title="Github"><img class=" resp" alt="Github"
-                        src="{{ url_for('static', filename='img/github.svg') }}" width="16"></a></li>
-            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary" data-toggle="tooltip"
-                    data-placement="top" title="Contact"><img class=" resp" alt="Contact"
-                        src="{{ url_for('static', filename='img/envelope.svg') }}" width="16"></a></li>
-        </ul>
+    <footer>
+    {% include "_footer.html" %}   
     </footer>
     {% block scripts %}
     <!-- Optional JavaScript -->
