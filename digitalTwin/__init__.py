@@ -3,7 +3,7 @@ This __init__.py can create global functions that can be called by any modules. 
 front-end functions, class definitions, and various "app" related functions/variables.
 """
 from celery import Celery, Task
-from flask_bootstrap import Bootstrap5
+from flask_bootstrap import Bootstrap
 from flask import Flask
 
 def create_app(test_config = None):

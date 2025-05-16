@@ -5,7 +5,6 @@ from flask import render_template, request, redirect, url_for, flash, abort, ses
 bp = Blueprint('digitaltwin', __name__) # Creates the name of the app
 from .routes import live_data, map, contact
 
-# land.findPID()
 @bp.route('/home')
 def home():
     return render_template('home.html')
