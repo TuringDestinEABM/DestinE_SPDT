@@ -1,15 +1,15 @@
 version: '3'
 services:
-  redis:
-    image: redis
-    volumes:
-      - RedisDB:/data
   spdt:
     image: spdt:latest
     restart: unless-stopped
     ports:
       - 80:5000 
     command: gunicorn --bind=0.0.0.0:5000 "digitalTwin:create_app()"
+  redis:
+    image: redis
+    volumes:
+      - RedisDB:/data
   celery:
     build:
         context: .
@@ -19,22 +19,32 @@ services:
     command: celery -A make_celery worker --loglevel INFO --uid=nobody --gid=nogroup
     depends_on:
       - redis
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017
-      ME_CONFIG_BASICAUTH: false
+
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+  #     ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017
+  #     ME_CONFIG_BASICAUTH: false
 volumes:
-    RedisDB:
-      external: true 
+  RedisDB:
+    external: true 
+  postgres-db-volume:
+    driver: local
+    driver_opts:
+        type: none
+        o: bind
+        device: ./data
+networks:
+  postgres-db-network:
+      driver: bridge

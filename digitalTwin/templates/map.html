@@ -1,26 +1,84 @@
-{% extends 'base.html' %}
+<html lang="en">
+<head>
+    {{ bootstrap.load_css() }}
+    <title>Display a map</title>
+    <meta property="og:description" content="Initialize a map in an HTML element with MapLibre GL JS." />
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
+    
+    <style>
+        body { margin: 0; padding: 0; }
+        html, body, #map { height: 94%; }
+    </style>
+</head>
+<body>
+{% include "_navbar.html" %}
+<section class="container-fluid flex-fill" id="main-content">
+    <div class="container">
+    <div id="map"></div>
+    <script>
+        const map = new maplibregl.Map({
+        container: 'map',
+        style:
+            'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+        center: [-1.6114,54.9793],
+        zoom: 15
+        });
 
-{% block content %}
-<div class="container my-3">
+    map.on('load', async () => {
+        // Add an image to use as a custom marker
+        const image = await map.loadImage('{{ url_for('static', filename='img/map_icons/marker_blue.png')}}');
+        map.addImage('custom-marker', image.data);
+        // Add a GeoJSON source with 2 points
+        map.addSource('conferences', {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-1.6114,54.9793]
+                        },
+                        'properties': {'name': 'Newcastle City Council'}
+                    },
+                    {
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'Point',
+                            'coordinates': [-1.6061, 54.9681]
+                        },
+                        'properties': {'name': 'Tyne Bridge'}
+                    },
+                 
+                ]
+            }
+        });
 
-    <h4>Introduction</h4>
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <picture>
-                    <source media="(min-width: 768px)" srcset="{{ url_for('static', filename='img/placeholder_map.jpg') }}">
-                    <img class="resp" alt="Placeholder" src="{{ url_for('static', filename='img/placeholder_map.jpg') }}" >
-                </picture>
-            </div>
-            
-            </div>
-        </div>
-    </div>
+        // Add a symbol layer
+        map.addLayer({
+            'id': 'conferences',
+            'type': 'symbol',
+            'source': 'conferences',
+            'layout': {
+                'icon-image': 'custom-marker',
+                // get the year from the source's "year" property
+                'text-field': ['get', 'name'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold'
+                ],
+                'text-offset': [0, 1.25],
+                'text-anchor': 'top'
+            }
+        });
+    });
+    </script>
+{% include "_footer.html" %}
 </div>
-
-
-<!-- scripts used on this page-->
-{% block javascript %}
-{% endblock %}
-{% endblock %}
+</section>
+</body>
+</html>
