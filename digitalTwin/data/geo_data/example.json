@@ -1,0 +1,24 @@
+{
+    "type": "geojson",
+    "data": {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-1.6114,54.9793]
+                },
+                "properties": {"name": "Newcastle City Council"}
+            },
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-1.6061, 54.9681]
+                },
+                "properties": {"name": "Tyne Bridge"}
+            }            
+        ]
+    }
+}
