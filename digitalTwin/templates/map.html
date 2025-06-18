@@ -31,38 +31,13 @@
         // Add an image to use as a custom marker
         const image = await map.loadImage('{{ url_for('static', filename='img/map_icons/marker_blue.png')}}');
         map.addImage('custom-marker', image.data);
-        // Add a GeoJSON source with 2 points
-        map.addSource('conferences', {
-            'type': 'geojson',
-            'data': {
-                'type': 'FeatureCollection',
-                'features': [
-                    {
-                        'type': 'Feature',
-                        'geometry': {
-                            'type': 'Point',
-                            'coordinates': [-1.6114,54.9793]
-                        },
-                        'properties': {'name': 'Newcastle City Council'}
-                    },
-                    {
-                        'type': 'Feature',
-                        'geometry': {
-                            'type': 'Point',
-                            'coordinates': [-1.6061, 54.9681]
-                        },
-                        'properties': {'name': 'Tyne Bridge'}
-                    },
-                 
-                ]
-            }
-        });
-
+        map.addSource('examples', {{data|safe}})
+        
         // Add a symbol layer
         map.addLayer({
             'id': 'conferences',
             'type': 'symbol',
-            'source': 'conferences',
+            'source': 'examples',
             'layout': {
                 'icon-image': 'custom-marker',
                 // get the year from the source's "year" property
