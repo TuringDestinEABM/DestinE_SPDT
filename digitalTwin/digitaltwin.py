@@ -3,7 +3,7 @@ This is the main function that creates the blueprint, imports in the modules, an
 """
 from flask import render_template, request, redirect, url_for, flash, abort, session, jsonify, Blueprint
 bp = Blueprint('digitaltwin', __name__) # Creates the name of the app
-from .routes import live_data, map, contact
+from .routes import contact, data_sources, help, live_data, map, queue, settings, user
 
 @bp.route('/home')
 def home():
