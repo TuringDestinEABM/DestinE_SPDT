@@ -1,28 +1,41 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container my-3">
 
-    <h4>Introduction</h4>
+<br>
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <p>Placeholder text</p>
-                <p>
-                    <a href="{{ url_for('digitaltwin.map') }}"><button class="btn btn-light my-2">Map</button></a>
-                </p>
+<div class="card shadow-md bg-body rounded border bg-light">
+    <div class="card-header"><h6>New Scenario</h6></div>
 
-                <ul>
-
-                </ul>
+    <div class="row justify-content-around p-3">
+        <div class="col-3">
+            <div class="card" style="width: 18rem;" >
+                <div class="card-header"><b>Create</b></div>
+                <a href="/createscenario" data-toggle="tooltip">
+                <img class="center-block" src="{{ url_for('static', filename='img/create_new.png') }}" class="card-img-top" alt="create new" style="width:80%">
+                </a>
             </div>
-            
+        </div>
+
+        <div class="col-3">
+        <div class="card" style="width: 18rem;"  href="/map">
+                <div class="card-header"><b>Load from Template</b></div>
+                <a href="/createscenario" data-toggle="tooltip">
+                <img class="center-block" src="{{ url_for('static', filename='img/load.png') }}" class="card-img-top" alt="create new" style="width:80%">
+                </a>
             </div>
         </div>
     </div>
 </div>
 
+<br>
+<br>
+
+<div class="card shadow-md bg-body rounded border bg-light">
+    <div class="card-header"><h6>Reports</h6></div>
+
+    </div>
+</div>
 
 <!-- scripts used on this page-->
 {% block javascript %}
