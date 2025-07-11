@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>New Scenario</h3>
+
+<br>
+
+<form>
+    <div class="card shadow-md bg-body rounded border bg-light">
+        <div class="card-header"><h6>Scenario Name</h6></div>
+        <div class="mb-3">
+            <input type="ScenarioName" class="form-control" id="exampleInputEmail1" id="ScenarioName">
+        </div>
+    </div>
+
+    <div class="card shadow-md bg-body rounded border bg-light">
+        <div class="card-header"><h6>Agents</h6></div>
+        <div class="row justify-content-around p-3">
+
+            <div class="col-2">
+                <div class="card" style="width: 18rem;" >
+                    <div class="card-header"><b>Wards</b></div>
+                    <div class="card-body">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward1">
+                            <label class="form-check-label" for="ward">Arthur's Hill</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward2">
+                            <label class="form-check-label" for="ward">Benwell & Scotswood</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward3">
+                            <label class="form-check-label" for="ward">Blakelaw</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward4">
+                            <label class="form-check-label" for="ward">Byker</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward5">
+                            <label class="form-check-label" for="ward">Callerton and Throckley</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward6">
+                            <label class="form-check-label" for="ward">Castle</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward7">
+                            <label class="form-check-label" for="ward">Chapel</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward8">
+                            <label class="form-check-label" for="ward">Dene and South Gosforth</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward9">
+                            <label class="form-check-label" for="ward">Denton and Westerhope</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward10">
+                            <label class="form-check-label" for="ward">Elswick</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward11">
+                            <label class="form-check-label" for="ward">Fawdon and West Gosforth </label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward12">
+                            <label class="form-check-label" for="ward">Gosforth</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward13">
+                            <label class="form-check-label" for="ward">Heaton</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward14">
+                            <label class="form-check-label" for="ward">Kenton</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward15">
+                            <label class="form-check-label" for="ward">Kingston Park South and Newbiggin Hall</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward16">
+                            <label class="form-check-label" for="ward">Lemington</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward17">
+                            <label class="form-check-label" for="ward">Manor Park</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward18">
+                            <label class="form-check-label" for="ward">Monument</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward19">
+                            <label class="form-check-label" for="ward">North Jesmond</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward20">
+                            <label class="form-check-label" for="ward">Ouseburn</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward21">
+                            <label class="form-check-label" for="ward">Parklands</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward22">
+                            <label class="form-check-label" for="ward">South Jesmond</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward23">
+                            <label class="form-check-label" for="ward">Walker</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward24">
+                            <label class="form-check-label" for="ward">Walkergate</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward25">
+                            <label class="form-check-label" for="ward">West Fenham</label>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="ward26">
+                            <label class="form-check-label" for="ward">Wingrove</label>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="col-2">
+                <div class="card" style="width: 9rem;" >
+                    <div class="card-header"><b>Population level</b></div>
+                    <div class="card-body">
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="pop1">
+                            <label class="form-check-label" for="popLevel">Household</label>
+                        </div>
+                        <div class="mb-3 form-check">    
+                            <input type="checkbox" class="form-check-input" id="pop2">
+                            <label class="form-check-label" for="popLevel">LOSA</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<br>
+
+<div class="col-2">
+    <div class="card" style="width: 9rem;" >
+        <div class="card-header"><b>Climate Scenario</b></div>
+        <div class="card-body">
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="scen1">
+                <label class="form-check-label" for="popLevel">Scenario 1</label>
+            </div>
+            <div class="mb-3 form-check">    
+                <input type="checkbox" class="form-check-input" id="scen2">
+                <label class="form-check-label" for="popLevel">Scenario 2</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="width: 9rem;" >
+        <div class="card-header"><b>policies</b></div>
+        <div class="card-body">
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="pol1">
+                <label class="form-check-label" for="popLevel">Policy 1</label>
+            </div>
+            <div class="mb-3 form-check">    
+                <input type="checkbox" class="form-check-input" id="pol2">
+                <label class="form-check-label" for="popLevel">Policy 2</label>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<br>
+<div class="btn-group" role="group" aria-label="Basic example">
+    <button type="save" class="btn btn-outline-secondary">Save as template</button>  
+    <button type="save" class="btn btn-outline-secondary">Save</button>  
+    <button type="submit" class="btn btn-success">Run</button>
+</div>
+</form>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+{% endblock %}
