@@ -7,8 +7,7 @@ from pathlib import Path
 @bp.route('/map', methods = ['POST', 'GET'])
 def map():
     filepath = Path(__file__).parents[1] /"data/geo_data/example.json"
-    d = loadJSONdata(filepath)
-    data = d
+    data = loadJSONdata(filepath)
     return render_template("map.html", data = data)
 
 def loadJSONdata(filepath):

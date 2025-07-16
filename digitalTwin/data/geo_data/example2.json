@@ -1,0 +1,14 @@
+{
+    "files":[ 
+        {
+        "id": "placeholder1",
+        "username": "Fake Name",
+        "date": "2025-12-25"
+        },
+        {
+        "id": "placeholder2",
+        "username": "John Smith",
+        "date": "2025-11-05"
+        }
+]
+}

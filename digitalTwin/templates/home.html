@@ -59,9 +59,31 @@
 
 <div class="card shadow-md bg-body rounded border bg-light">
     <div class="card-header"><h6>Reports</h6></div>
-
+    <div id="card-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Created</th>
+                    <th>User</th>
+                    <th>Link</th>
+                <tr>
+            </thead>
+            <tbody>
+                {% for file in data.files %}
+                <tr>
+                    <td>{{ file.id }}</td>
+                    <td>{{file.date}}</td>
+                    <td>{{ file.username }}</td>
+                    <td><a href="#">{{file.id }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
+
+
 
 <!-- scripts used on this page-->
 {% block javascript %}
