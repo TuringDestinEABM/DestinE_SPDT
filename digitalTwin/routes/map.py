@@ -1,16 +1,10 @@
 from ..digitaltwin import bp
-# from ..library import getData
-from flask import render_template, jsonify
-import json
+from ..library import getData
+from flask import render_template
 from pathlib import Path
 
 @bp.route('/map', methods = ['POST', 'GET'])
 def map():
     filepath = Path(__file__).parents[1] /"data/geo_data/example.json"
-    data = loadJSONdata(filepath)
-    return render_template("map.html", data = data)
-
-def loadJSONdata(filepath):
-    with open(filepath) as file:
-        d = json.load(file)
-    return d
+    data = getData.loadJSONdata(filepath)
+    return render_template("map2.html", data = data)
