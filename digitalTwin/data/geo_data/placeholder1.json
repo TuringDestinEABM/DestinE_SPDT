@@ -19,6 +19,10 @@
                 },
                 "properties": {"name": "Stephenson Steam Railway"}
             }            
+        ],
+        "style":[
+            {"center":[-1.6114, 54.9793],
+            "zoom": 15}
         ]
     }
 }

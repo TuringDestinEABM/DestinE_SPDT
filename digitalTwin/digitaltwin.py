@@ -10,7 +10,7 @@ from pathlib import Path
 
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    filepath = Path(__file__).parents[0] /"data/geo_data/example2.json"
+    filepath = Path(__file__).parents[0] /"data/geo_data/metadata.json"
     data = getData.loadJSONdata(filepath)
     return render_template('home.html', data = data)
 

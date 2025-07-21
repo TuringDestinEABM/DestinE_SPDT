@@ -15,7 +15,7 @@ def specific_report(ID):
     return render_template("reportTemplate.html", data = data)
 
 def findData(ID):
-    filepath = Path(__file__).parents[1] /"data/geo_data/example2.json"
+    filepath = Path(__file__).parents[1] /"data/geo_data/metadata.json"
     metadata = getData.loadJSONdata(filepath)
     for item in metadata["files"]:
         if item["id"] == ID:

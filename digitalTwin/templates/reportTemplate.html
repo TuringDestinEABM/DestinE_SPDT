@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block head %}
+     {{ super() }}
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
+{% endblock %}
+
 {% block content %}
 <!-- Tabs -->
 <div class="container my-5">
@@ -17,8 +23,21 @@
     <!-- Summary Tab -->
     <div class="tab-pane fade show active" id="summary" role="tabpanel" aria-labelledby="summary-tab">
       <h2 class="mb-3">Summary</h2>
-      <p class="lead">This is the summary overview {{data}}</p>
+      <div class="container">
+          <div class="row">
+            <div class="col">
+              <div class="container" style="height: 500px">
+              <div id="map" style="height: 100%"></div>
+              </div>
+            </div>
+            <div class="col">
+              {{data[properties]}}
+            </div>
+          </div>
+        </div>
     </div>
+
+
     <!-- Details Tab -->
     <div class="tab-pane fade" id="detailed" role="tabpanel" aria-labelledby="detailed-tab">
       <h2 class="mb-3">Detailed view</h2>
@@ -27,8 +46,41 @@
   </div>
 </div>
 
-<!-- scripts used on this page-->
-{% block javascript %}
 {% endblock %}
 
-{% endblock %}
+{% block scripts %}
+    <script>
+        const map = new maplibregl.Map({
+        container: 'map',
+        style:
+            'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+        center: [-1.6114,54.9793],
+        zoom: 15
+        });
+
+    map.on('load', async () => {
+        // Add an image to use as a custom marker
+        const image = await map.loadImage('{{ url_for('static', filename='img/map_icons/marker_blue.png')}}');
+        map.addImage('custom-marker', image.data);
+        map.addSource('examples', {{data|safe}})
+        
+        // Add a symbol layer
+        map.addLayer({
+            'id': 'conferences',
+            'type': 'symbol',
+            'source': 'examples',
+            'layout': {
+                'icon-image': 'custom-marker',
+                // get the year from the source's "year" property
+                'text-field': ['get', 'name'],
+                'text-font': [
+                    'Open Sans Semibold',
+                    'Arial Unicode MS Bold'
+                ],
+                'text-offset': [0, 1.25],
+                'text-anchor': 'top'
+            }
+        });
+    });
+    </script>
+    {% endblock %}
