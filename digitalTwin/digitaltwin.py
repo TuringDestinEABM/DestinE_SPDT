@@ -3,11 +3,16 @@ This is the main function that creates the blueprint, imports in the modules, an
 """
 from flask import render_template, request, redirect, url_for, flash, abort, session, jsonify, Blueprint
 bp = Blueprint('digitaltwin', __name__) # Creates the name of the app
-from .routes import live_data, map, contact
+from .routes import contact, data_sources, help, live_data, map, queue, reports, settings, user, createScenario
+from .library import getData
+import json
+from pathlib import Path
 
-@bp.route('/home')
+@bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    return render_template('home.html')
+    filepath = Path(__file__).parents[0] /"data/geo_data/metadata.json"
+    data = getData.loadJSONdata(filepath)
+    return render_template('home.html', data = data)
 
 @bp.route('/')
 def homePage():
@@ -16,5 +21,3 @@ def homePage():
 @bp.app_errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
-
-

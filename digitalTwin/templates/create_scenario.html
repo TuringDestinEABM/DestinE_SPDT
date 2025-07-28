@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>New Scenario</h3>
+
+<br>
+
+<form>
+    <div class="card shadow-md bg-body rounded border bg-light">
+        <div class="card-header"><h6>Scenario Name</h6></div>
+        <div class="card-body">
+            <input type="ScenarioName" class="form-control" id="exampleInputEmail1" id="ScenarioName" placeholder="Example 1">
+        </div>
+    </div>
+
+    <br>
+
+    <div class="card shadow-md bg-body rounded border bg-light">
+        <div class="card-header"><h6>Agents</h6></div>
+        <div class="row justify-content-around p-3">
+            <div class="col-4 form-group">
+                <label for="Wards"><b>Wards</b> (shift-click for multiple)</label>
+                    <div class="overflow-auto">
+                        <select multiple class="form-control" id="Wards">
+                            <option>Arthur's Hill</option>
+                            <option>Benwell and Scotswood </option>
+                            <option>Blakelaw</option>
+                            <option>Byker </option>
+                            <option>Callerton and Throckley </option>
+                            <option>Castle</option>
+                            <option>Chapel</option>
+                            <option>Dene and South Gosforth </option>
+                            <option>Denton and Westerhope </option>
+                            <option>Elswick</option>
+                            <option>Fawdon and West Gosforth</option>
+                            <option>Gosforth</option>
+                            <option>Heaton</option>
+                            <option>Kenton</option>
+                            <option>Kingston Park South and Newbiggin Hall</option>
+                            <option>Lemington</option>
+                            <option>Manor Park</option>
+                            <option> Monument</option>
+                            <option>North Jesmond</option>
+                            <option>Ouseburn</option>
+                            <option>Parklands</option>
+                            <option>South Jesmond</option>
+                            <option>Walker</option>
+                            <option>Walkergate</option>
+                            <option>West Fenham</option>
+                            <option>Wingrove</option>
+                        </select>
+                    </div>
+            </div>
+            <div class="col-4 form-group">
+                <label for="popLevel"><b>Population level</b></label>
+                    <select class="form-select" id="popLevel">
+                        <option>Household</option>
+                        <option>LOSA</option>
+                    </select>
+            </div>
+        </div>
+    </div>
+<br>
+
+    <div class="row justify-content-between p-3">
+        <div class="card shadow-md bg-body rounded border bg-light col-4 px-0">
+            <div class="card-header"><b>Climate Scenario</b></div>
+            <div class="card-body">
+                <div class="form-group">
+                    <select class="form-select" id="climateScenario">
+                        <option>Scenario 1</option>
+                        <option>Scenario 2</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-md bg-body rounded border bg-light col-4 px-0">
+            <div class="card-header"><b>Policies</b></div>
+            <div class="card-body">
+                <div class="form-group">
+                    <select class="form-select" id="climateScenario">
+                        <option>Scenario 1</option>
+                        <option>Scenario 2</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<br>
+
+<div class="btn-group float-end" role="group">
+    <button type="save" class="btn btn-outline-secondary">Save as template</button>  
+    <button type="save" class="btn btn-outline-secondary">Save</button>  
+    <button type="submit" class="btn btn-success">Run</button>
+</div>
+</form>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+{% endblock %}

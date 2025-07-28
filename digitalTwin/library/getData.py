@@ -1,12 +1,7 @@
-from json import loads as json_loads
-from flask import jsonify
+import json
 
-def getGEOJSON(file_path):
-    with open(file_path) as file:
-        try: 
-            result = jsonify(file)
-        except:
-            result = jsonify()
-        finally: 
-            return result
+def loadJSONdata(filepath):
+    with open(filepath) as file:
+        data = json.load(file)
+    return data
             

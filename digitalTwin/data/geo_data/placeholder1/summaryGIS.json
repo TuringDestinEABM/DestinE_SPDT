@@ -1,0 +1,25 @@
+{
+    "type": "geojson",
+    "data": {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-1.4676997483500394, 55.02680796143054]
+                },
+                "properties": {"name": "North Tyneside General Hospital"}
+            },
+            {
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [-1.497125874688362, 55.0176843256869 ]
+                },
+                "properties": {"name": "Stephenson Steam Railway"}
+            }            
+        ]
+
+    }
+}
