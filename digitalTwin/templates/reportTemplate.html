@@ -31,7 +31,7 @@
               </div>
             </div>
             <div class="col">
-              {{data[properties]}}
+              There will be more stuff here
             </div>
           </div>
         </div>
@@ -49,6 +49,7 @@
 {% endblock %}
 
 {% block scripts %}
+{{ super() }}
     <script>
         const map = new maplibregl.Map({
         container: 'map',
@@ -62,8 +63,8 @@
         // Add an image to use as a custom marker
         const image = await map.loadImage('{{ url_for('static', filename='img/map_icons/marker_blue.png')}}');
         map.addImage('custom-marker', image.data);
-        map.addSource('examples', {{data|safe}})
-        
+        map.addSource('examples', {{summaryGIS|safe}})
+
         // Add a symbol layer
         map.addLayer({
             'id': 'conferences',
