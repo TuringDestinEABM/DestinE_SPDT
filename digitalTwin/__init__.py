@@ -25,6 +25,8 @@ def create_app(test_config = None):
 
     return app
 
+
+
 def celery_init_app(app: Flask) -> Celery:
     class FlaskTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:
@@ -36,3 +38,16 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app.set_default()
     app.extensions["celery"] = celery_app
     return celery_app
+
+### Non-docker version for development
+# from flask_bootstrap import Bootstrap5
+# from flask import Flask
+
+# def create_app(test_config = None):
+#     app = Flask(__name__)
+#     bootstrap = Bootstrap5(app)
+
+#     from . import digitaltwin
+#     app.register_blueprint(digitaltwin.bp)
+
+#     return app
