@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container">
+    <h2>Job ran successfully</h2>
+    <p>Click the link to see the results
+      <br>
+      {{data}}
+
+    </p>
+    <p>
+      <a href="{{ url_for('digitaltwin.home') }}"><button class="btn btn-light my-2">Results</button></a>
+    </p>
+  </div>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+
+{% endblock %}

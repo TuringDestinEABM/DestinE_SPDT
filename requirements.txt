@@ -23,3 +23,19 @@ waitress==2.1.2
 Werkzeug==3.1.3
 WTForms==3.0.1
 zipp==3.16.2
+# Required for mesa (check after fineshed merging)
+# --- Core ABM stack ------------------------------------------------
+mesa               # Mesa 3.x agent-based modelling framework
+mesa-geo           # Spatial extensions (GeoSpace, GeoAgent)
+# --- Dashboard / UI -----------------------------------------------
+solara             # Reactive web UI + ipywidgets 8 backend
+# --- Data handling -------------------------------------------------
+pandas                    # tabular analysis + CSV/Parquet I/O
+numpy                     # numerical backbone (pandas + matplotlib depend on it)
+pyarrow                   # fast Parquet read/write for pandas
+# --- Visualisation -------------------------------------------------
+matplotlib                # static plots (line, bar, heat-map)
+folium                    # interactive Leaflet maps
+contextily                # background tiles for hex-bin basemap
+# --- Utility -------------------------------------------------------
+cloudpickle               # serialise full Mesa model objects for replay
