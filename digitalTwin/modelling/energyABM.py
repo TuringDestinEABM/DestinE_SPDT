@@ -41,8 +41,7 @@ import pandas as pd
 from .model import EnergyModel
 
 # ──────────────────────────── main ────────────────────────────────
-def run(sourceData, days, jobID) -> None:
-    outdir  = makeOutdir(jobID)
+def run(sourceData, days, outdir) -> None:
 
     # 1 ─ load geometry + build model ---------------------------------
     dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
@@ -85,11 +84,6 @@ def run(sourceData, days, jobID) -> None:
     with open(pickle_path, "wb") as fh:
         pickle.dump(model, fh)
 
-    return outdir    
 
 
 #Defining the place to save data, will change when I sort databasing
-def makeOutdir(jobID):
-    outdir = Path(__file__).parents[1] /"data/geo_data" / str(jobID)
-    outdir.mkdir(exist_ok=True)
-    return outdir

@@ -11,9 +11,9 @@ def reports():
 
 @bp.route('/reports/<ID>', methods = ['GET'])
 def specific_report(ID):
-    return render_template("reportTemplate.html", summaryGIS = findData(ID, "summaryGIS.json"))
+    return render_template("reportTemplate.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = findABMData(ID, 'metadata.json'))
 
-def findData(ID, filename):
+def findGEOData(ID, filename):
     filepath = Path(__file__).parents[1] /"data/geo_data/metadata.json"
     metadata = getData.loadJSONdata(filepath)
     for item in metadata["files"]:
@@ -23,4 +23,21 @@ def findData(ID, filename):
            data = getData.loadJSONdata(filepath)
            break
     return data
+    # TODO: make this do a 404
+
+def findABMData(ID, filename):
+    path = Path(__file__).parents[1] /"data/geo_data" / str(ID) / filename
+    
+    if path.suffix==".json":
+        data = getData.loadJSONdata(path)
+    else:
+        try:
+            with open(filepath, 'r') as f:
+                data = f.read()
+        except:
+            print('Invalid file type')
+            data = {}
+
+    return data
+
     # TODO: make this do a 404

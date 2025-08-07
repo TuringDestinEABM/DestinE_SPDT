@@ -1,15 +1,26 @@
 from ..modelling import energyABM
-import datetime
+import datetime, json
+from pathlib import Path
+from flask import url_for
 
 def run(form):
-    print('test3')
-    jobID = assignUniqueID()
-    metadata = simMetadata(form)
-    outdir = energyABM.run(metadata["DataSource"], metadata["Days"], jobID)
+    jobID = assignUniqueID(name = form.ScenarioName.data)
+    outdir = makeOutdir(jobID)
+    metadata = simMetadata(form, outdir)
+    energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
+
+    file = outdir / "metadata.json"
+    try:
+        with open(file, 'w') as f:
+            json.dump(metadata,f)
+    except:
+        with open(file, 'x') as f:
+            json.dump(metadata,f)
+
 
     return jobID, outdir
 
-def simMetadata(form):
+def simMetadata(form, outdir):
 
     now = datetime.datetime.now()
 
@@ -18,10 +29,21 @@ def simMetadata(form):
         "Days": int(form.Days.data),
         "DataSource": form.DataSource.data,
         "Job Submitted": str(now),
-        "Output Location": ''
+        "Output Location": str(outdir)
     }
+
     return metadata
 
-def assignUniqueID():
-    jobID = 4 #chosen by dice roll, guaranteed to be random
+def assignUniqueID(name):
+    date = datetime.datetime.now()
+    date = date.strftime("%Y%m%d")
+    if len(name) >8:
+        name = name[0:8]
+    
+    jobID = date + "_" + name
     return jobID
+
+def makeOutdir(jobID):
+    outdir = Path(__file__).parents[1] /"data/geo_data" / str(jobID)
+    outdir.mkdir(exist_ok=True)
+    return outdir
