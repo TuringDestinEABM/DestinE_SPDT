@@ -41,18 +41,18 @@ from shapely.geometry import Point
 import contextily as cx  
 
 # ────────────────────── CLI parser helper ───────────────────────
-def parse_args() -> argparse.Namespace:
-    """Return parsed command-line arguments."""
-    p = argparse.ArgumentParser(description="Make plots + Leaflet map from ABM outputs")
-    p.add_argument("--outdir", default=".",
-                   help="Folder containing energy_timeseries.csv etc. (default: .)")
-    p.add_argument("--geojson", required=True,
-                   help="Neighbourhood GeoJSON used by the ABM (required)")
-    p.add_argument("--jitter", type=float, default=25,
-                   help="Privacy jitter radius in metres (default: 25)")
-    p.add_argument("--no-map", action="store_true",
-                   help="Skip generating high_usage_map.html")
-    return p.parse_args()
+# def parse_args() -> argparse.Namespace:
+#     """Return parsed command-line arguments."""
+#     p = argparse.ArgumentParser(description="Make plots + Leaflet map from ABM outputs")
+#     p.add_argument("--outdir", default=".",
+#                    help="Folder containing energy_timeseries.csv etc. (default: .)")
+#     p.add_argument("--geojson", required=True,
+#                    help="Neighbourhood GeoJSON used by the ABM (required)")
+#     p.add_argument("--jitter", type=float, default=25,
+#                    help="Privacy jitter radius in metres (default: 25)")
+#     p.add_argument("--no-map", action="store_true",
+#                    help="Skip generating high_usage_map.html")
+#     return p.parse_args()
 
 # ────────────────────── geometry helpers ────────────────────────
 def jitter(geom, r: float) -> Point:
@@ -76,22 +76,12 @@ def reset_agent_index(df: pd.DataFrame) -> pd.DataFrame:
                  if "Agent" in c or c.endswith("_1")}
     )
 
-# ────────────────────────── main ────────────────────────────────
-def main() -> None:
-    args   = parse_args()
-    outdir = Path(args.outdir)
-    outdir.mkdir(exist_ok=True)
-
-    # ── 1. Load simulation outputs ───────────────────────────────
-    hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
-    model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
-    agent_ts = reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
-
+def highUsage(sourceData, timeseries, jitterRadius):
     # ── 2. Build *high-usage* household slice ────────────────────
     # a. keep only household rows (energy == 0 means PersonAgent)
-    houses = agent_ts[
-        (agent_ts["energy"] == 0) &
-        (agent_ts["energy_consumption"] > 0)
+    houses = timeseries[
+        (timeseries["energy"] == 0) &
+        (timeseries["energy_consumption"] > 0)
     ]
 
     # b. total kWh per household across entire run
@@ -100,7 +90,7 @@ def main() -> None:
                      .rename(columns={"energy_consumption": "total_energy"}))
 
     # c. attach geometry + property_type from GeoJSON
-    gdf = gpd.read_file(args.geojson)[["fid", "geometry", "property_type"]]
+    gdf = gpd.read_file(sourceData)[["fid", "geometry", "property_type"]]
     gdf["fid"]         = gdf["fid"].astype(str)      # unify dtype with totals
     totals["agent_id"] = totals["agent_id"].astype(str)
     gdf = gdf.rename(columns={"fid": "agent_id"}).merge(totals, on="agent_id")
@@ -113,29 +103,35 @@ def main() -> None:
 
     # e. jitter coordinates for privacy and keep dual CRS
     hi        = hi.to_crs(3857)                 # metres for hexbin
-    hi["geometry"] = hi["geometry"].apply(lambda g: jitter(g, args.jitter))
+    hi["geometry"] = hi["geometry"].apply(lambda g: jitter(g, jitterRadius))
     hi_latlon = hi.to_crs(4326)                 # WGS-84 for Leaflet pop-ups
+    
+    return hi
 
-    print("Sample of high-usage homes\n", hi.head()[["agent_id", "total_energy"]])
+    # print("Sample of high-usage homes\n", hi.head()[["agent_id", "total_energy"]])
 
+def prepTimeSeries(timeseries):
     # ── 3. Prepare time-series for bar plots ─────────────────────
-    wealth_cols = [c for c in ("high", "medium", "low") if c in model_ts.columns]
-    prop_cols   = [c for c in model_ts.columns
+    wealth_cols = [c for c in ("high", "medium", "low") if c in timeseries.columns]
+    prop_cols   = [c for c in timeseries.columns
                    if c not in ["total_energy", "cumulative_energy", *wealth_cols]]
 
     # force to numeric (handles strings or missing)
-    model_ts[prop_cols + wealth_cols] = model_ts[prop_cols + wealth_cols].apply(
+    timeseries[prop_cols + wealth_cols] = timeseries[prop_cols + wealth_cols].apply(
         pd.to_numeric, errors="coerce"
     )
-    model_ts["day"] = model_ts.index // 24    # index == step
+    timeseries["day"] = timeseries.index // 24    # index == step
+    print(timeseries)
+    return timeseries, prop_cols, wealth_cols
 
     # ── 4. Plot 1 – spatial hex-bin with basemap ─────────────────────
+def spatialHexBin(data, outdir):    
     fig1, ax1 = plt.subplots(figsize=(6, 6))
 
     hb = ax1.hexbin(
-        hi.geometry.x,
-        hi.geometry.y,
-        C=hi["total_energy"],
+        data.geometry.x,
+        data.geometry.y,
+        C=data["total_energy"],
         reduce_C_function=sum,
         gridsize=40,
         mincnt=1,
@@ -155,8 +151,9 @@ def main() -> None:
     fig1.tight_layout()
     fig1.savefig(outdir / "plot_hexbin.png", dpi=150)
 
+def dailyByPropType(timeseries, prop_cols, wealth_cols, outdir):
     # ── 5. Plot 2 – average daily kWh by property type ───────────
-    daily_type = model_ts.groupby("day")[prop_cols].sum()
+    daily_type = timeseries.groupby("day")[prop_cols].sum()
     fig2 = plt.figure()
     daily_type.mean().sort_values(ascending=False).plot.bar()
     plt.ylabel("avg kWh / day")
@@ -165,9 +162,10 @@ def main() -> None:
     fig2.tight_layout()
     fig2.savefig(outdir / "plot_prop_type.png", dpi=150)
 
+def dailyByWealth(timeseries, wealth_cols, outdir):
     # ── 6. Plot 3 – average daily kWh by wealth group ────────────
     if wealth_cols:
-        daily_w = model_ts.groupby("day")[wealth_cols].sum()
+        daily_w = timeseries.groupby("day")[wealth_cols].sum()
         avg_w   = daily_w.mean().loc[wealth_cols]    # preserve ordering
         fig3 = plt.figure()
         ax = avg_w.plot.bar(color=["#d73027", "#fc8d59", "#91bfdb"][: len(avg_w)])
@@ -180,9 +178,10 @@ def main() -> None:
     else:
         print("⚠️  No wealth columns – skipping wealth plot")
 
+def temporalHeatMap(timeseries, outdir):
     # ── 7. Plot 4 – temporal heat-map (day × hour) ───────────────
     fig4 = plt.figure(figsize=(7, 3))
-    pivot = hourly.pivot_table(
+    pivot = timeseries.pivot_table(
         index="day", columns="hour", values="total_energy", aggfunc="sum"
     )
     plt.imshow(pivot, aspect="auto")
@@ -192,36 +191,53 @@ def main() -> None:
     fig4.tight_layout()
     fig4.savefig(outdir / "plot_day_hour.png", dpi=150)
 
-    plt.show()   
+
+## TODO: Get this one working
 
     # ── 8. Optional interactive Leaflet map ──────────────────────
-    if not args.no_map:
-        try:
-            import folium
-            from folium.plugins import HeatMap
-        except ImportError:
-            print("Install *folium* for interactive map support"); return
+# def leafletMap()
+#     if map == True:
+#         try:
+#             import folium
+#             from folium.plugins import HeatMap
+#         except ImportError:
+#             print("Install *folium* for interactive map support"); return
 
-        centre = [hi_latlon.geometry.y.mean(), hi_latlon.geometry.x.mean()]
-        fmap   = folium.Map(location=centre, zoom_start=13, tiles="CartoDB positron")
+#         centre = [hi_latlon.geometry.y.mean(), hi_latlon.geometry.x.mean()]
+#         fmap   = folium.Map(location=centre, zoom_start=13, tiles="CartoDB positron")
 
-        # add heat layer (weight = total kWh)
-        heat_data = [[p.geometry.y, p.geometry.x, p.total_energy]
-                     for p in hi_latlon.itertuples()]
-        HeatMap(heat_data, radius=15, blur=10).add_to(fmap)
+#         # add heat layer (weight = total kWh)
+#         heat_data = [[p.geometry.y, p.geometry.x, p.total_energy]
+#                      for p in hi_latlon.itertuples()]
+#         HeatMap(heat_data, radius=15, blur=10).add_to(fmap)
 
-        # add circle markers with property type tooltip
-        for p in hi_latlon.itertuples():
-            folium.CircleMarker(
-                [p.geometry.y, p.geometry.x],
-                radius=3, color="#ff6e54", fill=True, fill_opacity=0.7,
-                popup=f"{p.property_type.title()}<br>{p.total_energy:.1f} kWh"
-            ).add_to(fmap)
+#         # add circle markers with property type tooltip
+#         for p in hi_latlon.itertuples():
+#             folium.CircleMarker(
+#                 [p.geometry.y, p.geometry.x],
+#                 radius=3, color="#ff6e54", fill=True, fill_opacity=0.7,
+#                 popup=f"{p.property_type.title()}<br>{p.total_energy:.1f} kWh"
+#             ).add_to(fmap)
 
-        html = outdir / "high_usage_map.html"
-        fmap.save(html)
-        print("Saved Leaflet map →", html)
+#         html = outdir / "high_usage_map.html"
+#         fmap.save(html)
+#         # print("Saved Leaflet map →", html)
 
 # ───────────────────────────────────────────────────────────────
-if __name__ == "__main__":
-    main()
+# ────────────────────────── main ────────────────────────────────
+def analyze(sourceData, outdir, jitterRadius=25, map =  True) -> None:
+    # ── 1. Load simulation outputs ───────────────────────────────
+    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+
+    hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
+    model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
+    agent_ts = reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
+   
+    hi = highUsage(dataPath, agent_ts, 25)
+    model_ts, prop_cols, wealth_cols = prepTimeSeries(model_ts)
+
+    spatialHexBin(hi, outdir)
+    dailyByPropType(model_ts, prop_cols, wealth_cols, outdir)
+    dailyByWealth(model_ts, wealth_cols, outdir)
+    temporalHeatMap(hourly, outdir)
+

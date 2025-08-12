@@ -1,4 +1,4 @@
-from ..modelling import energyABM
+from ..modelling import energyABM, analyze
 import datetime, json
 from pathlib import Path
 from flask import url_for
@@ -8,6 +8,7 @@ def run(form):
     outdir = makeOutdir(jobID)
     metadata = simMetadata(form, outdir)
     energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
+    analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
 
     file = outdir / "metadata.json"
     try:
