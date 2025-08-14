@@ -11,11 +11,12 @@
                 <tr>
             </thead>
             <tbody>
+                
                 {% for file in data.files %}
                 <tr>
                     <td>{{file.id}}</td>
-                    <td>{{file.date}}</td>
-                    <td>{{ file.username }}</td>
+                    <td>{{file.JobSubmitted}}</td>
+                    <td>{{file.UserName}}</td>
                     <td><a href="/reports/{{file.id}}" >.../reports/{{file.id }}</a></td>
                 </tr>
                 {% endfor %}

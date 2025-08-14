@@ -10,13 +10,13 @@ from pathlib import Path
 
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    filepath = Path(__file__).parents[0] /"data/geo_data/metadata.json"
-    data = getData.loadJSONdata(filepath)
+    data = reports.listAvailableReports()
     return render_template('home.html', data = data)
 
 @bp.route('/')
 def homePage():
-    return redirect("/home")
+    data = reports.listAvailableReports()
+    return redirect("/home", data = data)
 
 @bp.app_errorhandler(404)
 def page_not_found(error):

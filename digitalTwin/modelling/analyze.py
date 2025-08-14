@@ -129,10 +129,10 @@ def spatialHexBin(data, outdir):
     fig1, ax1 = plt.subplots(figsize=(6, 6))
 
     hb = ax1.hexbin(
-        data.geometry.x,
-        data.geometry.y,
-        C=data["total_energy"],
-        reduce_C_function=sum,
+        data.geometry.x, # x cordianates
+        data.geometry.y, # y cordianates
+        C=data["total_energy"], # total enercy, z cord
+        reduce_C_function=sum, 
         gridsize=40,
         mincnt=1,
     )
@@ -195,33 +195,33 @@ def temporalHeatMap(timeseries, outdir):
 ## TODO: Get this one working
 
     # ── 8. Optional interactive Leaflet map ──────────────────────
-# def leafletMap()
-#     if map == True:
-#         try:
-#             import folium
-#             from folium.plugins import HeatMap
-#         except ImportError:
-#             print("Install *folium* for interactive map support"); return
+def leafletMap():
+    if map == True:
+        try:
+            import folium
+            from folium.plugins import HeatMap
+        except ImportError:
+            print("Install *folium* for interactive map support"); return
 
-#         centre = [hi_latlon.geometry.y.mean(), hi_latlon.geometry.x.mean()]
-#         fmap   = folium.Map(location=centre, zoom_start=13, tiles="CartoDB positron")
+        centre = [hi_latlon.geometry.y.mean(), hi_latlon.geometry.x.mean()]
+        fmap   = folium.Map(location=centre, zoom_start=13, tiles="CartoDB positron")
 
-#         # add heat layer (weight = total kWh)
-#         heat_data = [[p.geometry.y, p.geometry.x, p.total_energy]
-#                      for p in hi_latlon.itertuples()]
-#         HeatMap(heat_data, radius=15, blur=10).add_to(fmap)
+        # add heat layer (weight = total kWh)
+        heat_data = [[p.geometry.y, p.geometry.x, p.total_energy]
+                     for p in hi_latlon.itertuples()]
+        HeatMap(heat_data, radius=15, blur=10).add_to(fmap)
 
-#         # add circle markers with property type tooltip
-#         for p in hi_latlon.itertuples():
-#             folium.CircleMarker(
-#                 [p.geometry.y, p.geometry.x],
-#                 radius=3, color="#ff6e54", fill=True, fill_opacity=0.7,
-#                 popup=f"{p.property_type.title()}<br>{p.total_energy:.1f} kWh"
-#             ).add_to(fmap)
+        # add circle markers with property type tooltip
+        for p in hi_latlon.itertuples():
+            folium.CircleMarker(
+                [p.geometry.y, p.geometry.x],
+                radius=3, color="#ff6e54", fill=True, fill_opacity=0.7,
+                popup=f"{p.property_type.title()}<br>{p.total_energy:.1f} kWh"
+            ).add_to(fmap)
 
-#         html = outdir / "high_usage_map.html"
-#         fmap.save(html)
-#         # print("Saved Leaflet map →", html)
+        html = outdir / "high_usage_map.html"
+        fmap.save(html)
+        # print("Saved Leaflet map →", html)
 
 # ───────────────────────────────────────────────────────────────
 # ────────────────────────── main ────────────────────────────────

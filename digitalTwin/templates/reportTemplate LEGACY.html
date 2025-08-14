@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+<!-- LEGACY VERSION TO BE DELETED -->
+
 {% block head %}
      {{ super() }}
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
@@ -25,18 +27,13 @@
       <h2 class="mb-3">Summary</h2>
       <div class="container">
           <div class="row">
-            
+            <div class="col">
+              <div class="container" style="height: 500px">
+              <div id="map" style="height: 100%"></div>
+              </div>
             </div>
             <div class="col">
               {{metadata}}
-               <!-- {{metadata.OutputLocation}}
-               {{figures.plot_day_hour}}
-
-              <figure>
-                <img src="{{figures.plot_day_hour}}" alt="plot_day_hour" style="width:100%">
-                <figcaption>plot_day_hour</figcaption>
-              </figure> -->
-
             </div>
           </div>
         </div>
@@ -47,11 +44,6 @@
     <div class="tab-pane fade" id="detailed" role="tabpanel" aria-labelledby="detailed-tab">
       <h2 class="mb-3">Detailed view</h2>
       <p class="lead">This is the detailed information.</p>
-
-      <div class="col">
-        <div class="container" style="height: 500px">
-        <div id="map" style="height: 100%"></div>
-      </div>
     </div>
   </div>
 </div>

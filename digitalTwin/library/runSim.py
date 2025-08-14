@@ -5,8 +5,8 @@ from flask import url_for
 
 def run(form):
     jobID = assignUniqueID(name = form.ScenarioName.data)
-    outdir = makeOutdir(jobID)
-    metadata = simMetadata(form, outdir)
+    
+    metadata, outdir = simMetadata(form, jobID)
     energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
     analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
 
@@ -21,19 +21,21 @@ def run(form):
 
     return jobID, outdir
 
-def simMetadata(form, outdir):
+def simMetadata(form, jobID):
 
     now = datetime.datetime.now()
+    outdir =makeOutdir(jobID)
 
     metadata={
-        "Scenario Name": form.ScenarioName.data,
+        "id": str(jobID),
         "Days": int(form.Days.data),
         "DataSource": form.DataSource.data,
-        "Job Submitted": str(now),
-        "Output Location": str(outdir)
+        "JobSubmitted": str(now),
+        "UserName": str(getUserName()),
+        "OutputLocation": str(outdir)
     }
 
-    return metadata
+    return metadata, outdir
 
 def assignUniqueID(name):
     date = datetime.datetime.now()
@@ -45,6 +47,11 @@ def assignUniqueID(name):
     return jobID
 
 def makeOutdir(jobID):
-    outdir = Path(__file__).parents[1] /"data/geo_data" / str(jobID)
+    outdir = Path(__file__).parents[1] /"data/geo_data/results" / str(jobID)
     outdir.mkdir(exist_ok=True)
     return outdir
+
+def getUserName():
+    # TODO: revisit when login functionality sorted
+    username = "Stacy Fakename"
+    return username
