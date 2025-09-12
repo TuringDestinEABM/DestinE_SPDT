@@ -25,17 +25,12 @@
       <h2 class="mb-3">Summary</h2>
       <div class="container">
           <div class="row">
-            
+            <div id='graphs' class='graphs'”></div>
             </div>
             <div class="col">
-              {{metadata}}
-               <!-- {{metadata.OutputLocation}}
-               {{figures.plot_day_hour}}
 
-              <figure>
-                <img src="{{figures.plot_day_hour}}" alt="plot_day_hour" style="width:100%">
-                <figcaption>plot_day_hour</figcaption>
-              </figure> -->
+            
+              
 
             </div>
           </div>
@@ -60,7 +55,7 @@
 
 {% block scripts %}
 {{ super() }}
-    <script>
+<script>
         const map = new maplibregl.Map({
         container: 'map',
         style:

@@ -1,7 +1,10 @@
 from ..digitaltwin import bp
-from ..library import getData
-from flask import render_template, url_for
+from ..library import getData, plotting
+from flask import render_template, url_for, send_file
 from pathlib import Path
+import base64
+from io import BytesIO
+# from . import mpl_plots
 
 @bp.route('/reports', methods = ['GET'])
 def reports():
@@ -10,7 +13,30 @@ def reports():
 
 @bp.route('/reports/<ID>', methods = ['GET'])
 def specific_report(ID):
-    return render_template("reportTemplate.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = findMetadata(ID), figures = listSummaryFigures(ID))
+    metadata = findMetadata(ID)
+    hi, model_ts, prop_cols, wealth_cols = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
+    hexbinPlot(hi)
+    fig2 = plotting.dailyByPropTypePX(model_ts, prop_cols)
+    fig3 = plotting.dailyByWealth(model_ts, wealth_cols)
+    return render_template("reportTemplateSimple.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = metadata, fig1="/reports/20250814_test1/hexbin" , fig2 = fig2, fig3 = fig3, ID=ID)
+
+@bp.route('/reports/<ID>/hexbin')
+def hexbinPlot(ID):
+    metadata = findMetadata("20250814_test1")
+    hi, model_ts, prop_cols, wealth_cols = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
+    fig = plotting.spatialHexBin(hi)
+    # img = BytesIO()
+    # fig.savefig(img)
+    # img.seek(0)
+    # return send_file(img, mimetype='image/png')
+    buf = BytesIO()
+    fig.savefig(buf, format="png")
+    # Embed the result in the html output.
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    return f"<img src='data:image/png;base64,{data}'/>"
+
+
+
 
 def findGEOData(ID, filename):
     filepath = Path(__file__).parents[1] /"data/geo_data/metadata.json"
@@ -27,9 +53,9 @@ def findGEOData(ID, filename):
 def findMetadata(ID):
     path = Path(__file__).parents[1] /"data/geo_data/results" / ID / "metadata.json"
     metadata = getData.loadJSONdata(path)
-    figures = listSummaryFigures(path)
+    # figures = listSummaryFigures(path)
     
-    return metadata, figures
+    return metadata
 
     # TODO: make this do a 404
 
@@ -54,5 +80,13 @@ def listAvailableReports():
        data.append(metadata) 
 
     data = dict(files = data)
-    print(data)
+    # print(data)
     return data
+
+# def create_figure():
+#     fig = Figure()
+#     axis = fig.add_subplot(1, 1, 1)
+#     xs = range(100)
+#     ys = [random.randint(1, 50) for x in xs]
+#     axis.plot(xs, ys)
+#     return fig

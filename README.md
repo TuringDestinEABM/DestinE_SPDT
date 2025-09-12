@@ -32,7 +32,7 @@ First comment out the relevant section of __init__.py
 
 1. Virtual environment 
 
-```python3 -m venv .env ```
+```python -m venv .env ```
 
 
 ```.env\Scripts\activate ```

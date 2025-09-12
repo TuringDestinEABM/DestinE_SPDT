@@ -15,8 +15,7 @@ def home():
 
 @bp.route('/')
 def homePage():
-    data = reports.listAvailableReports()
-    return redirect("/home", data = data)
+    return redirect("/home")
 
 @bp.app_errorhandler(404)
 def page_not_found(error):

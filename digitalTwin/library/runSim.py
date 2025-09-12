@@ -8,7 +8,7 @@ def run(form):
     
     metadata, outdir = simMetadata(form, jobID)
     energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
-    analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
+    # analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
 
     file = outdir / "metadata.json"
     try:

@@ -37,6 +37,7 @@ import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
+import pickle
 from shapely.geometry import Point
 import contextily as cx  
 
@@ -150,6 +151,7 @@ def spatialHexBin(data, outdir):
     ax1.set_title("High-usage homes (jittered)")
     fig1.tight_layout()
     fig1.savefig(outdir / "plot_hexbin.png", dpi=150)
+    # pickle.dump(fig1, open(str(outdir / "plot_hexbin.pickles"), 'wb'))
 
 def dailyByPropType(timeseries, prop_cols, wealth_cols, outdir):
     # ── 5. Plot 2 – average daily kWh by property type ───────────
@@ -223,6 +225,7 @@ def leafletMap():
         fmap.save(html)
         # print("Saved Leaflet map →", html)
 
+
 # ───────────────────────────────────────────────────────────────
 # ────────────────────────── main ────────────────────────────────
 def analyze(sourceData, outdir, jitterRadius=25, map =  True) -> None:
@@ -236,8 +239,8 @@ def analyze(sourceData, outdir, jitterRadius=25, map =  True) -> None:
     hi = highUsage(dataPath, agent_ts, 25)
     model_ts, prop_cols, wealth_cols = prepTimeSeries(model_ts)
 
-    spatialHexBin(hi, outdir)
-    dailyByPropType(model_ts, prop_cols, wealth_cols, outdir)
-    dailyByWealth(model_ts, wealth_cols, outdir)
-    temporalHeatMap(hourly, outdir)
+    # spatialHexBin(hi, outdir)
+    # dailyByPropType(model_ts, prop_cols, wealth_cols, outdir)
+    # dailyByWealth(model_ts, wealth_cols, outdir)
+    # temporalHeatMap(hourly, outdir)
 
