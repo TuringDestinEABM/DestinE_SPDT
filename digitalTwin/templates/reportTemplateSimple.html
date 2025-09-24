@@ -4,31 +4,35 @@
      {{ super() }}
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
     <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
-    <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+    <script src='https://cdn.plot.ly/plotly-3.1.0.min.js' charset='utf-8'></script>
 {% endblock %}
 
 {% block content %}
 <!-- Tabs -->
 Hello World
 
+<br>
+<a href='/reports/{{ID}}/timeline'>Timeline</a>
 
-<img src={{url_for('digitaltwin.hexbinPlot', ID = "20250814_test1")}} alt="User Image">
-<!-- <a href={{url_for('digitaltwin.hexbinPlot', ID = "20250814_test1")}}>link text</a> -->
 <br>
 <div id='chart2' class='chart2'”></div>
-<br>
 <div id='chart3' class='chart3'”></div>
+<div id='chart4' class='chart4'”></div>
 <br>
 
 {% endblock %}
 
 {% block scripts %}
 <script type='text/javascript'>
-  var graphs = {{fig2 | safe}};
-  Plotly.plot('chart2',graphs,{});
+  var graphs = {{fig2| safe}};
+  Plotly.newPlot('chart2',graphs, {});
 </script>
 <script type='text/javascript'>
-  var graphs = {{fig3 | safe}};
-  Plotly.plot('chart3',graphs,{});
+  var graphs = {{fig3| safe}};
+  Plotly.newPlot('chart3',graphs, {});
+</script>
+<script type='text/javascript'>
+  var graphs = {{fig4| safe}};
+  Plotly.newPlot('chart4',graphs, {});
 </script>
 {% endblock %}

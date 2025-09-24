@@ -14,16 +14,24 @@ def reports():
 @bp.route('/reports/<ID>', methods = ['GET'])
 def specific_report(ID):
     metadata = findMetadata(ID)
-    hi, model_ts, prop_cols, wealth_cols = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
-    hexbinPlot(hi)
+    hi, model_ts, prop_cols, wealth_cols, hourly = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
+    
     fig2 = plotting.dailyByPropTypePX(model_ts, prop_cols)
     fig3 = plotting.dailyByWealth(model_ts, wealth_cols)
-    return render_template("reportTemplateSimple.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = metadata, fig1="/reports/20250814_test1/hexbin" , fig2 = fig2, fig3 = fig3, ID=ID)
+    fig4 = plotting.temporalHeatMap(hourly)
+
+    return render_template("reportTemplateSimple.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = metadata, fig1="/reports/20250814_test1/hexbin" , fig2 = fig2, fig3 = fig3, fig4 = fig4, ID=ID)
+
+@bp.route('/reports/<ID>/timeline', methods = ['GET'])
+def specific_report_timeline(ID):
+    metadata = findMetadata(ID)
+    plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
+    return render_template("reportTemplateTimeline.html")
 
 @bp.route('/reports/<ID>/hexbin')
 def hexbinPlot(ID):
     metadata = findMetadata("20250814_test1")
-    hi, model_ts, prop_cols, wealth_cols = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
+    hi, model_ts, prop_cols, wealth_cols, hourly = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
     fig = plotting.spatialHexBin(hi)
     # img = BytesIO()
     # fig.savefig(img)
@@ -34,9 +42,6 @@ def hexbinPlot(ID):
     # Embed the result in the html output.
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
     return f"<img src='data:image/png;base64,{data}'/>"
-
-
-
 
 def findGEOData(ID, filename):
     filepath = Path(__file__).parents[1] /"data/geo_data/metadata.json"

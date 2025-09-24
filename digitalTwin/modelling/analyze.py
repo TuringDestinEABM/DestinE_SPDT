@@ -76,6 +76,18 @@ def reset_agent_index(df: pd.DataFrame) -> pd.DataFrame:
         columns={c: "agent_id" for c in df.columns
                  if "Agent" in c or c.endswith("_1")}
     )
+    
+
+def allUsage_ts(sourceData, timeseries, jitterRadius):
+    # a. keep only household rows (energy == 0 means PersonAgent)
+    houses = timeseries[
+        (timeseries["energy"] == 0) &
+        (timeseries["energy_consumption"] > 0)
+    ]
+
+    geom = gpd.read_file(sourceData)[["fid", "geometry", "property_type"]]
+    
+    return geom, houses    
 
 def highUsage(sourceData, timeseries, jitterRadius):
     # ── 2. Build *high-usage* household slice ────────────────────
@@ -122,7 +134,6 @@ def prepTimeSeries(timeseries):
         pd.to_numeric, errors="coerce"
     )
     timeseries["day"] = timeseries.index // 24    # index == step
-    print(timeseries)
     return timeseries, prop_cols, wealth_cols
 
     # ── 4. Plot 1 – spatial hex-bin with basemap ─────────────────────
