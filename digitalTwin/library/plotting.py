@@ -108,9 +108,12 @@ def timeline(sourceData, outdir):
     outdir = Path(outdir)
     agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
     
-    geom, timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
+    timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
+    timeseries.drop('energy', axis = 1)
+    timeseries_js = timeseries.to_json()
 
+    steps = []
     for step in pd.unique(timeseries['Step']):
-        df = timeseries[timeseries['Step'] == step]
-        dict_df = df.set_index('agent_id')['energy_consumption'].to_dict()
-        print("step " +str(step)+ "dict" + str(dict_df))
+        steps.append(int(step))
+  
+    return steps, timeseries_js

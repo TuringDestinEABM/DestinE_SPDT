@@ -25,18 +25,14 @@ def specific_report(ID):
 @bp.route('/reports/<ID>/timeline', methods = ['GET'])
 def specific_report_timeline(ID):
     metadata = findMetadata(ID)
-    plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
-    return render_template("reportTemplateTimeline.html")
+    steps, timeseries = plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
+    return render_template("reportTemplateTimeline.html", steps = steps, timeseries = timeseries)
 
 @bp.route('/reports/<ID>/hexbin')
 def hexbinPlot(ID):
     metadata = findMetadata("20250814_test1")
     hi, model_ts, prop_cols, wealth_cols, hourly = plotting.prepare_data(metadata["DataSource"], metadata["OutputLocation"], 25)
     fig = plotting.spatialHexBin(hi)
-    # img = BytesIO()
-    # fig.savefig(img)
-    # img.seek(0)
-    # return send_file(img, mimetype='image/png')
     buf = BytesIO()
     fig.savefig(buf, format="png")
     # Embed the result in the html output.

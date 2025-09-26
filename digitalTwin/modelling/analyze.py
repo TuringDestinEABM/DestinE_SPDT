@@ -80,14 +80,17 @@ def reset_agent_index(df: pd.DataFrame) -> pd.DataFrame:
 
 def allUsage_ts(sourceData, timeseries, jitterRadius):
     # a. keep only household rows (energy == 0 means PersonAgent)
-    houses = timeseries[
+    ts = timeseries[
         (timeseries["energy"] == 0) &
         (timeseries["energy_consumption"] > 0)
     ]
 
     geom = gpd.read_file(sourceData)[["fid", "geometry", "property_type"]]
-    
-    return geom, houses    
+    geom["fid"] = geom["fid"].astype(str)      # unify dtype with totals
+    ts["agent_id"] = ts["agent_id"].astype(str)
+    ts = geom.rename(columns={"fid": "agent_id"}).merge(ts, on="agent_id")
+
+    return ts    
 
 def highUsage(sourceData, timeseries, jitterRadius):
     # ── 2. Build *high-usage* household slice ────────────────────
