@@ -102,7 +102,7 @@ def temporalHeatMap(timeseries):
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return figJSON
 
-
+##
 def timeline(sourceData, outdir):
     dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
     outdir = Path(outdir)
@@ -111,9 +111,22 @@ def timeline(sourceData, outdir):
     timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
+    
+    # Get min and max data usage
+    ec = timeseries['energy_consumption'] 
+    energy_range = {"min":ec.min(), 
+                    "max": ec.max()
+                    }
 
-    steps = []
+    # create list of number of steps                
+    stepArray = []
     for step in pd.unique(timeseries['Step']):
-        steps.append(int(step))
+        stepArray.append(int(step))
+
+    steps = {
+       "min": min(stepArray),
+       "max": max(stepArray),
+       "steps": stepArray
+    }
   
-    return steps, timeseries_js
+    return steps, timeseries_js, energy_range

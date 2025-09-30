@@ -1,25 +1,26 @@
-<head>
-    <title>Timeline</title>
-    <meta property="og:description" content="Timeline of energy use." />
-    <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.7.3/dist/maplibre-gl.css' />
-    <script src='https://unpkg.com/maplibre-gl@5.7.3/dist/maplibre-gl.js'></script>
-    <style>
-        body { margin: 0; padding: 0; }
-        html, body, #map { height: 100%; }
-    </style>
-</head>
-<body>
+<!-- A dummy page for testing GIS functionality, delete before roll out -->
 
+{% extends 'base.html' %}
 
+{% block head %}
+     {{ super() }}
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
+{% endblock %}
+
+{% block content %}
 <style>
+    .maplibregl-popup {
+        max-width: 400px;
+        font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+
     .map-overlay {
         font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
         position: absolute;
         width: 25%;
-        top: 0;
-        left: 0;
+        top: 100px;
+        left: 100px;
         padding: 10px;
     }
 
@@ -31,16 +32,10 @@
         margin-bottom: 10px;
     }
 
-    .map-overlay h2 {
-        line-height: 24px;
-        display: block;
-        margin: 0 0 10px;
-    }
-
     .map-overlay .legend .bar {
         height: 10px;
         width: 100%;
-        background: linear-gradient(to right, #fca107, #7f3121);
+        background: linear-gradient(to right, rgba(46,111,142), rgb(189,223,38));
     }
 
     .map-overlay input {
@@ -52,148 +47,136 @@
         cursor: ew-resize;
     }
 </style>
-
-<br>
-timesteps
-<br>
-
-<div id="map"></div>
-
-<div class="map-overlay top">
-    <div class="map-overlay-inner">
-        <h2>Timestep</h2>
-        <label id="month" for="slider"></label>
-        <input id="slider" type="range" min="0" max="11" step="1" value="0" />
-    </div>
-    <div class="map-overlay-inner">
-        <div id="legend" class="legend">
-            <div class="bar"></div>
-            <div>Magnitude (m)</div>
-        </div>
-    </div>
+<div class="container" style="height: 89vh">
+    <div id="map" style="height: 100%"></div>
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <b>Timestep</b>
+            <label id="step" for="slider"></label>
+            <input id="slider" type="range" min={{steps.min}} max={{steps.max}} step="1" value="0" />
+            <div class="map-overlay-inner">
+                <div id="legend" class="legend">
+                    <div class="bar"></div>
+                    <div>Energy usage (kWh)</div>
+                </div>
+            </div>
+        </div> 
+    </div> 
+    
 </div>
+{% endblock %}
 
-<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-<script>
-    const map = new maplibregl.Map({
-        container: 'map',
-        style: 'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-        center: [-1.6114, 54.9793],
-        zoom: 10
-    });
+{% block scripts %}
+    <script>
+        
+        const map = new maplibregl.Map({
+            container: 'map',
+            style:
+                'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+            center: [-1.65260,55.01802],
+            zoom: 15
+        });
 
-    const timesteps ={{steps|safe}};
+        let hoveredStateId = null; // hoverstate for mouseover
 
-    const months = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December'
-    ];
+        const steplist = {{steps.steps|safe}};
 
-    function filterBy(month) {
-        const filters = ['==', 'month', month];
-        map.setFilter('earthquake-circles', filters);
-        map.setFilter('earthquake-labels', filters);
+        // For the slider filter
+        function filterBy(step) {
+            const filters = ['==', 'Step', step];
+            map.setFilter('ts_fills', filters);
 
-        // Set the label to the month
-        document.getElementById('month').textContent = months[month];
-    }
+            // Set the label to the month
+            document.getElementById('step').textContent = steplist[step];
+        }
+        
+        map.on('load', () => {      
+            map.addSource('ts', {
+                'type': 'geojson',
+                'data': {{timeseries|safe}}
+            });     
+            map.addLayer({
+                'id': 'ts_fills',
+                'type': 'fill',
+                'source': 'ts',
+                'layout': {},
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'energy_consumption'],
+                        {{energy_range.min}},
+                        'rgba(46,111,142)',
+                        {{energy_range.max}},
+                        'rgb(189,223,38)'
+                    ],
+                    'fill-opacity': [
+                        'case',
+                        ['boolean', ['feature-state', 'hover'], false],
+                        1,
+                        0.5
+                    ]
+                }
+            });             
+            
+            // For the slider filter
+            filterBy(1);
 
-    map.on('load', () => {
-        // Data courtesy of https://www.usgs.gov/programs/earthquake-hazards
-        // Query for significant earthquakes in 2015 URL request looked like this:
-        // https://earthquake.usgs.gov/fdsnws/event/1/query
-        //    ?format=geojson
-        //    &starttime=2015-01-01
-        //    &endtime=2015-12-31
-        //    &minmagnitude=6'
-        //
-        // Here we're using d3 to help us make the ajax request but you can use
-        // Any request method (library or otherwise) you wish.
-        d3.json(
-            'https://maplibre.org/maplibre-gl-js/docs/assets/significant-earthquakes-2015.geojson',
-            (err, data) => {
-                if (err) throw err;
-
-                // Create a month property value based on time
-                // used to filter against.
-                data.features = data.features.map((d) => {
-                    d.properties.month = new Date(d.properties.time).getMonth();
-                    return d;
+            document
+                .getElementById('slider')
+                .addEventListener('input', (e) => {
+                    const step = parseInt(e.target.value, 10);
+                    filterBy(step);
                 });
 
-                map.addSource('earthquakes', {
-                    'type': 'geojson',
-                    data
-                });
-
-                map.addLayer({
-                    'id': 'earthquake-circles',
-                    'type': 'circle',
-                    'source': 'earthquakes',
-                    'paint': {
-                        'circle-color': [
-                            'interpolate',
-                            ['linear'],
-                            ['get', 'mag'],
-                            6,
-                            '#FCA107',
-                            8,
-                            '#7F3121'
-                        ],
-                        'circle-opacity': 0.75,
-                        'circle-radius': [
-                            'interpolate',
-                            ['linear'],
-                            ['get', 'mag'],
-                            6,
-                            20,
-                            8,
-                            40
-                        ]
+            // Code for hover over effect
+            map.on('mousemove', 'ts_fills', (e) => {
+                if (e.features.length > 0) {
+                    if (hoveredStateId) {
+                        map.setFeatureState(
+                            {source: 'ts', id: hoveredStateId},
+                            {hover: false}
+                        );
                     }
-                });
+                    hoveredStateId = e.features[0].id;
+                    map.setFeatureState(
+                        {source: 'ts', id: hoveredStateId},
+                        {hover: true}
+                    );
+                }
+            });
 
-                map.addLayer({
-                    'id': 'earthquake-labels',
-                    'type': 'symbol',
-                    'source': 'earthquakes',
-                    'layout': {
-                        'text-field': [
-                            'concat',
-                            ['to-string', ['get', 'mag']],
-                            'm'
-                        ],
-                        'text-font': [ 'Noto Sans Regular' ],
-                        'text-size': 12
-                    },
-                    'paint': {
-                        'text-color': 'rgba(0,0,0,0.5)'
-                    }
-                });
+            // When the mouse leaves the state-fill layer, update the feature state of the
+            // previously hovered feature.
+            map.on('mouseleave', 'ts_fills', () => {
+                if (hoveredStateId) {
+                    map.setFeatureState(
+                        {source: 'ts', id: hoveredStateId},
+                        {hover: false}
+                    );
+                }
+                hoveredStateId = null;
+            });
+            //code for on click effect
+            map.on('click', 'ts_fills', (e) => {
+            new maplibregl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<b>Energy consumption: </b>' +  Math.round(e.features[0].properties.energy_consumption * 1000)/1000 + ' kWh <br> <b>Property type: </b>' + e.features[0].properties.property_type)           
+                .addTo(map);
+            });
 
-                // Set filter to first month of the year
-                // 0 = January
-                filterBy(0);
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'ts_fills', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
 
-                document
-                    .getElementById('slider')
-                    .addEventListener('input', (e) => {
-                        const month = parseInt(e.target.value, 10);
-                        filterBy(month);
-                    });
-            }
-        );
-    });
-</script>
-</body>
-</html>
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'ts_fills', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+        
+        
+        });
+    </script>
+{% endblock %}

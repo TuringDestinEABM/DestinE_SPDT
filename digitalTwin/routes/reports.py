@@ -20,13 +20,14 @@ def specific_report(ID):
     fig3 = plotting.dailyByWealth(model_ts, wealth_cols)
     fig4 = plotting.temporalHeatMap(hourly)
 
-    return render_template("reportTemplateSimple.html", summaryGIS = findGEOData('placeholder1', "summaryGIS.json"), metadata = metadata, fig1="/reports/20250814_test1/hexbin" , fig2 = fig2, fig3 = fig3, fig4 = fig4, ID=ID)
+    return render_template("reportTemplate.html", metadata = metadata, fig2 = fig2, fig3 = fig3, fig4 = fig4, ID=ID)
+
 
 @bp.route('/reports/<ID>/timeline', methods = ['GET'])
 def specific_report_timeline(ID):
     metadata = findMetadata(ID)
-    steps, timeseries = plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
-    return render_template("reportTemplateTimeline.html", steps = steps, timeseries = timeseries)
+    steps, timeseries, energy_range = plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
+    return render_template("reportTemplateTimeline.html", timeseries = timeseries, energy_range = energy_range, steps = steps)
 
 @bp.route('/reports/<ID>/hexbin')
 def hexbinPlot(ID):

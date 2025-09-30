@@ -7,6 +7,7 @@ def run(form):
     jobID = assignUniqueID(name = form.ScenarioName.data)
     
     metadata, outdir = simMetadata(form, jobID)
+    print(metadata["DataSource"])
     energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
     # analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
 
