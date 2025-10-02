@@ -28,9 +28,11 @@ This file structure is temporary and is likely to change as the project evolves.
 
 ## Debug version
 
+First comment out the relevant section of __init__.py
+
 1. Virtual environment 
 
-```python3 -m venv .env ```
+```python -m venv .env ```
 
 
 ```.env\Scripts\activate ```

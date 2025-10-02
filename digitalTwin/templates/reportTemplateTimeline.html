@@ -1,0 +1,182 @@
+<!-- A dummy page for testing GIS functionality, delete before roll out -->
+
+{% extends 'base.html' %}
+
+{% block head %}
+     {{ super() }}
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
+{% endblock %}
+
+{% block content %}
+<style>
+    .maplibregl-popup {
+        max-width: 400px;
+        font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    }
+
+    .map-overlay {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        position: absolute;
+        width: 25%;
+        top: 100px;
+        left: 100px;
+        padding: 10px;
+    }
+
+    .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .map-overlay .legend .bar {
+        height: 10px;
+        width: 100%;
+        background: linear-gradient(to right, rgba(46,111,142), rgb(189,223,38));
+    }
+
+    .map-overlay input {
+        background-color: transparent;
+        display: inline-block;
+        width: 100%;
+        position: relative;
+        margin: 0;
+        cursor: ew-resize;
+    }
+</style>
+<div class="container" style="height: 89vh">
+    <div id="map" style="height: 100%"></div>
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <b>Timestep</b>
+            <label id="step" for="slider"></label>
+            <input id="slider" type="range" min={{steps.min}} max={{steps.max}} step="1" value="0" />
+            <div class="map-overlay-inner">
+                <div id="legend" class="legend">
+                    <div class="bar"></div>
+                    <div>Energy usage (kWh)</div>
+                </div>
+            </div>
+        </div> 
+    </div> 
+    
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        
+        const map = new maplibregl.Map({
+            container: 'map',
+            style:
+                'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
+            center: [-1.65260,55.01802],
+            zoom: 15
+        });
+
+        let hoveredStateId = null; // hoverstate for mouseover
+
+        const steplist = {{steps.steps|safe}};
+
+        // For the slider filter
+        function filterBy(step) {
+            const filters = ['==', 'Step', step];
+            map.setFilter('ts_fills', filters);
+
+            // Set the label to the month
+            document.getElementById('step').textContent = steplist[step];
+        }
+        
+        map.on('load', () => {      
+            map.addSource('ts', {
+                'type': 'geojson',
+                'data': {{timeseries|safe}}
+            });     
+            map.addLayer({
+                'id': 'ts_fills',
+                'type': 'fill',
+                'source': 'ts',
+                'layout': {},
+                'paint': {
+                    'fill-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'energy_consumption'],
+                        {{energy_range.min}},
+                        'rgba(46,111,142)',
+                        {{energy_range.max}},
+                        'rgb(189,223,38)'
+                    ],
+                    'fill-opacity': [
+                        'case',
+                        ['boolean', ['feature-state', 'hover'], false],
+                        1,
+                        0.5
+                    ]
+                }
+            });             
+            
+            // For the slider filter
+            filterBy(1);
+
+            document
+                .getElementById('slider')
+                .addEventListener('input', (e) => {
+                    const step = parseInt(e.target.value, 10);
+                    filterBy(step);
+                });
+
+            // Code for hover over effect
+            map.on('mousemove', 'ts_fills', (e) => {
+                if (e.features.length > 0) {
+                    if (hoveredStateId) {
+                        map.setFeatureState(
+                            {source: 'ts', id: hoveredStateId},
+                            {hover: false}
+                        );
+                    }
+                    hoveredStateId = e.features[0].id;
+                    map.setFeatureState(
+                        {source: 'ts', id: hoveredStateId},
+                        {hover: true}
+                    );
+                }
+            });
+
+            // When the mouse leaves the state-fill layer, update the feature state of the
+            // previously hovered feature.
+            map.on('mouseleave', 'ts_fills', () => {
+                if (hoveredStateId) {
+                    map.setFeatureState(
+                        {source: 'ts', id: hoveredStateId},
+                        {hover: false}
+                    );
+                }
+                hoveredStateId = null;
+            });
+            //code for on click effect
+            map.on('click', 'ts_fills', (e) => {
+            new maplibregl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<b>Energy consumption: </b>' +  Math.round(e.features[0].properties.energy_consumption * 1000)/1000 + ' kWh <br> <b>Property type: </b>' + e.features[0].properties.property_type)           
+                .addTo(map);
+            });
+
+        // Change the cursor to a pointer when the mouse is over the states layer.
+        map.on('mouseenter', 'ts_fills', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        // Change it back to a pointer when it leaves.
+        map.on('mouseleave', 'ts_fills', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+        
+        
+        });
+    </script>
+{% endblock %}
