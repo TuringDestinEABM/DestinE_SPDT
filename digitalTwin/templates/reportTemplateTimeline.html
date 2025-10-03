@@ -1,9 +1,10 @@
-<!-- A dummy page for testing GIS functionality, delete before roll out -->
+<!-- Detailed timeline for a report -->
 
 {% extends 'base.html' %}
 
 {% block head %}
-     {{ super() }}
+    {{ super() }}
+    <!-- Scripts for maplibre GIS functionality -->
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
     <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
 {% endblock %}
@@ -15,30 +16,23 @@
         font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     }
 
-    .map-overlay {
-        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    /* Overlay for slider */
+    .map-overlay-slider {
+        background-color:  rgba(255, 255, 255, 0.6);
+        font: 14px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
         position: absolute;
         width: 25%;
-        top: 100px;
-        left: 100px;
-        padding: 10px;
+        min-width: 150px;
+        top:  5px;
+        left: 10px;
     }
 
-    .map-overlay .map-overlay-inner {
-        background-color: #fff;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        border-radius: 3px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-
-    .map-overlay .legend .bar {
-        height: 10px;
+    .map-overlay-slider .map-overlay-inner {
+        background-color:  transparent;
         width: 100%;
-        background: linear-gradient(to right, rgba(46,111,142), rgb(189,223,38));
+        padding: 10px;
     }
-
-    .map-overlay input {
+    .map-overlay-slider input {
         background-color: transparent;
         display: inline-block;
         width: 100%;
@@ -46,61 +40,128 @@
         margin: 0;
         cursor: ew-resize;
     }
-</style>
-<div class="container" style="height: 89vh">
-    <div id="map" style="height: 100%"></div>
-    <div class="map-overlay top">
-        <div class="map-overlay-inner">
-            <b>Timestep</b>
-            <label id="step" for="slider"></label>
-            <input id="slider" type="range" min={{steps.min}} max={{steps.max}} step="1" value="0" />
-            <div class="map-overlay-inner">
-                <div id="legend" class="legend">
-                    <div class="bar"></div>
-                    <div>Energy usage (kWh)</div>
-                </div>
-            </div>
-        </div> 
-    </div> 
     
+    /* Overlay for colorbar */
+    .map-overlay-colorbar {
+        background-color:  transparent;
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        position: absolute;
+        width: 180px;
+        top: 50px;
+        right: 15px;
+        padding: 5px;
+    }
+
+    /* The color bar itself */
+    .map-overlay-colorbar .colorbar .bar {
+        float: right;
+        height: 151px;
+        width: 20px;
+        position: relative;
+        top:11px;
+        /* left: 105px; */
+        background: linear-gradient(rgba(46,111,142), rgb(189,223,38));
+        border-style: solid
+    }
+
+    /* box for the labels */
+    /* TODO: make this less janky */
+
+    .map-overlay-colorbar .labels{
+        font: 9px/10px;
+        text-align: right;
+        height: 230px;
+        width: 5em;
+        display: inline-block;
+        position: relative;
+        left: 75px;
+        background: transparent;
+        overflow: hidden;
+    }
+
+
+</style>
+
+<!-- TODO: make this more responsive -->
+<div class="container-xxl position-relative" style="height: 90vh">
+    <!-- shows the basic map -->
+    <div id="map" style="height: 100%"></div> 
+    
+       <!-- shows the slider overlay-->
+        <div class="map-overlay-slider">
+            <div class="map-overlay-inner">
+                <b>Timestep: </b>
+                <label id="step" for="slider"></label>
+                <input id="slider" type="range" min={{steps.min}} max={{steps.max}} step="1" value="0" />
+            </div>
+        </div>
+
+        <!-- shows the colorbar overlay-->
+        <div class="map-overlay-colorbar">
+            <div><b>Energy usage (kWh)</b></div>
+            <div id="colorbar" class="colorbar">
+                    <div id="labels" class="labels">
+                        <b>{{energy_range.max}} </b> 
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <b>{{energy_range.min}}</b> 
+                    </div>
+                    <div class="bar"></div>
+            </div>
+            
+        </div>
+            
+               
 </div>
 {% endblock %}
 
 {% block scripts %}
     <script>
-        
+        // Script for base map
         const map = new maplibregl.Map({
             container: 'map',
             style:
                 'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-            center: [-1.65260,55.01802],
+            center: [-1.65260, 55.01802], //TODO: make this depend on centre of geojson data
             zoom: 15
         });
 
         let hoveredStateId = null; // hoverstate for mouseover
 
-        const steplist = {{steps.steps|safe}};
+        const steplist = {{steps.steps|safe}}; // loads in an array containing each step
 
         // For the slider filter
         function filterBy(step) {
             const filters = ['==', 'Step', step];
             map.setFilter('ts_fills', filters);
 
-            // Set the label to the month
+            // Set the label to the step number
             document.getElementById('step').textContent = steplist[step];
         }
         
+        // loads in the data
         map.on('load', () => {      
+            // loads in the saved timeseries data in geojson format
             map.addSource('ts', {
                 'type': 'geojson',
                 'data': {{timeseries|safe}}
             });     
+
+            // overlays the timestep data on the basemap
             map.addLayer({
                 'id': 'ts_fills',
                 'type': 'fill',
                 'source': 'ts',
                 'layout': {},
                 'paint': {
+                    // fill color depends on value of energy consumption
+                    // RGB values based on viridis colorscheme
+                    // TODO: allow other schemes to be selected
                     'fill-color': [
                         'interpolate',
                         ['linear'],
@@ -110,6 +171,7 @@
                         {{energy_range.max}},
                         'rgb(189,223,38)'
                     ],
+                    // makes the elements 50% transparent unless mouse is over top
                     'fill-opacity': [
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
@@ -157,7 +219,8 @@
                 }
                 hoveredStateId = null;
             });
-            //code for on click effect
+
+            //On click effect, brings up a pop up containing information about point 
             map.on('click', 'ts_fills', (e) => {
             new maplibregl.Popup()
                 .setLngLat(e.lngLat)
@@ -165,18 +228,16 @@
                 .addTo(map);
             });
 
-        // Change the cursor to a pointer when the mouse is over the states layer.
-        map.on('mouseenter', 'ts_fills', () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
+            // Change the cursor to a pointer when the mouse is over the states layer.
+            map.on('mouseenter', 'ts_fills', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
 
-        // Change it back to a pointer when it leaves.
-        map.on('mouseleave', 'ts_fills', () => {
-            map.getCanvas().style.cursor = '';
-        });
-
-        
-        
+            // Change it back to a pointer when it leaves.
+            map.on('mouseleave', 'ts_fills', () => {
+                map.getCanvas().style.cursor = '';
+            });
         });
     </script>
+    
 {% endblock %}

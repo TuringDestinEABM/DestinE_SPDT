@@ -2,6 +2,20 @@
 This __init__.py can create global functions that can be called by any modules. Things to investigate include bootstrap js/html for global 
 front-end functions, class definitions, and various "app" related functions/variables.
 """
+### Non-docker version for development
+from flask_bootstrap import Bootstrap5
+from flask import Flask
+
+def create_app(test_config = None):
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'secretkey'
+    bootstrap = Bootstrap5(app)
+
+    from . import digitaltwin
+    app.register_blueprint(digitaltwin.bp)
+
+    return app
+
 # from celery import Celery, Task
 # from flask_bootstrap import Bootstrap5
 # from flask import Flask
@@ -39,16 +53,4 @@ front-end functions, class definitions, and various "app" related functions/vari
 #     app.extensions["celery"] = celery_app
 #     return celery_app
 
-### Non-docker version for development
-from flask_bootstrap import Bootstrap5
-from flask import Flask
 
-def create_app(test_config = None):
-    app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'secretkey'
-    bootstrap = Bootstrap5(app)
-
-    from . import digitaltwin
-    app.register_blueprint(digitaltwin.bp)
-
-    return app

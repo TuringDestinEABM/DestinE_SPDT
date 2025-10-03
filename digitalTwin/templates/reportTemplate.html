@@ -1,13 +1,17 @@
+<!-- A template for specific reports. Loads in data then shows summary statistics and links to detailed map  -->
 {% extends 'base.html' %}
 
 {% block head %}
      {{ super() }}
+     <!-- script for plotly figures -->
      <script src='https://cdn.plot.ly/plotly-3.1.0.min.js' charset='utf-8'></script>    
 {% endblock %}
 
 {% block content %}
-<!-- Tabs -->
+<h3>Summary report</h3>
 <br>
+
+<!-- Summary data -->
 <div class="card shadow-md bg-body rounded border bg-light">
     <div class="card-header"><h6>Summary information</h6></div>
     <div class="row align-items-start">
@@ -27,15 +31,18 @@
   <a href='/reports/{{ID}}/timeline'> View detailed timeline</a>
 </div>
 
+<!-- Tabs for summary figures -->
 <div class="container my-5">
   <br>
   <ul class="nav nav-tabs justify-content-center" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="propType-tab" data-bs-toggle="tab" data-bs-target="#propType" type="button" role="tab" aria-controls="propType" aria-selected="true">Average by Property Type</button>
     </li>
+
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="wealth-tab" data-bs-toggle="tab" data-bs-target="#wealth" type="button" role="tab" aria-controls="wealth" aria-selected="false">Average by Wealth Group</button>
     </li>
+    
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#heatmap" type="button" role="tab" aria-controls="heatmap" aria-selected="false">Heatmap</button>
     </li>
