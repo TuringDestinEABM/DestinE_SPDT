@@ -185,7 +185,7 @@ The datasets are `geojson` feature collections containing the following properti
 - `main_heating_system` Type of main heating controls
 - `sap_band_ord` ??
 - `retrofit_envelope_score`: ??
-- `is_off_gas` logical corresponding to whether the propert is (1) or isn't (1) off gas
+- `is_off_gas` logical corresponding to whether the propert is (1) or isn't (0) off gas
 - `energy_demand_kwh` ??
 - `factor` ??
 - `energy_cal_kwh` ??
