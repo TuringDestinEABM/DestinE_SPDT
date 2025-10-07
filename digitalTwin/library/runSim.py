@@ -1,16 +1,18 @@
-from ..modelling import energyABM, analyze
+'''Scripts which deal with running the simulations, as well as storing the data and metadata. Takes results from CreateScenarioForm, creates a folder and metadata dict and runs the ABM model.
+
+This functionality to be replaced with databasing in the deployment version'''
+
+from ..modelling import energyABM
 import datetime, json
 from pathlib import Path
-from flask import url_for
 
+'''main script'''
 def run(form):
-    jobID = assignUniqueID(name = form.ScenarioName.data)
+    jobID = assignUniqueID(name = form.ScenarioName.data) 
     
     metadata, outdir = simMetadata(form, jobID)
-    print(metadata["DataSource"])
     energyABM.run(metadata["DataSource"], metadata["Days"], outdir)
-    # analyze.analyze(metadata["DataSource"], outdir, jitterRadius=25, map =True)
-
+    
     file = outdir / "metadata.json"
     try:
         with open(file, 'w') as f:
@@ -22,6 +24,7 @@ def run(form):
 
     return jobID, outdir
 
+'''Creates a dictionary containing the metadata describing the data'''
 def simMetadata(form, jobID):
 
     now = datetime.datetime.now()
@@ -29,6 +32,7 @@ def simMetadata(form, jobID):
 
     metadata={
         "id": str(jobID),
+        "name": str(form.ScenarioName.data),
         "Days": int(form.Days.data),
         "DataSource": form.DataSource.data,
         "JobSubmitted": str(now),
@@ -38,6 +42,8 @@ def simMetadata(form, jobID):
 
     return metadata, outdir
 
+'''Assigns a unique ID containing the submission date and job name
+TODO: actually ensure uniqueness'''
 def assignUniqueID(name):
     date = datetime.datetime.now()
     date = date.strftime("%Y%m%d")
@@ -47,12 +53,14 @@ def assignUniqueID(name):
     jobID = date + "_" + name
     return jobID
 
+'''Creates a folder for the results (temporary solution until databasing implemented)'''
 def makeOutdir(jobID):
     outdir = Path(__file__).parents[1] /"data/geo_data/results" / str(jobID)
     outdir.mkdir(exist_ok=True)
     return outdir
 
+'''Get the user's login'''
 def getUserName():
     # TODO: revisit when login functionality sorted
-    username = "Stacy Fakename"
+    username = "<username>"
     return username

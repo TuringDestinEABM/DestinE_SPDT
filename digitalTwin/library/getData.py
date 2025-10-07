@@ -1,3 +1,4 @@
+'''Helper scripts for loading in different data'''
 import json
 
 def loadJSONdata(filepath):

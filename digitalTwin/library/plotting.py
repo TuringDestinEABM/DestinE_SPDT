@@ -1,65 +1,64 @@
+'''Scripts for creating figures and visual elements, including plotly and maplibre GIS
+
+Figures are returned aas json dumps of plotly fig objects. GIS information returned in geoJSON format, with helper information as dicts.
+
+'''
+
 from ..modelling import analyze
 from pathlib import Path
-import geopandas as gpd
 import pandas as pd
-import plotly.figure_factory as ff
 import plotly.express as px
-import plotly.graph_objects as go
 import plotly
-import matplotlib.pyplot as plt
 import json
-import contextily as cx  
 
-
-import datetime
-import numpy as np
-np.random.seed(1)
-
-
+# generic script to prepare the data for each of the figures
 def prepare_data(sourceData, outdir, jitterRadius=25):
-    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
     outdir = Path(outdir)
 
     hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
     model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
     agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
    
-    hi = analyze.highUsage(dataPath, agent_ts, 25)
+    hi = analyze.highUsage(dataPath, agent_ts, 25) #
     model_ts, prop_cols, wealth_cols= analyze.prepTimeSeries(model_ts)
     return hi, model_ts, prop_cols, wealth_cols, hourly
 
-def spatialHexBin(df):    
-    fig, ax = plt.subplots(figsize=(6, 6))
 
-    hb = ax.hexbin(
-        df.geometry.x, # x cordianates
-        df.geometry.y, # y cordianates
-        C=df["total_energy"], # total enercy, z cord
-        reduce_C_function=sum, 
-        gridsize=40,
-        mincnt=1,
-    )
+# TODO: Fix this
+# # script for spatial hexbin figure
+# def spatialHexBin(df):    
+#     fig, ax = plt.subplots(figsize=(6, 6))
 
-    # ▼  add an OSM/CartoDB background  ▼
-    cx.add_basemap(
-        ax,
-        crs="EPSG:3857",
-        source=cx.providers.CartoDB.Positron,   # light-grey background
-        attribution=False,                      # omit tiny © text
-    )
+#     hb = ax.hexbin(
+#         df.geometry.x, # x cordianates
+#         df.geometry.y, # y cordianates
+#         C=df["total_energy"], # total enercy, z cord
+#         reduce_C_function=sum, 
+#         gridsize=40,
+#         mincnt=1,
+#     )
 
-    ax.set_axis_off()
-    fig.colorbar(hb, label="aggregated kWh")
-    ax.set_title("High-usage homes (jittered)")
-    fig.tight_layout()
-    return fig
+#     # ▼  add an OSM/CartoDB background  ▼
+#     cx.add_basemap(
+#         ax,
+#         crs="EPSG:3857",
+#         source=cx.providers.CartoDB.Positron,   # light-grey background
+#         attribution=False,                      # omit tiny © text
+#     )
+
+#     ax.set_axis_off()
+#     fig.colorbar(hb, label="aggregated kWh")
+#     ax.set_title("High-usage homes (jittered)")
+#     fig.tight_layout()
+#     return fig
     
-
+# script for bar chart showing mean energy usage by different property types.
 def dailyByPropTypePX(timeseries, prop_cols):
     daily_type = timeseries.groupby("day")[prop_cols].sum()
     mean_daily_type = daily_type.mean().sort_values(ascending=False)
 
-    ## Todo remove zero values
+    ## TODO: remove zero values
     fig = px.bar(mean_daily_type, 
                  labels = {"index":"Property Type",
                         "value":"avg kWh / day"},
@@ -69,6 +68,8 @@ def dailyByPropTypePX(timeseries, prop_cols):
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return figJSON
 
+
+# script for bar chart showing mean energy usage by different wealth groups.
 def dailyByWealth(timeseries, wealth_cols):
     daily_w = timeseries.groupby("day")[wealth_cols].sum()
     avg_w   = daily_w.mean().loc[wealth_cols]    # preserve ordering
@@ -86,6 +87,7 @@ def dailyByWealth(timeseries, wealth_cols):
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return figJSON
 
+# Heatmap showing total energy usage by day and hour.
 def temporalHeatMap(timeseries):
 
     pivot = timeseries.pivot_table(
@@ -102,20 +104,21 @@ def temporalHeatMap(timeseries):
     figJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return figJSON
 
-##
+# Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
 def timeline(sourceData, outdir):
-    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
     outdir = Path(outdir)
-    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
     
+    # combine agent data and energy usage timeseries into a single dataframe
+    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
     timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
     
-    # Get min and max data usage
+    # Get min and max data usage to help define colors in the maplibre GIS
     ec = timeseries['energy_consumption'] 
-    energy_range = {"min":ec.min(), 
-                    "max": ec.max()
+    energy_range = {"min":round(ec.min(),3), 
+                    "max": round(ec.max(),3)
                     }
 
     # create list of number of steps                
@@ -128,5 +131,7 @@ def timeline(sourceData, outdir):
        "max": max(stepArray),
        "steps": stepArray
     }
+
+    
   
     return steps, timeseries_js, energy_range

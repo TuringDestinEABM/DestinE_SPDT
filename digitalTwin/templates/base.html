@@ -1,4 +1,4 @@
-<!-- {% from 'bootstrap5/nav.html' import render_nav_item %}-->
+<!-- base template, creates global style for web pages-->
 <!doctype html>
 <html lang="en">
 
@@ -31,25 +31,20 @@
     {% endblock %}
 </head>
 
-<body class="d-flex flex-column vh-100">
-    {% include "_navbar.html" %}
-
-    <!--</section>-->
-
-
+<div class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
+    <!-- Navigation bar -->
+    {% include "_navbar.html" %} 
 
     <!-- Containers for main page content -->
-
-    <section class="container-fluid flex-fill" id="main-content">
+     <main role="main" class="flex-grow-1 overflow-auto">
         <div class="container">
             <!-- Each page content -->
             {% block content %}
             {% endblock %}
         </div>
-    </section>
-
+    </main>
     <!-- footer -->
-    <footer class="text-center bg-body-tertiary">
+    <footer class="container-fluid py-4 flex-grow-0 flex-shrink-1 bg-body-tertiary">
     {% include "_footer.html" %}   
     </footer>
     {% block scripts %}
@@ -61,5 +56,4 @@
         crossorigin="anonymous"></script>
     {% endblock %}
 </body>
-
 </html>

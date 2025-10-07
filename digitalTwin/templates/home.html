@@ -1,15 +1,19 @@
+<!-- Home page -->
 {% extends 'base.html' %}
 
 {% block content %}
 
 <br>
 
+<!-- New scenario card -->
 <div class="card shadow-md bg-body rounded border bg-light">
-    <div class="card-header"><h6>New Scenario</h6></div>
+    <div class="card-header"><h5>New Scenario</h5></div>
 
+    
     <div class="row justify-content-around p-3">
+        <!-- Create a new scenario from scratch -->
         <div class="col-3">
-            <div class="card" style="width: 18rem;" >
+            <div class="card text-center" style="width: 18rem;" >
                 <div class="card-header"><b>Create</b></div>
                 <a href="/createscenario" data-toggle="tooltip">
                 <img class="center-block" src="{{ url_for('static', filename='img/create_new.png') }}" class="card-img-top" alt="create new" style="width:80%">
@@ -17,49 +21,52 @@
             </div>
         </div>
 
+        <!-- Load from template -->
         <div class="col-3">
-            <button class="card" style="width: 18rem;"  data-bs-toggle="modal" data-bs-target="#selectTemplate">
+            <button class="card text-center" style="width: 18rem;"  data-bs-toggle="modal" data-bs-target="#selectTemplate">
                     <div class="card-header"><b>Load from Template</b></div>
                     <img class="center-block" src="{{ url_for('static', filename='img/load.png') }}" class="card-img-top" alt="create new" style="width:80%">
             </button>
-            <div class="modal fade" id="selectTemplate" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Select Template</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="example1" id="example1">
-                        <label class="form-check-label" for="flexRadioDefault1">
-                           Example 1
-                        </label>
+
+            <!-- Modal to select templates -->
+            <div class="modal fade" id="selectTemplate" tabindex="-1" aria-labelledby="selectTemplate" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="selectTemplate">Select Template</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="form-check">
-                        <input class="form-check-input" type="radio" name="example2" id="example2">
-                        <label class="form-check-label" for="flexRadioDefault1">
-                           Example2
-                        </label>
+
+                        <div class="modal-body">
+                    <!-- Warn that this isn't functional yet -->
+                    <!-- TODO: make functional then remove this warning -->
+                            <div class="alert alert-warning" role="alert">This feature has not yet been implemented. You will be rerouted to '/createscenario'.</div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="example1" id="example1">
+                                <label class="form-check-label" for="flexRadioDefault1">Example 1</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="example2" id="example2">
+                                <label class="form-check-label" for="flexRadioDefault1">Example2</label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <a class="btn btn-primary" href="/createscenario" role="button">Create</a>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <a class="btn btn-primary" href="/createscenario" role="button">Create</a>
-                </div>
+
+            </div>
         </div>
     </div>
 </div>
-        </div>
-    </div>
-</div>
-
 <br>
 <br>
 
+<!-- Table for loading reports -->
 {% include "_reports.html" %}
-
-
 
 <!-- scripts used on this page-->
 {% block javascript %}

@@ -1,9 +1,9 @@
+<!-- Page for creating a new scenario -->
 {% extends 'base.html' %}
 
 {% block content %}
 <h3>New Scenario</h3>
-
-
+<div class="alert alert-warning" role="alert"><b>Warning:</b> <br>Distributed task queuing is not implemented in the development version of the digital twin. The simulation takes a long time to run. We recommend using reduced datasets (e.g. '..._div100', which contains 1 % of the points from the main dataset) and short runs ( less than 10 days). </div>
     <form action='' method="post">
         {{ form.hidden_tag() }}
         <p>
