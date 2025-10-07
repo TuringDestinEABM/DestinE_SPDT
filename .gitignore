@@ -1,5 +1,4 @@
-# Unlicensed data
-digitalTwin/data/ncc_data
+
 
 #Files for production version
 ForProduction/
@@ -8,4 +7,7 @@ ForProduction/
 .env/
 *cache
 digitalTwin/data/geo_data/results/
-digitalTwin/data/synthetic_data/
+!digitalTwin/data/geo_data/results/.gitkeep
+
+digitalTwin/data/synthetic_data/*
+!digitalTwin/data/synthetic_data/.gitkeep

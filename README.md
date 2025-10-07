@@ -20,29 +20,33 @@ This web app is built using flask to give users an accessible way to run the MAB
 │   │   └───synthetic_data/                        # Synthetic source data
 |   |   
 │   ├───library/                                  # Python scripts for the flask web app
-│   │   └───forms.py                              # wtforms webforms
-│   │   └───getData.py                            # Scripts for collecting different file types into the web app
-│   │   └───plotting.py                           # Plotting and GIS
+│   │   ├───forms.py                              # wtforms webforms
+│   │   ├───getData.py                            # Scripts for collecting different file types into the web app
+│   │   ├───plotting.py                           # Plotting and GIS
 │   │   └───model.py                              # Call the MABM and saves the data
 |   |   
 │   ├───modelling/
-│   │   └───agent.py                              # HouseholdAgent & PersonAgent
-│   │   └───analyze.py                            # Post-run plots & maps
-│   │   └───energyABM.py                          # Main ABM script
+│   │   ├───agent.py                              # HouseholdAgent & PersonAgent
+│   │   ├───analyze.py                            # Post-run plots & maps
+│   │   ├───energyABM.py                          # Main ABM script
 │   │   └───model.py                              # EnergyModel (ABM core)
 |   |   
 │   ├───routes/                                   # Flask routes for web app pages
 |   |   
 │   ├───static/                                   # Static files
-│   │   ├───img/                                  # Images
-│   │   │   ├───logos/                            # Logos
-│   │   │   └───map_icons/                        # map icons
+│   │   └───img/                                  # Images
+│   │       ├───logos/                            # Logos
+│   │       └───map_icons/                        # map icons
 |   |   
 │   ├───templates/                                # HTML templates for the web app pages
 |   | 
 │   ├───__init.py__                               # Initialisation
 |   | 
-│   ├───digitalTwin.py                            # Main flask script
+│   └───digitalTwin.py                            # Main flask script
+├───README.md
+└───requirements.txt
+
+
 ```
 
 ## Initial set up (windows)
@@ -53,21 +57,52 @@ or use
 
 ```git clone https://github.com/TuringDestinEABM/DestinE_SPDT```
 
-2. Create a virtual environment in the same folder as the code
+2. Unzip the two folders from `ZippedData/`. Move the contents of `results.zip` into `digitalTwin/data/geodata/results/` and the contents of `synthetic_data.zip` into `digitalTwin/data/synthetic_data`. The resulting local file structure should be this
+```
+├───digitalTwin/                                  
+│   └───data/
+│       ├───geo_data/                                        
+│       │   ├───results/
+|       │   │   ├───20251007_example/
+|       │   │   │   ├───agent_timeseries.parquet
+|       │   │   │   ├───energy_timeseries.csv
+|       │   │   │   ├───metadata.json
+|       │   │   │   └───model_timeseries.parquet
+|       │   │   └───20251007_example3/
+|       │   │       ├───agent_timeseries.parquet
+|       │   │       ├───energy_timeseries.csv
+|       │   │       ├───metadata.json
+|       │   │       └───model_timeseries.parquet
+|       │   └───.gitkeep 
+│       └───synthetic_data/  
+|           ├───.gitkeep  
+|           ├───epc_abm_newcastle_div10.geojson
+|           ├───epc_abm_newcastle_div50.geojson
+|           ├───epc_abm_newcastle_div100.geojson
+|           ├───epc_abm_newcastle.geojson
+|           ├───epc_abm_sunderland_div10.geojson
+|           ├───epc_abm_sunderland_div50.geojson
+|           ├───epc_abm_sunderland_div100.geojson
+|           └───epc_abm_sunderland.geojson
+...
+```
+
+
+3. Create a virtual environment in the same folder as the code
 
 ```python -m venv .env ```
 
 
 ```.env\Scripts\activate ```
 
-3. Install dependencies
+4. Install dependencies
 
 ```python.exe -m pip install --upgrade pip```
  
 ```pip install -r requirements.txt```
 
 
-4. Run flask
+5. Run flask
 
 ```set FLASK_APP=digitalTwin.py```
 
