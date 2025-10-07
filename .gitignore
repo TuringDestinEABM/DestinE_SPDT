@@ -7,5 +7,6 @@ ForProduction/
 #local only files
 .env/
 *cache
-digitalTwin/data/geo_data/results/
+digitalTwin/data/geo_data/results/*
 digitalTwin/data/synthetic_data/
+!*.gitkeep
