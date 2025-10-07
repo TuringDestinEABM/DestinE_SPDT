@@ -1,5 +1,5 @@
 #Files for production version
-# ForProduction/*
+ForProduction/*
 
 #local only files
 .env/
