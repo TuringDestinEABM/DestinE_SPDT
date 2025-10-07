@@ -98,7 +98,7 @@
 
         <!-- shows the colorbar overlay-->
         <div class="map-overlay-colorbar">
-            <div><b>Energy usage (kWh)</b></div>
+            <p class="text-end"><b>Energy usage (kWh)</b></p>
             <div id="colorbar" class="colorbar">
                     <div id="labels" class="labels">
                         <b>{{energy_range.max}} </b> 
@@ -128,7 +128,7 @@
             style:
                 'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
             center: [-1.65260, 55.01802], //TODO: make this depend on centre of geojson data
-            zoom: 15
+            zoom: 11
         });
 
         let hoveredStateId = null; // hoverstate for mouseover
@@ -138,10 +138,10 @@
         // For the slider filter
         function filterBy(step) {
             const filters = ['==', 'Step', step];
-            map.setFilter('ts_fills', filters);
+            map.setFilter('ts_circs', filters);
 
             // Set the label to the step number
-            document.getElementById('step').textContent = steplist[step];
+            document.getElementById('step').textContent = steplist[step] - 1;
         }
         
         // loads in the data
@@ -153,16 +153,19 @@
             });     
 
             // overlays the timestep data on the basemap
+
             map.addLayer({
-                'id': 'ts_fills',
-                'type': 'fill',
-                'source': 'ts',
-                'layout': {},
-                'paint': {
+            // 'id': 'ts_circs',
+            'id': 'ts_circs',
+            // 'type': 'fill',
+            'type': 'circle',
+            'source': 'ts',
+            'layout': {},
+            'paint': {
                     // fill color depends on value of energy consumption
                     // RGB values based on viridis colorscheme
                     // TODO: allow other schemes to be selected
-                    'fill-color': [
+                    'circle-color': [
                         'interpolate',
                         ['linear'],
                         ['get', 'energy_consumption'],
@@ -171,15 +174,28 @@
                         {{energy_range.max}},
                         'rgb(189,223,38)'
                     ],
+                    'circle-stroke-color': [
+                        'interpolate',
+                        ['linear'],
+                        ['get', 'energy_consumption'],
+                        {{energy_range.min}},
+                        'rgba(46,111,142)',
+                        {{energy_range.max}},
+                        'rgb(189,223,38)'
+                    ],
+                    'circle-stroke-width': 3,
+                    // 'circle-color': 'rgb(189,223,38)',
+
                     // makes the elements 50% transparent unless mouse is over top
-                    'fill-opacity': [
+                    'circle-opacity': [
                         'case',
                         ['boolean', ['feature-state', 'hover'], false],
                         1,
-                        0.5
+                        0.7
                     ]
+
                 }
-            });             
+            });   
             
             // For the slider filter
             filterBy(1);
@@ -192,7 +208,7 @@
                 });
 
             // Code for hover over effect
-            map.on('mousemove', 'ts_fills', (e) => {
+            map.on('mousemove', 'ts_circs', (e) => {
                 if (e.features.length > 0) {
                     if (hoveredStateId) {
                         map.setFeatureState(
@@ -210,7 +226,7 @@
 
             // When the mouse leaves the state-fill layer, update the feature state of the
             // previously hovered feature.
-            map.on('mouseleave', 'ts_fills', () => {
+            map.on('mouseleave', 'ts_circs', () => {
                 if (hoveredStateId) {
                     map.setFeatureState(
                         {source: 'ts', id: hoveredStateId},
@@ -221,7 +237,7 @@
             });
 
             //On click effect, brings up a pop up containing information about point 
-            map.on('click', 'ts_fills', (e) => {
+            map.on('click', 'ts_circs', (e) => {
             new maplibregl.Popup()
                 .setLngLat(e.lngLat)
                 .setHTML('<b>Energy consumption: </b>' +  Math.round(e.features[0].properties.energy_consumption * 1000)/1000 + ' kWh <br> <b>Property type: </b>' + e.features[0].properties.property_type)           
@@ -229,12 +245,12 @@
             });
 
             // Change the cursor to a pointer when the mouse is over the states layer.
-            map.on('mouseenter', 'ts_fills', () => {
+            map.on('mouseenter', 'ts_circs', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves.
-            map.on('mouseleave', 'ts_fills', () => {
+            map.on('mouseleave', 'ts_circs', () => {
                 map.getCanvas().style.cursor = '';
             });
         });

@@ -1,0 +1,13 @@
+# Unlicensed data
+digitalTwin/data/ncc_data
+
+#Files for production version
+ForProduction/
+
+#local only files
+.env/
+*cache
+digitalTwin/data/geo_data/results/
+digitalTwin/data/synthetic_data/
+!digitalTwin/data/geo_data/results/example1
+!digitalTwin/data/geo_data/results/example3

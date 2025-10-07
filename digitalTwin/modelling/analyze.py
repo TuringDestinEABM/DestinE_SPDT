@@ -3,17 +3,11 @@
 analyze.py
 ==========
 
-Offline post-processing of a Household-Energy ABM run.
-
-Inputs (produced by *run.py* in the same ``--outdir``):
+Inputs
 
 * ``energy_timeseries.csv``          – hourly model totals
 * ``model_timeseries.parquet``       – DataCollector (model-level)
 * ``agent_timeseries.parquet``       – DataCollector (agent-level)
-
-Optional static file:
-
-* ``--geojson`` (required)           – building footprints with *fid* + geometry
 
 Outputs (written next to the inputs):
 
@@ -29,7 +23,6 @@ Usage::
 """
 
 # ───────────────────────── imports ──────────────────────────────
-import argparse
 import random
 from pathlib import Path
 
@@ -37,23 +30,9 @@ import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
-import pickle
 from shapely.geometry import Point
 import contextily as cx  
 
-# ────────────────────── CLI parser helper ───────────────────────
-# def parse_args() -> argparse.Namespace:
-#     """Return parsed command-line arguments."""
-#     p = argparse.ArgumentParser(description="Make plots + Leaflet map from ABM outputs")
-#     p.add_argument("--outdir", default=".",
-#                    help="Folder containing energy_timeseries.csv etc. (default: .)")
-#     p.add_argument("--geojson", required=True,
-#                    help="Neighbourhood GeoJSON used by the ABM (required)")
-#     p.add_argument("--jitter", type=float, default=25,
-#                    help="Privacy jitter radius in metres (default: 25)")
-#     p.add_argument("--no-map", action="store_true",
-#                    help="Skip generating high_usage_map.html")
-#     return p.parse_args()
 
 # ────────────────────── geometry helpers ────────────────────────
 def jitter(geom, r: float) -> Point:
@@ -85,10 +64,10 @@ def allUsage_ts(sourceData, timeseries, jitterRadius):
         (timeseries["energy_consumption"] > 0)
     ]
 
-    geom = gpd.read_file(sourceData)[["fid", "geometry", "property_type"]]
-    geom["fid"] = geom["fid"].astype(str)      # unify dtype with totals
+    geom = gpd.read_file(sourceData)[["UPRN", "geometry", "property_type"]]
+    geom["UPRN"] = geom["UPRN"].astype(str)      # unify dtype with totals
     ts["agent_id"] = ts["agent_id"].astype(str)
-    ts = geom.rename(columns={"fid": "agent_id"}).merge(ts, on="agent_id")
+    ts = geom.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")
 
     return ts    
 
@@ -106,10 +85,10 @@ def highUsage(sourceData, timeseries, jitterRadius):
                      .rename(columns={"energy_consumption": "total_energy"}))
 
     # c. attach geometry + property_type from GeoJSON
-    gdf = gpd.read_file(sourceData)[["fid", "geometry", "property_type"]]
-    gdf["fid"]         = gdf["fid"].astype(str)      # unify dtype with totals
+    gdf = gpd.read_file(sourceData)[["UPRN", "geometry", "property_type"]]
+    gdf["UPRN"]         = gdf["UPRN"].astype(str)      # unify dtype with totals
     totals["agent_id"] = totals["agent_id"].astype(str)
-    gdf = gdf.rename(columns={"fid": "agent_id"}).merge(totals, on="agent_id")
+    gdf = gdf.rename(columns={"UPRN": "agent_id"}).merge(totals, on="agent_id")
 
     # d. take top quartile (fallback to top-half for tiny samples)
     q75 = gdf["total_energy"].quantile(0.75)

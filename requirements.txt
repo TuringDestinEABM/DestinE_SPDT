@@ -1,44 +1,33 @@
-blinker==1.6.2
-Bootstrap-Flask==2.3.0
-celery[redis]==5.2.7
-click==8.1.6
-colorama==0.4.6
-docker==7.0.0
-dominate==2.8.0
-Flask==2.3.2
-flask-sock==0.6.0
-Flask-WTF==1.2.2
-gunicorn==21.2.0
-h11==0.14.0
-importlib-metadata==6.8.0
-itsdangerous==2.1.2
-Jinja2==3.1.2
-mesa               # Mesa 3.x agent-based modelling framework
-mesa-geo  
-MarkupSafe==2.1.2
-numpy==2.3.2
-packaging==23.1
-pathlib==1.0.1
-cloudpickle 
-redis==4.5.4
-Turbo-Flask==0.8.4
-visitor==0.1.3
-waitress==2.1.2
-Werkzeug==3.1.3
-WTForms==3.0.1
-zipp==3.16.2
-# Required for mesa (check after fineshed merging)
-# --- Core ABM stack ------------------------------------------------
-         # Spatial extensions (GeoSpace, GeoAgent)
-# --- Dashboard / UI -----------------------------------------------
-solara             # Reactive web UI + ipywidgets 8 backend
-# --- Data handling -------------------------------------------------
-pandas                    # tabular analysis + CSV/Parquet I/O
-numpy                     # numerical backbone (pandas + matplotlib depend on it)
-pyarrow                   # fast Parquet read/write for pandas
-# --- Visualisation -------------------------------------------------
-matplotlib                # static plots (line, bar, heat-map)
-folium                    # interactive Leaflet maps
-contextily                # background tiles for hex-bin basemap
-# --- Utility -------------------------------------------------------
-cloudpickle               # serialise full Mesa model objects for replay
+# Flask requirements 
+flask == 3.1.2
+flask-WTF == 1.2.0
+wtforms == 3.2.1
+
+
+# Plotting and front end requirements
+bootstrap-flask == 2.5.0
+contextily == 1.6.2
+markupsafe == 3.0.3 # required for bootstrap
+plotly == 6.3.1
+
+# Filetype and data handling requirements
+geopandas == 1.1.1
+pandas == 2.3.2
+
+
+# Model requirements
+fastparquet == 2024.11.0
+mesa == 3.3.0
+mesa-geo == 0.9.1
+pyarrow == 21.0.0
+shapely == 2.1.2
+
+# Networking requirements
+
+
+
+# Testing requirements
+
+
+
+# Other

@@ -11,9 +11,9 @@ import plotly.express as px
 import plotly
 import json
 
-# generic script to prepare the data for wach o fthe figures
+# generic script to prepare the data for each of the figures
 def prepare_data(sourceData, outdir, jitterRadius=25):
-    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
     outdir = Path(outdir)
 
     hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
@@ -106,7 +106,7 @@ def temporalHeatMap(timeseries):
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
 def timeline(sourceData, outdir):
-    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
     outdir = Path(outdir)
     
     # combine agent data and energy usage timeseries into a single dataframe
@@ -131,5 +131,7 @@ def timeline(sourceData, outdir):
        "max": max(stepArray),
        "steps": stepArray
     }
+
+    
   
     return steps, timeseries_js, energy_range

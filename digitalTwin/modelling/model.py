@@ -58,9 +58,6 @@ class EnergyModel(mesa.Model):
     cumulative_energy: float (Σ over all hours and dwellings)
     """
 
-    # optional: used by Mesa-Geo visualisation if GeoJSON was not supplied
-    geojson_regions: str = "data/ncc_neighborhood.geojson"
-
     # ------------------------------------------------------------------
     #  Construction
     # ------------------------------------------------------------------
@@ -98,7 +95,7 @@ class EnergyModel(mesa.Model):
         # ------------- 1. instantiate households --------------------
         for _, row in gdf.iterrows():
             house = HouseholdAgent(
-                unique_id=row["fid"],
+                unique_id=row["UPRN"],
                 model=self,
                 geometry=row["geometry"],
                 property_type=row.get("property_type", ""),
