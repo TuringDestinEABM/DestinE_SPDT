@@ -1,5 +1,5 @@
 # DestinE_SPDT
-This is the pSublic relase of the development version of the Scenario Planning Digital Twin web app for the [Earth observation-informed agent-based models for scenario planning digital twins](https://www.turing.ac.uk/research/research-projects/earth-observation-informed-agent-based-models-scenario-planning-digital) project. 
+This is the public relase of the development version of the Scenario Planning Digital Twin web app for the [Earth observation-informed agent-based models for scenario planning digital twins](https://www.turing.ac.uk/research/research-projects/earth-observation-informed-agent-based-models-scenario-planning-digital) project. 
 
 > [!WARNING]
 > This is a pre-release development version of the software and does not include all of the planned functionality of the final release.
