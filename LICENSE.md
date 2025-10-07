@@ -32,7 +32,7 @@ use this data under the excemption for non-commercial research.
 
 Use of this data includes the following restrictions:
 
-Copyright and Database Right Information
+### Copyright and Database Right Information
 The Department for Levelling Up, Housing & Communities has published this data in
 order to provide information about the energy performance of buildings. The publication
 of this data is intended to contribute to delivering the Government’s policies to adapt
@@ -44,7 +44,7 @@ Please note that this data contains personal data. If processing falls within th
 General Data Protection Regulation, or the Data Protection Act 2018, you will become a data
 controller and must comply with the data protection legislation.
 
-1.Ordnance Survey and Royal Mail Copyright and Database Right Notice
+### 1.Ordnance Survey and Royal Mail Copyright and Database Right Notice
 This data contains address data (address 1, address 2, address 3, postcode – see [FAQ: Why do
 I need to sign up to use this site?](https://epc.opendatacommunities.org/docs/guidance#faq-why-sign-up)) processed against Ordnance Survey’s AddressBase Premium product,
 which incorporates Royal Mail’s PAF® database (Address Data). The Department for Levelling Up,
@@ -88,7 +88,7 @@ By using address data on this website you will be taken to agree to the terms se
 database right notice. Failure to comply with this copyright and database right notice may lead to Ordnance Survey 
 and/or Royal Mail Group Limited taking legal action against you.
 
-2. Non-Address data
+### 2. Non-Address data
 All data fields other than the address and postcode data (address, address 1, address 2, address 3, postcode)
 available via this website are licensed under the Open Government Licence v3.0, which includes Ordnance Survey
 UPRNs.
