@@ -170,6 +170,9 @@ Clicking on a property will bring up a text box containing information about the
 > [!CAUTION]
 > The main datasets are large and this development version of the web app does not include task queueing or databasing. Running the MABM using the full dataset for many days is slow and can crash your browser; instead use one of the reduced datasets.
 
+> [!WARNING]
+> This documentation is incomplete and will be updated in future releases.
+
 We include two synthetic datasets `epc_abm_newcastle.geojson` and `epc_abm_sunderland.geojson`, representing properties in Newcastle and Sunderland respectively. These datasets are derived from the open [Energy Performance aof Buildings Dataset](https://epc.opendatacommunities.org/)
 
 The datasets are `geojson` feature collections containing the following properties for each feature:
