@@ -122,7 +122,7 @@ and then running flask
 On running flask, you should be presented with a hyperlink to the local port where the SPDT is running. This link should open in your browser. If it doesn't, try copying and pasting it address bar of your browser.
 
 ### Home page
-On opening the SPDT, you should be redircted to the home page. You can access this page at any time by clicking the `Home` button in the navigation bar.
+On opening the SPDT, you should be redirected to the home page. You can access this page at any time by clicking the `Home` button in the navigation bar.
 
 From the home page, you can choose to `Create` a new Scenario or `Load from Template` [currently inactive]. 
 
@@ -173,10 +173,10 @@ Clicking on a property will bring up a text box containing information about the
 > [!WARNING]
 > This documentation is incomplete and will be updated in future releases.
 
-We include two synthetic datasets `epc_abm_newcastle.geojson` and `epc_abm_sunderland.geojson`, representing properties in Newcastle and Sunderland respectively. These datasets are derived from the open [Energy Performance aof Buildings Dataset](https://epc.opendatacommunities.org/)
+We include two synthetic datasets `epc_abm_newcastle.geojson` and `epc_abm_sunderland.geojson`, representing properties in Newcastle and Sunderland respectively. These datasets are derived from the open [Energy Performance af Buildings Dataset](https://epc.opendatacommunities.org/)
 
 The datasets are `geojson` feature collections containing the following properties for each feature:
-- `UPRN` [Unique Property Reference Number](https://www.geoplace.co.uk/addresses-streets/location-data/the-uprn) of the locastion
+- `UPRN` [Unique Property Reference Number](https://www.geoplace.co.uk/addresses-streets/location-data/the-uprn) of the location
 - `lsoa_code` [Lower Layer Super Output Area](https://www.ons.gov.uk/methodology/geography/geographicalproducts/namescodesandlookups/namesandcodeslistings/namesandcodesforsuperoutputareassoa) code for the property
 - `local_authority` Corresponding local authority code
 - `ward_code` Code for the ward corresponding to the feature
@@ -188,7 +188,7 @@ The datasets are `geojson` feature collections containing the following properti
 - `main_heating_system` Type of main heating controls
 - `sap_band_ord` ??
 - `retrofit_envelope_score`: ??
-- `is_off_gas` logical corresponding to whether the propert is (1) or isn't (0) off gas
+- `is_off_gas` logical corresponding to whether the property is (1) or isn't (0) off gas
 - `energy_demand_kwh` ??
 - `factor` ??
 - `energy_cal_kwh` ??
