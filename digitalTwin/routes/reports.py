@@ -3,11 +3,12 @@ from ..library import getData, plotting
 from flask import render_template, url_for, send_file
 import base64
 from io import BytesIO
-# from . import mpl_plots
+from pathlib import Path
 
 @bp.route('/reports', methods = ['GET'])
 def reports():
-    data = getData.listAvailableReports()
+    results_dir = Path(__file__).parents[1] /"data/geo_data/results"
+    data = getData.listAvailableReports(results_dir)
     return render_template("reports.html", data = data)
 
 @bp.route('/reports/<ID>', methods = ['GET'])

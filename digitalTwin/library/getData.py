@@ -34,8 +34,7 @@ def listSummaryFigures(ID):
                    )
     return figures
 
-def listAvailableReports():
-    path = Path(__file__).parents[1] /"data/geo_data/results"
+def listAvailableReports(path):
     folders = [x for x in path.iterdir() if x.is_dir()]
     data = list()
 

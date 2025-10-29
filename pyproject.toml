@@ -1,0 +1,37 @@
+[project]
+name = "DestinE_SPDT"
+description = "The aim of this project is to pioneer the development of a scenario-planning digital twin (SPDT) for the European Space Agency, creating a prototype multi-level agent-based model (MABM) that will simulate energy consumption for residential heating energy use at the household level. For this demonstrator, we use synthetic datasets built based on the UK cities of Newcastle and Sunderland."
+requires-python = ">=3.13.7"
+version = "1.0"
+authors = [
+    {name = "Matt Tipuric", email = "mtipuric@turing.ac.uk"},
+]
+license = {text = "MIT License (additional restrictions on datasets, see license.md)"}
+readme = {file = "README.md", content-type = "text/markdown"}
+
+dependencies = [
+    "flask == 3.1.2",
+    "flask-WTF == 1.2.0",
+    "wtforms == 3.2.1",
+    "bootstrap-flask == 2.5.0",
+    "contextily == 1.6.2",
+    "markupsafe == 3.0.3",
+    "plotly == 6.3.1",
+    "geopandas == 1.1.1",
+    "pandas == 2.3.2",
+    "fastparquet == 2024.11.0",
+    "mesa == 3.3.0",
+    "mesa-geo == 0.9.1",
+    "pyarrow == 21.0.0",
+    "shapely == 2.1.2"
+                ]
+[dependency-groups]
+test = [
+    "pytest == 8.4.2",
+    "pytest-dependency == 0.6.0",
+]
+
+[tool.setuptools]
+py-modules = []
+[tool.pytest.ini_options]
+testpaths = "./tests"

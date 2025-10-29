@@ -5,12 +5,12 @@ from flask import render_template, request, redirect, url_for, flash, abort, ses
 bp = Blueprint('digitaltwin', __name__) # Creates the name of the app
 from .routes import contact, createScenario, data_sources, help, queue, reports, settings, user
 from .library import getData
-import json
 from pathlib import Path
 
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    data = getData.listAvailableReports()
+    results_dir = Path(__file__).parents[0] /"data/geo_data/results"
+    data = getData.listAvailableReports(results_dir)
     return render_template('home.html', data = data)
 
 @bp.route('/')
@@ -20,3 +20,4 @@ def homePage():
 @bp.app_errorhandler(404)
 def page_not_found(error):
     return render_template('page_not_found.html'), 404
+

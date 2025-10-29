@@ -1,3 +1,5 @@
+import pytest
+
 """Test 404"""
 def test_nonexistent_route(client):
     response = client.get('/ThisROuteDoesNoTeXist')
@@ -43,10 +45,11 @@ def test_redirect_slash(client):
     assert len(response.history) == 1
     assert response.request.path == "/home"
 
-# """Test routes with GET requests"""
-# def test_GET_reports(client, dummy_metadata, tmp_metadata):
+# # """Test routes with GET requests"""
+# @pytest.mark.dependency(depends=["library/test_getData.py::test_listAvailableReports"]) #dependency doesnt seem to work session scope
+# def test_GET_reports(client):
 #     response = client.get('/reports')
-#     assert response.data == 
+#     assert len(response.data) == 1
 
 # def test_status_code_report_ID(client):
 #     validResponse = client.get('/report/validID')
