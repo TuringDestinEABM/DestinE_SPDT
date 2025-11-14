@@ -3,6 +3,9 @@ flask == 3.1.2
 flask-WTF == 1.2.0
 wtforms == 3.2.1
 
+# Databasing
+Flask-SQLAlchemy == 3.1.1
+Flask-Migrate == 4.1.0
 
 # Plotting and front end requirements
 bootstrap-flask == 2.5.0

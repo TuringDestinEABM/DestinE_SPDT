@@ -9,14 +9,21 @@ Secret key not currently used, required for wtforms functionality
 ### Non-docker version for development
 from flask_bootstrap import Bootstrap5
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from pathlib import Path
 from flask import g
+from .config import Config
 
 def create_app(test_config = None):
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'secretkey'
-    app.config['RESULTS_DIR'] = initialise_data_db('data/geo_data/results')
-    
+    app.config.from_object(Config)
+    app.config['RESULTS_DIR'] = initialise_data_db('data/geo_data/results') # should be deletable once db set up
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+
+
+
     bootstrap = Bootstrap5(app)
     from . import digitaltwin
     app.register_blueprint(digitaltwin.bp)
