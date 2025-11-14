@@ -1,13 +1,13 @@
 from ..digitaltwin import bp
 from ..library import getData, plotting
-from flask import render_template, url_for, send_file
+from flask import render_template, url_for, send_file, current_app
 import base64
 from io import BytesIO
 from pathlib import Path
 
 @bp.route('/reports', methods = ['GET'])
 def reports():
-    results_dir = Path(__file__).parents[1] /"data/geo_data/results"
+    results_dir = Path(current_app.config['RESULTS_DIR'])
     data = getData.listAvailableReports(results_dir)
     return render_template("reports.html", data = data)
 

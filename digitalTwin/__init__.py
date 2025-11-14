@@ -9,16 +9,31 @@ Secret key not currently used, required for wtforms functionality
 ### Non-docker version for development
 from flask_bootstrap import Bootstrap5
 from flask import Flask
+from pathlib import Path
+from flask import g
 
 def create_app(test_config = None):
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secretkey'
+    app.config['RESULTS_DIR'] = initialise_data_db('data/geo_data/results')
+    
     bootstrap = Bootstrap5(app)
-
     from . import digitaltwin
     app.register_blueprint(digitaltwin.bp)
-
+    
     return app
+
+# check if data_db exists, create if not, and then add to global context
+# a fudge for now, until I set up databasing properly
+def initialise_data_db(extension):
+    results_dir = Path(__file__).parents[0] / extension
+    if not results_dir:
+        results_dir.mkdir()
+
+    return str(results_dir)
+        
+
+
 
 # '''
 # Everything below here is for the deployment version
