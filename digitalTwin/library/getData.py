@@ -20,6 +20,10 @@ def findGEOData(ID, filename):
     return data
     # TODO: make this do a 404            
 
+def findDBData(ID):
+    pass
+    # return data
+
 def findMetadata(ID):
     results_dir = Path(current_app.config['RESULTS_DIR'])
     path = results_dir / ID / "metadata.json"
@@ -48,3 +52,4 @@ def listAvailableReports(path):
     data = dict(files = data)
     # print(data)
     return data
+

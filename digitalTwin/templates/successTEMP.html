@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container">
+    <h2>Job ran successfully</h2>
+    <p>Click the link to see the results
+      <br>
+       </p>
+    <p>
+      <a href="{{ url_for('digitaltwin.specific_report_DB', ID=ID) }}"><button class="btn btn-light my-2">Results</button></a>
+    </p>
+  </div>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+
+{% endblock %}

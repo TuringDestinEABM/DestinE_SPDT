@@ -1,0 +1,21 @@
+<!-- A template for specific reports. Loads in data then shows summary statistics and links to detailed map  -->
+{% extends 'base.html' %}
+
+{% block head %}
+     {{ super() }}
+     <!-- script for plotly figures -->
+     <script src='https://cdn.plot.ly/plotly-3.1.0.min.js' charset='utf-8'></script>    
+{% endblock %}
+
+{% block content %}
+<h3>Summary report</h3>
+<br>
+{{id}}
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}

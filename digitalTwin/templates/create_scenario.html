@@ -9,6 +9,9 @@
         <p>
             {{ form.ScenarioName.label }}<br>
             {{ form.ScenarioName(size=32) }}
+            {% for error in form.ScenarioName.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
         </p>
         <p>
             {{ form.Days.label }}<br>

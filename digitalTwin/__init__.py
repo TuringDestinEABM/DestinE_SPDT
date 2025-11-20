@@ -15,14 +15,15 @@ from pathlib import Path
 from flask import g
 from .config import Config
 
+migrate = Migrate()
+db = SQLAlchemy()
+
 def create_app(test_config = None):
     app = Flask(__name__)
     app.config.from_object(Config)
     app.config['RESULTS_DIR'] = initialise_data_db('data/geo_data/results') # should be deletable once db set up
-    db = SQLAlchemy(app)
-    migrate = Migrate(app, db)
-
-
+    db.init_app(app)
+    migrate.init_app(app, db)
 
     bootstrap = Bootstrap5(app)
     from . import digitaltwin
@@ -39,7 +40,7 @@ def initialise_data_db(extension):
 
     return str(results_dir)
         
-
+from digitalTwin.models import models
 
 
 # '''
