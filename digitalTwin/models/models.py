@@ -19,7 +19,7 @@ class Scenario(db.Model):
         back_populates='scenario')
 
     def __repr__(self):
-        return '<scenario {}>'.format(self.username)
+        return '<scenario {}>'.format(self.scenario_name)
     
 class Result(db.Model):
     __tablename__ = "result"

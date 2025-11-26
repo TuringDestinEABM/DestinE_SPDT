@@ -6,6 +6,7 @@ from wtforms.validators import DataRequired, Length, NumberRange, ValidationErro
 from digitalTwin import db
 from digitalTwin.models import models
 import sqlalchemy as sa
+import string
 
 # Form for createScenario.py route
 class CreateScenarioForm(FlaskForm):
@@ -24,9 +25,16 @@ class CreateScenarioForm(FlaskForm):
                                                         validators=[DataRequired()])
     
     def validate_ScenarioName(self, ScenarioName):
+        # check valid characters (needs to work in a url)
+        valid_chars = list(string.ascii_letters) + list(string.digits) + ['-', '_']
+        for s in str(ScenarioName.data):
+            if s not in valid_chars:
+                raise ValidationError('Please only use alphanumeric characters, hyphens or underscores (a-z, A-Z, 0-9, -, _).')
+        # check uniqueness
         scenario = db.session.scalar(sa.select(models.Scenario).where(
             models.Scenario.scenario_name == ScenarioName.data))
         if scenario is not None:
-            raise ValidationError('Please use a unique Scenario Name.')
-        
-    Submit = SubmitField('Run')
+            raise ValidationError('This scenario name is already in use. Please use a unique value.')
+       
+                
+    Submit = SubmitField('Save')

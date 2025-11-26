@@ -2,6 +2,10 @@
 import json
 from pathlib import Path
 from flask import current_app
+from digitalTwin import db
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+from digitalTwin.models import models
 
 def loadJSONdata(filepath):
     with open(filepath) as file:
@@ -20,9 +24,9 @@ def findGEOData(ID, filename):
     return data
     # TODO: make this do a 404            
 
-def findDBData(ID):
-    pass
-    # return data
+def findDBData(scenario_name):
+    scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
+    return scenario
 
 def findMetadata(ID):
     results_dir = Path(current_app.config['RESULTS_DIR'])

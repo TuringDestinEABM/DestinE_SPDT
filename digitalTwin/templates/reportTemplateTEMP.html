@@ -8,10 +8,11 @@
 {% endblock %}
 
 {% block content %}
-<h3>Summary report</h3>
+<h3>Scenario '{{scenario.scenario_name}}'</h3>
 <br>
-{{id}}
-
+Days:{{scenario.days}}
+<br>
+Created on {{scenario.timestamp}} by {{scenario.user_name}}.
 
 {% endblock %}
 

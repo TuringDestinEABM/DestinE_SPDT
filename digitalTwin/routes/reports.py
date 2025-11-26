@@ -29,10 +29,10 @@ def specific_report_timeline(ID):
     steps, timeseries, energy_range = plotting.timeline(metadata["DataSource"], metadata["OutputLocation"])
     return render_template("reportTemplateTimeline.html", timeseries = timeseries, energy_range = energy_range, steps = steps)
 
-@bp.route('/reportsDB/<ID>', methods = ['GET'])
-def specific_report_DB(ID):
-    # data = getData.findDBData(ID)
-    return render_template("reportTemplateTEMP.html", id = ID)
+@bp.route('/reportsDB/<scenario_name>', methods = ['GET'])
+def specific_report_DB(scenario_name):
+    scenario = getData.findDBData(scenario_name)
+    return render_template("reportTemplateTEMP.html", scenario=scenario)
 
 # @bp.route('/reports/<ID>/hexbin')
 # def hexbinPlot(ID):

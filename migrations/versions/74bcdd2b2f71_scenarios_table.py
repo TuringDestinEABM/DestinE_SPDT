@@ -1,8 +1,8 @@
 """scenarios table
 
-Revision ID: 80a8f15aad48
+Revision ID: 74bcdd2b2f71
 Revises: 
-Create Date: 2025-11-20 14:04:18.452401
+Create Date: 2025-11-24 12:21:11.973348
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '80a8f15aad48'
+revision = '74bcdd2b2f71'
 down_revision = None
 branch_labels = None
 depends_on = None
