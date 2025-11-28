@@ -37,4 +37,4 @@ class CreateScenarioForm(FlaskForm):
             raise ValidationError('This scenario name is already in use. Please use a unique value.')
        
                 
-    Submit = SubmitField('Save')
+    Submit = SubmitField('Run')

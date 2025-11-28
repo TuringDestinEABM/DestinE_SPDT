@@ -17,8 +17,9 @@ def createScenario():
     form  = CreateScenarioForm()
     if form.validate_on_submit():
         scenario_name = runSimTEMP.createNewScenario(form)
+        runSimTEMP.run(scenario_name)
         # return redirect(url_for('success', ID=id))
-        return render_template("successTEMP.html", scenario_name=scenario_name)
+        return render_template("successTEMP.html", scenario_name = scenario_name)
     return render_template("create_scenario.html", form=form)
 
 # @bp.route("/rub/<ID>", methods = ['GET', 'POST'])

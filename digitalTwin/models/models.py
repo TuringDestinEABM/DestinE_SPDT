@@ -15,23 +15,65 @@ class Scenario(db.Model):
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
 
-    results: so.WriteOnlyMapped[Optional['Result']] = so.relationship(
+    agent_time_series: so.WriteOnlyMapped[Optional['AgentTimeSeries']] = so.relationship(
+        back_populates='scenario')
+    energy_time_series: so.WriteOnlyMapped[Optional['EnergyTimeSeries']] = so.relationship(
+        back_populates='scenario')
+    model_time_series: so.WriteOnlyMapped[Optional['ModelTimeSeries']] = so.relationship(
         back_populates='scenario')
 
     def __repr__(self):
         return '<scenario {}>'.format(self.scenario_name)
-    
-class Result(db.Model):
-    __tablename__ = "result"
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    # agent_ts: so.Mapped[str] = 
-    # energy_ts: so.Mapped[str] = 
-    # model_ts: so.Mapped[str] = 
 
+class AgentTimeSeries(db.Model):
+    __tablename__ = "agent_time_series"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
     scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
                                                index=True)
+    scenario: so.Mapped[Scenario] = so.relationship(back_populates='agent_time_series')
+    energy: so.Mapped[int] = so.mapped_column()
+    energy_consumption: so.Mapped[int] = so.mapped_column()
+    step: so.Mapped[int] = so.mapped_column()
+    Agent_id: so.Mapped[int] = so.mapped_column()
 
-    scenario: so.Mapped[Scenario] = so.relationship(back_populates='results')
+    def __repr__(self):
+        return '<Post {}>'.format(self.body)  
+
+class EnergyTimeSeries(db.Model):
+    __tablename__ = "energy_time_series"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
+                                               index=True)
+    scenario: so.Mapped[Scenario] = so.relationship(back_populates='energy_time_series')
+    step: so.Mapped[int] = so.mapped_column()
+    hour: so.Mapped[int] = so.mapped_column()
+    day: so.Mapped[int] = so.mapped_column()
+    total_energy: so.Mapped[int] = so.mapped_column()
+    average_energy: so.Mapped[int] = so.mapped_column()
+
+    def __repr__(self):
+        return '<Post {}>'.format(self.body)
+    
+    
+class ModelTimeSeries(db.Model):
+    __tablename__ = "model_time_series"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
+                                               index=True)
+    scenario: so.Mapped[Scenario] = so.relationship(back_populates='model_time_series')
+    mid_terraced_house: so.Mapped[float] = so.mapped_column()
+    semi_detached_house: so.Mapped[float] = so.mapped_column()
+    flats_small: so.Mapped[float] = so.mapped_column()
+    flats_large: so.Mapped[float] = so.mapped_column()
+    flats_block: so.Mapped[float] = so.mapped_column()
+    end_terrace_house: so.Mapped[float] = so.mapped_column()
+    detached_house: so.Mapped[float] = so.mapped_column()
+    flat_mixed_use: so.Mapped[float] = so.mapped_column()
+    high: so.Mapped[float] = so.mapped_column()
+    medium: so.Mapped[float] = so.mapped_column()
+    low: so.Mapped[float] = so.mapped_column()
+    total_energy: so.Mapped[float] = so.mapped_column()
+    cumulative_energy: so.Mapped[float] = so.mapped_column()
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)

@@ -2,12 +2,14 @@
 
 This functionality to be replaced with databasing in the deployment version'''
 
-from ..modelling import energyABM
+from digitalTwin.modelling import energyABMTEMP
 import datetime, json
 from pathlib import Path
 import random
 from digitalTwin import db
 from digitalTwin.models import models
+import sqlalchemy as sa
+import sqlalchemy.orm as so
 
 '''main script'''
 def createNewScenario(form):
@@ -24,7 +26,48 @@ def createNewScenario(form):
     
     return scenario_name
 
-# def run(form):
+def run(scenario_name):
+    scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
+    model, records = energyABMTEMP.run (scenario.data_source, scenario.days) # run the model
+    
+    # pass the energy time series to the database
+    for entry in records:
+        energy_ts = models.EnergyTimeSeries(scenario_id = scenario.id,
+                                            step = entry["step"],
+                                            hour = entry["hour"],
+                                            day = entry["day"],
+                                            total_energy = entry["total_energy"],
+                                            average_energy = entry["avg_energy"]
+                                            )
+        db.session.add(energy_ts)
+    db.session.commit()
+
+    # pass the energy time series to the database
+    model_df = model.datacollector.get_model_vars_dataframe()
+    for row in model_df.iterrows():
+        model_ts = models.ModelTimeSeries(scenario_id = scenario.id,
+                                        mid_terraced_house = row["mid-terraced house"],
+                                        semi_detached_house = row["semi-detached house"],
+                                        flats_small = row["small block of flats/dwelling converted into flats"],
+                                        flats_large = row["large block of flats"],
+                                        flats_block = row["block of flats"],
+                                        end_terrace_house = row["end-terrace house"],
+                                        detached_house = row["detached house"],
+                                        flat_mixed_use = row["flat in mixed use building"],
+                                        high = row["high"],
+                                        medium = row["medium"],
+                                        low = row["low"],
+                                        total_energy = row["total_energy"],
+                                        cumulative_energy = row["cumulative_energy"])
+        db.session.add(model_ts)
+    db.session.commit()
+
+
+
+
+
+    
+
 #     id = assignUniqueID() 
 #     scenario_name = form.Days.data
 #     days = form.ScenarioName.data
