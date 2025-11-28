@@ -57,3 +57,8 @@ def listAvailableReports(path):
     # print(data)
     return data
 
+
+def listAvailableScenarios(page):
+    query = sa.select(models.Scenario).order_by(models.Scenario.timestamp.desc())
+    data = db.paginate(query, page=page, per_page=10, error_out=False)
+    return data

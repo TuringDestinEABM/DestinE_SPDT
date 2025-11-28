@@ -3,6 +3,7 @@
 <div class="card shadow-md bg-body rounded border bg-light">
     <div class="card-header"><h6>Reports</h6></div>
     <div id="card-container">
+        
         <table class="table">
             <thead>
                 <tr>
@@ -14,12 +15,12 @@
             </thead>
             <tbody>
                 
-                {% for file in data.files %}
+                {% for item in data.items %}
                 <tr>
-                    <td>{{file.name}}</td>
-                    <td>{{file.JobSubmitted}}</td>
-                    <td>{{file.UserName}}</td>
-                    <td><a href="/reports/{{file.id}}" >.../reports/{{file.id }}</a></td>
+                    <td>{{item.scenario_name}}</td>
+                    <td>{{item.timestamp}}</td>
+                    <td>{{item.user_name}}</td>
+                    <td><a href="/reports/{{item.scenario_name}}" >.../reports/{{item.scenario_name}}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>

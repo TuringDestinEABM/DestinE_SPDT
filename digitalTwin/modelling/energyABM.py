@@ -29,7 +29,7 @@ import pandas as pd
 from .model import EnergyModel
 
 # ──────────────────────────── main ────────────────────────────────
-def run(sourceData, days, outdir) -> None:
+def run(sourceData, days) -> None:
 
     # 1 ─ load geometry + build model ---------------------------------
     # dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
@@ -55,24 +55,19 @@ def run(sourceData, days, outdir) -> None:
                 avg_energy=tot / len(model.household_agents),
             )
         )
+    
+    return model, records
 
     # 3 ─ write outputs ----------------------------------------------
     # 3-a CSV with hourly totals
-    df = pd.DataFrame(records)
-    csv_path = outdir / "energy_timeseries.csv"
-    df.to_csv(csv_path, index=False)
+    # df = pd.DataFrame(records)
+    # csv_path = outdir / "energy_timeseries.csv"
+    # df.to_csv(csv_path, index=False)
 
     # 3-b Parquet tables from Mesa’s DataCollector
-    model_parquet  = outdir / "model_timeseries.parquet"
-    agent_parquet  = outdir / "agent_timeseries.parquet"
-    model.datacollector.get_model_vars_dataframe().to_parquet(model_parquet)
-    model.datacollector.get_agent_vars_dataframe().to_parquet(agent_parquet)
-
-    # # 3-c Optional: pickle entire model for replay
-    # pickle_path = outdir / "energy_model.pkl"
-    # with open(pickle_path, "wb") as fh:
-    #     pickle.dump(model, fh)
+    # model_parquet  = outdir / "model_timeseries.parquet"
+    # agent_parquet  = outdir / "agent_timeseries.parquet"
+    # model.datacollector.get_model_vars_dataframe().to_parquet(model_parquet)
+    # model.datacollector.get_agent_vars_dataframe().to_parquet(agent_parquet)
 
 
-
-#Defining the place to save data, will change when I sort databasing

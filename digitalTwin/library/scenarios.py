@@ -2,7 +2,7 @@
 
 This functionality to be replaced with databasing in the deployment version'''
 
-from digitalTwin.modelling import energyABMTEMP
+from digitalTwin.modelling import energyABM
 import datetime, json
 from pathlib import Path
 import random
@@ -28,7 +28,7 @@ def createNewScenario(form):
 
 def run(scenario_name):
     scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
-    model, records = energyABMTEMP.run (scenario.data_source, scenario.days) # run the model
+    model, records = energyABM.run (scenario.data_source, scenario.days) # run the model
     
     # pass the energy time series to the database
     for entry in records:
@@ -42,16 +42,17 @@ def run(scenario_name):
         db.session.add(energy_ts)
     db.session.commit()
 
-    # pass the energy time series to the database
-    model_df = model.datacollector.get_model_vars_dataframe()
-    for row in model_df.iterrows():
+    # pass the model time series to the database
+    model_df = model.datacollector.get_model_vars_dataframe() # method for mesa model (dataframe seems to be only option)
+    model_dict = model_df.to_dict('records') # convert to list for quicker iteration
+    for row in model_dict:
         model_ts = models.ModelTimeSeries(scenario_id = scenario.id,
                                         mid_terraced_house = row["mid-terraced house"],
                                         semi_detached_house = row["semi-detached house"],
-                                        flats_small = row["small block of flats/dwelling converted into flats"],
+                                        flats_small = row["small block of flats/dwelling converted in to flats"],
                                         flats_large = row["large block of flats"],
                                         flats_block = row["block of flats"],
-                                        end_terrace_house = row["end-terrace house"],
+                                        end_terrace_house = row["end-terraced house"],
                                         detached_house = row["detached house"],
                                         flat_mixed_use = row["flat in mixed use building"],
                                         high = row["high"],
@@ -62,23 +63,19 @@ def run(scenario_name):
         db.session.add(model_ts)
     db.session.commit()
 
-
-
-
-
-    
-
-#     id = assignUniqueID() 
-#     scenario_name = form.Days.data
-#     days = form.ScenarioName.data
-#     data_source = form.DataSource.data
-#     job_name = form.ScenarioName.data
-#     user_name = getUserName()
-#     timestamp = datetime.datetime.now(datetime.timezone.utc)
-#     results = dummyRunSim(days)
-    
-#     return id
-
+   # pass the agent time series to the database
+    agent_df = model.datacollector.get_agent_vars_dataframe() # method for mesa model (dataframe seems to be only option)
+    agent_dict = [agent_df.columns.tolist()] + agent_df.reset_index().values.tolist() # convert to list for quicker iteration
+    for row in agent_dict:
+        if row[0] != 'energy': # first row is column headings, skip this
+            agent_ts = models.AgentTimeSeries(scenario_id = scenario.id,
+                                            energy = row[2],
+                                            energy_consumption = row[3],
+                                            step = row[0],
+                                            Agent_id = row[1]
+                                            )
+            db.session.add(agent_ts)
+    db.session.commit()
 
 
 '''Get the user's login'''

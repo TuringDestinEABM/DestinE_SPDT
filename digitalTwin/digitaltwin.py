@@ -10,8 +10,7 @@ from pathlib import Path
 
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    results_dir = Path(current_app.config['RESULTS_DIR'])
-    data = getData.listAvailableReports(results_dir)
+    data = getData.listAvailableScenarios(1)
     return render_template('home.html', data = data)
 
 @bp.route('/')
