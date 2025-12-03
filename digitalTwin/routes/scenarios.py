@@ -19,7 +19,7 @@ def createScenario():
         scenario_name = scenarios.createNewScenario(form)
         scenarios.run(scenario_name)
         # return redirect(url_for('success', ID=id))
-        return render_template("successTEMP.html", scenario_name = scenario_name)
+        return render_template("success.html", scenario_name = scenario_name)
     return render_template("create_scenario.html", form=form)
 
 # @bp.route("/run/<ID>", methods = ['GET', 'POST'])

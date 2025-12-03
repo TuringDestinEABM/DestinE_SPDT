@@ -1,8 +1,8 @@
 '''Helper scripts for loading in different data'''
 import json
 from pathlib import Path
-from flask import current_app
-from digitalTwin import db
+from flask import current_app, url_for
+from digitalTwin import db, routes
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from digitalTwin.models import models
@@ -60,5 +60,10 @@ def listAvailableReports(path):
 
 def listAvailableScenarios(page):
     query = sa.select(models.Scenario).order_by(models.Scenario.timestamp.desc())
-    data = db.paginate(query, page=page, per_page=10, error_out=False)
+    data = db.paginate(query, page=page, per_page=2, error_out=False)
+    # next_url = url_for('digitalTwin.reports', page=data.next_num) \
+    #     if data.has_next else None
+    # prev_url = url_for('digitalTwin.reports', page=data.prev_num) \
+    #     if data.has_prev else None
+    # return data, next_url, prev_url
     return data

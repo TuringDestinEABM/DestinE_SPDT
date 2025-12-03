@@ -20,10 +20,17 @@
                     <td>{{item.scenario_name}}</td>
                     <td>{{item.timestamp}}</td>
                     <td>{{item.user_name}}</td>
-                    <td><a href="/reports/{{item.scenario_name}}" >.../reports/{{item.scenario_name}}</a></td>
+                    <td><a href="{{ url_for('digitaltwin.specific_report_DB', scenario_name=item.scenario_name) }}">.../reports/{{item.scenario_name}}</a></td>
                 </tr>
                 {% endfor %}
+               
             </tbody>
         </table>
+         {% if prev_url %}
+            <a href="{{ prev_url }}">Newer reports</a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}">Older reports</a>
+        {% endif %}
     </div>
 </div>

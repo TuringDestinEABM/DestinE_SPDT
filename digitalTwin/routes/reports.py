@@ -5,12 +5,14 @@ import base64
 from io import BytesIO
 from pathlib import Path
 
-@bp.route('/reports', methods = ['GET'])
+@bp.route('/reports', methods = ['GET', 'POST'])
 def reports():
     page = request.args.get('page', 1, type=int)
+    # data, next_url, prev_url = getData.listAvailableScenarios(page)
+
+    # return render_template("reports.html", data = data, next_url=next_url, prev_url=prev_url)
     data = getData.listAvailableScenarios(page)
-    # results_dir = Path(current_app.config['RESULTS_DIR'])
-    # data = getData.listAvailableReports(results_dir)
+
     return render_template("reports.html", data = data)
 
 @bp.route('/reports/<ID>', methods = ['GET'])
