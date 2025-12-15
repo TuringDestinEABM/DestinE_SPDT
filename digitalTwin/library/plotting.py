@@ -5,22 +5,27 @@ Figures are returned aas json dumps of plotly fig objects. GIS information retur
 '''
 
 from ..modelling import analyze
+from ..library import getData
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly
 import json
 
-# generic script to prepare the data for each of the figures
-def prepare_data(sourceData, outdir, jitterRadius=25):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    outdir = Path(outdir)
+from digitalTwin import db, routes
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+from digitalTwin.models import models
 
-    hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
-    model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
-    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
-   
-    hi = analyze.highUsage(dataPath, agent_ts, 25) #
+def prepare_data(scenario, jitterRadius=25):
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
+
+    hourly = getData.findDBData('EnergyTimeSeries', scenario.id)
+    model_ts = getData.findDBData('ModelTimeSeries', scenario.id)
+    agent_ts = analyze.reset_agent_index(getData.findDBData('AgentTimeSeries', scenario.id))
+
+    hi = analyze.highUsage(dataPath, agent_ts, 25) 
+
     model_ts, prop_cols, wealth_cols= analyze.prepTimeSeries(model_ts)
     return hi, model_ts, prop_cols, wealth_cols, hourly
 
@@ -105,16 +110,15 @@ def temporalHeatMap(timeseries):
     return figJSON
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
-def timeline(sourceData, outdir):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    outdir = Path(outdir)
-    
+def timeline(scenario):
+    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
+      
     # combine agent data and energy usage timeseries into a single dataframe
-    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
+    agent_ts = analyze.reset_agent_index(getData.findDBData('AgentTimeSeries', scenario.id))
     timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
-    
+
     # Get min and max data usage to help define colors in the maplibre GIS
     ec = timeseries['energy_consumption'] 
     energy_range = {"min":round(ec.min(),3), 
@@ -123,7 +127,7 @@ def timeline(sourceData, outdir):
 
     # create list of number of steps                
     stepArray = []
-    for step in pd.unique(timeseries['Step']):
+    for step in pd.unique(timeseries['step']):
         stepArray.append(int(step))
 
     steps = {

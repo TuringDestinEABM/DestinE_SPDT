@@ -37,7 +37,7 @@ class AgentTimeSeries(db.Model):
     Agent_id: so.Mapped[int] = so.mapped_column()
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)  
+        return '<agent_ts {}>'.format(self.id)  
 
 class EnergyTimeSeries(db.Model):
     __tablename__ = "energy_time_series"
@@ -52,7 +52,7 @@ class EnergyTimeSeries(db.Model):
     average_energy: so.Mapped[int] = so.mapped_column()
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return '<energy_ts {}>'.format(self.id)
     
     
 class ModelTimeSeries(db.Model):
@@ -76,4 +76,4 @@ class ModelTimeSeries(db.Model):
     cumulative_energy: so.Mapped[float] = so.mapped_column()
 
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return '<model_ts {}>'.format(self.id)

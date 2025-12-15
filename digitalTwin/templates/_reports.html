@@ -20,7 +20,7 @@
                     <td>{{item.scenario_name}}</td>
                     <td>{{item.timestamp}}</td>
                     <td>{{item.user_name}}</td>
-                    <td><a href="{{ url_for('digitaltwin.specific_report_DB', scenario_name=item.scenario_name) }}">.../reports/{{item.scenario_name}}</a></td>
+                    <td><a href="{{ url_for('digitaltwin.specific_report', scenario_name=item.scenario_name) }}">.../reports/{{item.scenario_name}}</a></td>
                 </tr>
                 {% endfor %}
                

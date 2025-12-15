@@ -10,8 +10,9 @@ from pathlib import Path
 
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
-    data = getData.listAvailableScenarios(1)
-    return render_template('home.html', data = data)
+    data, next_url, prev_url = getData.listAvailableScenarios(1)
+    return render_template('home.html', data = data, next_url=next_url,
+                           prev_url=prev_url)
 
 @bp.route('/')
 def homePage():
