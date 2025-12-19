@@ -46,6 +46,21 @@ def findDBData(DBmodel, identifier):
         
     return data
 
+# def loadSourceData(table, subset=100):
+def loadGeoJSONDB(table):
+    # if table = "Newcastle"
+    #     rows = so.session.query(epc_abm_newcastle).count()
+    if table == "Newcastle":
+        query = sa.Select(models.epc_abm_newcastle)
+        # query = sa.Select(models.epc_abm_newcastle).where(models.ModelTimeSeries.scenario_id == identifier)
+    elif table =="Sunderland":
+        query = sa.Select(models.epc_abm_sunderland)
+
+    with db.engine.connect() as conn:
+        data = pd.read_sql(query, conn)
+    return data
+
+
 def findMetadata(ID):
     results_dir = Path(current_app.config['RESULTS_DIR'])
     path = results_dir / ID / "metadata.json"

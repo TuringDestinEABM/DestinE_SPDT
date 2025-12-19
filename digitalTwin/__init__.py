@@ -7,6 +7,7 @@ Makes use of bootstrap5 for responsive site design.
 Secret key not currently used, required for wtforms functionality
 """
 ### Non-docker version for development
+import json
 from flask_bootstrap import Bootstrap5
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -14,9 +15,15 @@ from flask_migrate import Migrate
 from pathlib import Path
 from flask import g
 from .config import Config
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+from sqlalchemy import event
+
 
 migrate = Migrate()
 db = SQLAlchemy()
+
+
 
 def create_app(test_config = None):
     app = Flask(__name__)
@@ -28,8 +35,9 @@ def create_app(test_config = None):
     bootstrap = Bootstrap5(app)
     from . import digitaltwin
     app.register_blueprint(digitaltwin.bp)
-    
+
     return app
+
 
 # check if data_db exists, create if not, and then add to global context
 # a fudge for now, until I set up databasing properly
@@ -40,7 +48,14 @@ def initialise_data_db(extension):
 
     return str(results_dir)
         
-from digitalTwin.models import models
+# class TempClass(db.Model):
+#     __tablename__ = "temp_table"
+#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
+#     dataset:  so.Mapped[str] = so.mapped_column(sa.String(64))
+#     val1: so.Mapped[float] = so.mapped_column()
+#     val2: so.Mapped[float] = so.mapped_column()
+
+
 
 
 # '''

@@ -27,19 +27,20 @@ import geopandas as gpd
 import pandas as pd
 
 from .model import EnergyModel
+from ..library import getData
 
 # ──────────────────────────── main ────────────────────────────────
-def run(sourceData, days) -> None:
+def run(scenario) -> None:
 
     # 1 ─ load geometry + build model ---------------------------------
     # dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    gdf   = gpd.read_file(dataPath)
+    # dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
+    gdf   = getData.loadGeoJSONDB(scenario.data_source)
     # return(gdf)
     model = EnergyModel(gdf)
 
     # 2 ─ run simulation ----------------------------------------------
-    steps   = days * 24 #TODO: make this user input
+    steps   = scenario.days * 24 #TODO: make this user input
     records = []                                    # per-hour summary rows
 
     for step in range(steps):

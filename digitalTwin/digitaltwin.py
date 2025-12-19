@@ -7,7 +7,6 @@ from .routes import contact, data_sources, help, queue, reports, scenarios, sett
 from .library import getData
 from pathlib import Path
 
-
 @bp.route('/home', methods = ['POST', 'GET'])
 def home():
     data, next_url, prev_url = getData.listAvailableScenarios(1)

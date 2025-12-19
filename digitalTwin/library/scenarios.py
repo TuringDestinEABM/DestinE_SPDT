@@ -19,6 +19,7 @@ def createNewScenario(form):
     scenario = models.Scenario(scenario_name = scenario_name,
                 days = days,
                 data_source = form.DataSource.data,
+                subset = form.Subset.data,
                 user_name = getUserName(),
                 timestamp = datetime.datetime.now(datetime.timezone.utc))
     db.session.add(scenario)
@@ -28,7 +29,7 @@ def createNewScenario(form):
 
 def run(scenario_name):
     scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
-    model, records = energyABM.run (scenario.data_source, scenario.days) # run the model
+    model, records = energyABM.run(scenario) # run the model
     
     # pass the energy time series to the database
     for entry in records:
