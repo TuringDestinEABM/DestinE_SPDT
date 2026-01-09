@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+{{init_coords}}
 <style>
     .maplibregl-popup {
         max-width: 400px;
@@ -127,7 +128,7 @@
             container: 'map',
             style:
                 'https://api.maptiler.com/maps/positron/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL',
-            center: [-1.65260, 55.01802], //TODO: make this depend on centre of geojson data
+            center: {{init_coords}}, //TODO: make this depend on centre of geojson data
             zoom: 11
         });
 

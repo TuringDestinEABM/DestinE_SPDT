@@ -18,10 +18,14 @@ def createNewScenario(form):
 
     scenario = models.Scenario(scenario_name = scenario_name,
                 days = days,
-                data_source = form.DataSource.data,
+                city = form.City.data,
                 subset = form.Subset.data,
                 user_name = getUserName(),
-                timestamp = datetime.datetime.now(datetime.timezone.utc))
+                timestamp = datetime.datetime.now(datetime.timezone.utc),
+                init_lat = setInitLatLon(form.City.data)[0],
+                init_lon = setInitLatLon(form.City.data)[1])
+                
+    
     db.session.add(scenario)
     db.session.commit()
     
@@ -30,7 +34,7 @@ def createNewScenario(form):
 def run(scenario_name):
     scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
     model, records = energyABM.run(scenario) # run the model
-    
+    print('model run')
     # pass the energy time series to the database
     for entry in records:
         energy_ts = models.EnergyTimeSeries(scenario_id = scenario.id,
@@ -42,7 +46,7 @@ def run(scenario_name):
                                             )
         db.session.add(energy_ts)
     db.session.commit()
-
+    print('energy_ts saved')
     # pass the model time series to the database
     model_df = model.datacollector.get_model_vars_dataframe() # method for mesa model (dataframe seems to be only option)
     model_dict = model_df.to_dict('records') # convert to list for quicker iteration
@@ -63,6 +67,7 @@ def run(scenario_name):
                                         cumulative_energy = row["cumulative_energy"])
         db.session.add(model_ts)
     db.session.commit()
+    print('model_ts saved')
 
    # pass the agent time series to the database
     agent_df = model.datacollector.get_agent_vars_dataframe() # method for mesa model (dataframe seems to be only option)
@@ -77,6 +82,9 @@ def run(scenario_name):
                                             )
             db.session.add(agent_ts)
     db.session.commit()
+    print('agent_ts saved')
+
+    # return gdf
 
 
 '''Get the user's login'''
@@ -85,13 +93,31 @@ def getUserName():
     username = "<username>"
     return username
 
-def dummyRunSim(days):
-    results = []
-    for day in range(days):
-        results.append(random.randint(0,9))
+def setInitLatLon(city):
+    print(city)
+    if city == 'newcastle':
+        lon = -1.65260
+        lat = 55.01802
 
-    timesteps = list(range(days))
-    data = {'timesteps': timesteps,
-            'results': results}
+    elif city == 'sunderland':
+        lon = -1.401567
+        lat = 54.901682
+    
+    else:
+        lon = 0.0
+        lat = 0.0
 
-    return data
+    return [lon, lat]
+
+
+
+# def dummyRunSim(days):
+#     results = []
+#     for day in range(days):
+#         results.append(random.randint(0,9))
+
+#     timesteps = list(range(days))
+#     data = {'timesteps': timesteps,
+#             'results': results}
+
+#     return data

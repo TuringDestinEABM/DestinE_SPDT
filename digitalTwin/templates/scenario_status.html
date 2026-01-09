@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container">
+    <h2>Scenario "{{scenario_name}}" created</h2>
+    Statues: complete
+    <p>
+    <a href="{{ url_for('digitaltwin.specific_report', scenario_name=scenario_name) }}"><button class="btn btn-light my-2">View</button></a>
+
+{% block javascript %}
+{% endblock %}
+
+{% endblock %}

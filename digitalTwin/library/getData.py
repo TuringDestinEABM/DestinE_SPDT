@@ -2,11 +2,14 @@
 import json
 from pathlib import Path
 import pandas as pd
+import geopandas
 from flask import current_app, url_for
 from digitalTwin import db, routes
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from digitalTwin.models import models
+import numpy as np
+from typing import List, Optional
 
 def loadJSONdata(filepath):
     with open(filepath) as file:
@@ -26,6 +29,7 @@ def findGEOData(ID, filename):
     # TODO: make this do a 404            
 
 def findDBData(DBmodel, identifier):
+
     if DBmodel == 'Scenario':
         data = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == identifier))
 
@@ -43,24 +47,66 @@ def findDBData(DBmodel, identifier):
         query = sa.Select(models.AgentTimeSeries).where(models.AgentTimeSeries.scenario_id == identifier)
         with db.engine.connect() as conn:
             data = pd.read_sql(query, conn)
-        
+                    
     return data
 
 # def loadSourceData(table, subset=100):
-def loadGeoJSONDB(table):
-    # if table = "Newcastle"
-    #     rows = so.session.query(epc_abm_newcastle).count()
-    if table == "Newcastle":
-        query = sa.Select(models.epc_abm_newcastle)
-        # query = sa.Select(models.epc_abm_newcastle).where(models.ModelTimeSeries.scenario_id == identifier)
-    elif table =="Sunderland":
-        query = sa.Select(models.epc_abm_sunderland)
+# def loadGeoJSONDB(city):
+#     # print(city)
+#     query = sa.Select(models.EPCABMdata).where(models.EPCABMdata.city == city)
+    
+#     with db.engine.connect() as conn:
+#         df = pd.read_sql(query, conn) # load from db to data frame
+#     gdf = geopandas.GeoDataFrame(df, 
+#                                  geometry=geopandas.points_from_xy(df.geometry_coordinates_lon, df.geometry_coordinates_lat),
+#                                   crs="EPSG:4326") # convert to geodataframe
+#     gdf = gdf.drop(columns=['id','geometry_type','geometry_coordinates_lon','geometry_coordinates_lat'])
+#     return gdf
+
+def loadGeoJSONDB(city: str, subset: int, columns: Optional[List[str]]=None):
+    
+    geometry = ['geometry_type',
+                'geometry_coordinates_lon',
+                'geometry_coordinates_lat']
+
+    #Handle Columns
+    if columns is None:
+        # User didn't pass anything -> Select All
+        query = sa.select(models.EPCABMdata)
+        # query = query.where(models.EPCABMdata.city == city)
+    else:
+        # User passed a list -> Select Specific
+        # Add non-optional geometry columns
+        target_columns = columns + geometry
+    
+        cols_to_select = [getattr(models.EPCABMdata, col) for col in target_columns]
+        query = sa.select(*cols_to_select)
+    
+    query = query.where(models.EPCABMdata.city == city)
+
+    # Handle Subset (Optional)
+    if subset != 100:
+        selection = calculateSubset(city, subset)
+        # --- FIX: Convert numpy types to standard Python ints ---
+        selection = [int(x) for x in selection]
+        query = query.where(models.EPCABMdata.id.in_(selection))
 
     with db.engine.connect() as conn:
-        data = pd.read_sql(query, conn)
-    return data
+        df = pd.read_sql(query, conn) # load from db to data frame
+    
+    gdf = geopandas.GeoDataFrame(df, 
+                                 geometry=geopandas.points_from_xy( df.geometry_coordinates_lat, df.geometry_coordinates_lon),
+                                  crs="EPSG:4326") # convert to geodataframe
+    gdf = gdf.drop(columns=geometry)
+    return gdf
 
-
+def calculateSubset(city, subset):
+    first = db.first_or_404(sa.select(models.EPCABMdata.id).order_by(models.EPCABMdata.id.asc()).where(models.EPCABMdata.city == city))
+    last = db.first_or_404(sa.select(models.EPCABMdata.id).order_by(models.EPCABMdata.id.desc()).where(models.EPCABMdata.city == city))
+    num = int(subset * (last-first) /100)
+    selection = np.linspace(first,last, num, dtype=int)
+    return(selection)
+    
 def findMetadata(ID):
     results_dir = Path(current_app.config['RESULTS_DIR'])
     path = results_dir / ID / "metadata.json"

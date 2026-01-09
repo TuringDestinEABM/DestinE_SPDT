@@ -32,11 +32,10 @@ from ..library import getData
 # ──────────────────────────── main ────────────────────────────────
 def run(scenario) -> None:
 
-    # 1 ─ load geometry + build model ---------------------------------
-    # dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
-    # dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    gdf   = getData.loadGeoJSONDB(scenario.data_source)
-    # return(gdf)
+    gdf   = getData.loadGeoJSONDB(scenario.city, scenario.subset)
+    # gdf = gdf.head() # delete this
+    # return gdf
+#     # return(gdf)
     model = EnergyModel(gdf)
 
     # 2 ─ run simulation ----------------------------------------------
@@ -58,6 +57,7 @@ def run(scenario) -> None:
         )
     
     return model, records
+# ---
 
     # 3 ─ write outputs ----------------------------------------------
     # 3-a CSV with hourly totals

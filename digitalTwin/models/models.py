@@ -10,11 +10,13 @@ class Scenario(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     scenario_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     days: so.Mapped[int] = so.mapped_column()
-    data_source: so.Mapped[str] = so.mapped_column(sa.String(64))
+    city: so.Mapped[str] = so.mapped_column(sa.String(64))
     subset: so.Mapped[int] = so.mapped_column()
     user_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     timestamp: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
+    init_lat: so.Mapped[int] = so.mapped_column()
+    init_lon: so.Mapped[int] = so.mapped_column()
 
     agent_time_series: so.WriteOnlyMapped[Optional['AgentTimeSeries']] = so.relationship(
         back_populates='scenario')
@@ -88,19 +90,20 @@ class TempClass(db.Model):
     val2: so.Mapped[float] = so.mapped_column()
 
 class EPCABMdata(db.Model):
+    # __bind_key__ = "gis"
     __tablename__ = "epc_abm_data"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     city: so.Mapped[str] = so.mapped_column()
-    uprn: so.Mapped[int] = so.mapped_column()
+    UPRN: so.Mapped[int] = so.mapped_column()
     lsoa_code: so.Mapped[str] = so.mapped_column()
     local_authority: so.Mapped[str] = so.mapped_column()
     ward_code: so.Mapped[str] = so.mapped_column()
     habitable_rooms: so.Mapped[Optional[int]] = so.mapped_column()
     sap_rating: so.Mapped[int] = so.mapped_column()
-    floor_area: so.Mapped[float] = so.mapped_column()
+    floor_area_m2: so.Mapped[float] = so.mapped_column()
     property_type: so.Mapped[str] = so.mapped_column()
     property_age: so.Mapped[str] = so.mapped_column()
-    main_fuel: so.Mapped[str] = so.mapped_column()
+    main_fuel_type: so.Mapped[Optional[str]] = so.mapped_column()
     main_heating_system: so.Mapped[str] = so.mapped_column()
     sap_band_ord: so.Mapped[int] = so.mapped_column()
     retrofit_envelope_score: so.Mapped[float] = so.mapped_column()
@@ -120,7 +123,9 @@ class EPCABMdata(db.Model):
     is_oil: so.Mapped[Optional[bool]] = so.mapped_column()
     is_solid_fuel: so.Mapped[Optional[bool]] = so.mapped_column()
     epc_lodgement_date_year: so.Mapped[int] = so.mapped_column()
-    geometry: so.Mapped[str] = so.mapped_column()
+    geometry_type: so.Mapped[str] = so.mapped_column()
+    geometry_coordinates_lat: so.Mapped[float] = so.mapped_column()
+    geometry_coordinates_lon: so.Mapped[float] = so.mapped_column()
 
     def __repr__(self):
         return '<epc_abm_newcastle {}>'.format(self.id)    

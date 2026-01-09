@@ -18,13 +18,11 @@ import sqlalchemy.orm as so
 from digitalTwin.models import models
 
 def prepare_data(scenario, jitterRadius=25):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
-
     hourly = getData.findDBData('EnergyTimeSeries', scenario.id)
     model_ts = getData.findDBData('ModelTimeSeries', scenario.id)
-    agent_ts = analyze.reset_agent_index(getData.findDBData('AgentTimeSeries', scenario.id))
-
-    hi = analyze.highUsage(dataPath, agent_ts, 25) 
+    a_ts = getData.findDBData('AgentTimeSeries', scenario.id)
+    agent_ts = analyze.reset_agent_index(a_ts)
+    hi = analyze.highUsage(scenario, agent_ts, 25) 
 
     model_ts, prop_cols, wealth_cols= analyze.prepTimeSeries(model_ts)
     return hi, model_ts, prop_cols, wealth_cols, hourly
@@ -111,11 +109,11 @@ def temporalHeatMap(timeseries):
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
 def timeline(scenario):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
+    # dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
       
     # combine agent data and energy usage timeseries into a single dataframe
     agent_ts = analyze.reset_agent_index(getData.findDBData('AgentTimeSeries', scenario.id))
-    timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
+    timeseries = analyze.allUsage_ts(scenario, agent_ts, 25)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
 

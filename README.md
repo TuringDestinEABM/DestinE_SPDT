@@ -1,21 +1,27 @@
 # Development Quick Launch 
-## app
+## First time initalisation
 ```.env\Scripts\activate ```
 
 ```set FLASK_APP=digitalTwin.py```
 
-```set FLASK_DEBUG=1```
+```pip install -r requirements.txt```
 
-```flask run```
-
-## db
 ```flask db init```
 
 ```flask db migrate -m "first migration"```
 
 ```flask db upgrade```
 
-```flask db downgrade```
+```py populateDB.py```
+
+```set FLASK_DEBUG=1```
+
+```flask run```
+
+## Once initialised
+```.env\Scripts\activate ```
+
+```flask run```
 
 
 # DestinE_SPDT

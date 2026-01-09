@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="container">
+    <h2>Scenario "{{scenario_name}}" created</h2>
+    <div class="card shadow-md bg-body rounded border bg-light">
+    <div class="card-header"><h6>Summary information</h6></div>
+    <div class="row align-items-start">
+    <div class="col">
+        <b>Scenario: </b><br>
+        <b>Days: </b><br>
+        <b>Created on: </b><br>
+        <b>Created by: </b><br>
+      </div>
+      <div class="col">
+        {{scenario.id}}<br>
+        {{scenario.days}}<br>
+        {{scenario.timestamp}}<br>
+        {{scenario.user_name}}<br>
+      </div>
+    </div>
+  </div>
+    <p>
+    <a href="{{ url_for('digitaltwin.runScenario', scenario_name=scenario_name) }}"><button class="btn btn-light my-2">Run</button></a>
+    <a href="{{ url_for('digitaltwin.createScenario') }}"><button class="btn btn-light my-2">Create another</button></a>
+    <a href="{{ url_for('digitaltwin.home') }}"><button class="btn btn-light my-2">Home</button></a>
+  </p>
+  
+</div>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+
+{% endblock %}

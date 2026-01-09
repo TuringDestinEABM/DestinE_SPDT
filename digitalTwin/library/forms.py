@@ -43,8 +43,8 @@ class CreateScenarioForm(FlaskForm):
     ScenarioName = StringField('Scenario Name', validators=[DataRequired(), Length(1,32)])
     Days = IntegerField('Days', validators=[DataRequired(), NumberRange(1, 9125)] )
     # DataSource = SelectField('Data Source', choices = ["ncc_neighborhood.geojson", "ncc_neighborhood_10k.geojson"],validators=[DataRequired()])
-    DataSource = SelectField('Data Source', choices = ["Newcastle",
-                                                        "Sunderland",
+    City = SelectField('Data Source', choices = ["newcastle",
+                                                        "sunderland",
                                                         ],
                                                         validators=[DataRequired()])
     Subset = IntegerField('Subset (%)', validators=[DataRequired(), NumberRange(1, 100)], default=100 )
@@ -62,4 +62,4 @@ class CreateScenarioForm(FlaskForm):
             raise ValidationError('This scenario name is already in use. Please use a unique value.')
         
                 
-    Submit = SubmitField('Run')
+    Submit = SubmitField('Save')

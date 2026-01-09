@@ -9,6 +9,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Created</th>
+                    <th>City</th>
                     <th>User</th>
                     <th>Link</th>
                 <tr>
@@ -19,6 +20,7 @@
                 <tr>
                     <td>{{item.scenario_name}}</td>
                     <td>{{item.timestamp}}</td>
+                     <td>{{item.city}}</td>
                     <td>{{item.user_name}}</td>
                     <td><a href="{{ url_for('digitaltwin.specific_report', scenario_name=item.scenario_name) }}">.../reports/{{item.scenario_name}}</a></td>
                 </tr>

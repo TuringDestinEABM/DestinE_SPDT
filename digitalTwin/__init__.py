@@ -28,7 +28,6 @@ db = SQLAlchemy()
 def create_app(test_config = None):
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['RESULTS_DIR'] = initialise_data_db('data/geo_data/results') # should be deletable once db set up
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -37,54 +36,6 @@ def create_app(test_config = None):
     app.register_blueprint(digitaltwin.bp)
 
     return app
-
-
-# check if data_db exists, create if not, and then add to global context
-# a fudge for now, until I set up databasing properly
-def initialise_data_db(extension):
-    results_dir = Path(__file__).parents[0] / extension
-    if not results_dir:
-        results_dir.mkdir()
-
-    return str(results_dir)
-        
-# class TempClass(db.Model):
-#     __tablename__ = "temp_table"
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     dataset:  so.Mapped[str] = so.mapped_column(sa.String(64))
-#     val1: so.Mapped[float] = so.mapped_column()
-#     val2: so.Mapped[float] = so.mapped_column()
-
-
-
-
-# '''
-# Everything below here is for the deployment version
-# '''
-
-# from celery import Celery, Task
-# from flask_bootstrap import Bootstrap5
-# from flask import Flask
-
-# def create_app(test_config = None):
-#     app = Flask(__name__)
-#     app.config.from_mapping(
-#         CELERY=dict(
-#             broker_url="redis://redis:6379/0",
-#             result_backend="redis://redis:6379/0",
-#             task_ignore_result=True,
-#         ),
-#     )
-#     app.config.from_prefixed_env()
-#     celery_init_app(app)
-
-#     bootstrap = Bootstrap5(app)
-
-#     from . import digitaltwin
-#     app.register_blueprint(digitaltwin.bp)
-
-#     return app
-
 
 
 # def celery_init_app(app: Flask) -> Celery:

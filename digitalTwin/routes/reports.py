@@ -15,16 +15,16 @@ def reports():
 def specific_report_timeline(scenario_name):
     scenario = getData.findDBData('Scenario', scenario_name)
     steps, timeseries, energy_range = plotting.timeline(scenario)
+    init_coords = [ scenario.init_lon,scenario.init_lat]
+    print(init_coords)
 
-    print(steps)
-    print('---')
-    print(energy_range)
-    return render_template("reportTemplateTimeline.html", timeseries = timeseries, energy_range = energy_range, steps = steps)
+    return render_template("reportTemplateTimeline.html", timeseries = timeseries, energy_range = energy_range, steps = steps, init_coords = init_coords)
 
 @bp.route('/reports/<scenario_name>', methods = ['GET'])
 def specific_report(scenario_name):
     scenario = getData.findDBData('Scenario', scenario_name)
     hi, model_ts, prop_cols, wealth_cols, hourly = plotting.prepare_data(scenario)
+    # model_ts, prop_cols, wealth_cols, hourly = plotting.prepare_data(scenario)
     fig2 = plotting.dailyByPropTypePX(model_ts, prop_cols)
     fig3 = plotting.dailyByWealth(model_ts, wealth_cols)
     fig4 = plotting.temporalHeatMap(hourly)
