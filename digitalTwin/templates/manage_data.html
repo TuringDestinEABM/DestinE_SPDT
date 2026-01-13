@@ -1,0 +1,33 @@
+<!-- Wraps around '_reports.html to allow list to be seen in its own page' -->
+{% extends 'base.html' %}
+
+{% block content %}
+
+<ul class="nav nav-tabs">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if active_tab == 'scenarios' %}active{% endif %}"
+    id="home-tab" data-bs-toggle="tab" data-bs-target="#scenarios" type="button" role="tab" aria-controls="scenarios" aria-selected="true">Scenarios</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link {% if active_tab == 'sources' %}active{% endif %}"
+    id="source-tab" data-bs-toggle="tab" data-bs-target="#source" type="button" role="tab" aria-controls="profile" aria-selected="false">Sources</button>
+  </li>
+</ul>
+
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade {% if active_tab == 'scenarios' %}show active{% endif %}"id="scenarios" role="tabpanel" aria-labelledby="scenarios-tab">
+    {% include "_scenariosManager.html" %}
+</div>
+<div class="tab-pane fade {% if active_tab == 'sources' %}show active{% endif %}" 
+id="source" role="tabpanel" aria-labelledby="source-tab">
+    {% include "_sourceDataViewer.html" %}
+</div>
+
+</div>
+
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+
+{% endblock %}

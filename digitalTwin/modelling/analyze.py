@@ -33,7 +33,7 @@ import matplotlib.ticker as mtick
 from shapely.geometry import Point
 import contextily as cx  
 
-from ..library import getData
+from ..library import dataManager
 
 # ────────────────────── geometry helpers ────────────────────────
 def jitter(geom, r: float) -> Point:
@@ -66,7 +66,7 @@ def allUsage_ts(scenario, timeseries, jitterRadius):
     ]
 
     columns = ["UPRN", "property_type"]
-    gdf = getData.loadGeoJSONDB(scenario.city, scenario.subset, columns)
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.subset, columns)
     gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     ts["agent_id"] = ts["agent_id"].astype(str)
     ts = gdf.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")
@@ -88,7 +88,7 @@ def highUsage(scenario, timeseries, jitterRadius):
 
     # c. attach geometry + property_type from GeoJSON
     columns = ["UPRN", "property_type"]
-    gdf = getData.loadGeoJSONDB(scenario.city, scenario.subset, columns)
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.subset, columns)
     
     gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     totals["agent_id"] = totals["agent_id"].astype(str)
@@ -227,9 +227,9 @@ def analyze(scenario, outdir, jitterRadius=25, map =  True) -> None:
     # ── 1. Load simulation outputs ───────────────────────────────
     # dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
 
-    hourly = getData.findDBData('EnergyTimeSeries', scenario.name)
-    model_ts = getData.findDBData('ModelTimeSeries', scenario.name)
-    agent_ts = getData.findDBData('AgentTimeSeries', scenario.name)
+    hourly = dataManager.findDBData('EnergyTimeSeries', scenario.name)
+    model_ts = dataManager.findDBData('ModelTimeSeries', scenario.name)
+    agent_ts = dataManager.findDBData('AgentTimeSeries', scenario.name)
  
     hi = highUsage(scenario, agent_ts, 25)
     model_ts, prop_cols, wealth_cols = prepTimeSeries(model_ts)

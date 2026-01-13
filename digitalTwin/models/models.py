@@ -19,11 +19,20 @@ class Scenario(db.Model):
     init_lon: so.Mapped[int] = so.mapped_column()
 
     agent_time_series: so.WriteOnlyMapped[Optional['AgentTimeSeries']] = so.relationship(
-        back_populates='scenario')
+        back_populates="scenario", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
     energy_time_series: so.WriteOnlyMapped[Optional['EnergyTimeSeries']] = so.relationship(
-        back_populates='scenario')
+        back_populates="scenario", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
     model_time_series: so.WriteOnlyMapped[Optional['ModelTimeSeries']] = so.relationship(
-        back_populates='scenario')
+        back_populates="scenario", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
 
     def __repr__(self):
         return '<scenario {}>'.format(self.scenario_name)
@@ -31,8 +40,9 @@ class Scenario(db.Model):
 class AgentTimeSeries(db.Model):
     __tablename__ = "agent_time_series"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
-                                               index=True)
+    scenario_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey(Scenario.id, ondelete="CASCADE"), 
+        index=True)
     scenario: so.Mapped[Scenario] = so.relationship(back_populates='agent_time_series')
     energy: so.Mapped[int] = so.mapped_column()
     energy_consumption: so.Mapped[int] = so.mapped_column()
@@ -45,8 +55,9 @@ class AgentTimeSeries(db.Model):
 class EnergyTimeSeries(db.Model):
     __tablename__ = "energy_time_series"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
-                                               index=True)
+    scenario_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey(Scenario.id, ondelete="CASCADE"), 
+        index=True)
     scenario: so.Mapped[Scenario] = so.relationship(back_populates='energy_time_series')
     step: so.Mapped[int] = so.mapped_column()
     hour: so.Mapped[int] = so.mapped_column()
@@ -61,8 +72,11 @@ class EnergyTimeSeries(db.Model):
 class ModelTimeSeries(db.Model):
     __tablename__ = "model_time_series"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
-                                               index=True)
+    # scenario_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Scenario.id),
+    #                                            index=True)
+    scenario_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey(Scenario.id, ondelete="CASCADE"), 
+        index=True)
     scenario: so.Mapped[Scenario] = so.relationship(back_populates='model_time_series')
     mid_terraced_house: so.Mapped[float] = so.mapped_column()
     semi_detached_house: so.Mapped[float] = so.mapped_column()
@@ -81,13 +95,6 @@ class ModelTimeSeries(db.Model):
     def __repr__(self):
         return '<model_ts {}>'.format(self.id)
     
-
-class TempClass(db.Model):
-    __tablename__ = "temp_table"
-    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    dataset:  so.Mapped[str] = so.mapped_column(sa.String(64))
-    val1: so.Mapped[float] = so.mapped_column()
-    val2: so.Mapped[float] = so.mapped_column()
 
 class EPCABMdata(db.Model):
     # __bind_key__ = "gis"

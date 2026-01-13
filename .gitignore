@@ -10,7 +10,7 @@ digitalTwin/data/synthetic_data/*
 !digitalTwin/data/synthetic_data/.gitkeep
 
 #databasing
-digitalTwin\app.db
+digitalTwin/app.db
 migrations/*
 
 # Byte-compiled / optimized / DLL files

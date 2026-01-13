@@ -1,0 +1,58 @@
+<!-- Table for managing scenarios -->
+<br>
+<div class="card shadow-md bg-body rounded border bg-light">
+    <div class="card-header"><h6>Reports</h6></div>
+    <div id="card-container">
+        
+        <div class="table-responsive">
+             <table class="table text-nowrap">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">id</th>
+                        <th>scenario_name</th>
+                        <th>days</th>
+                        <th>city</th>
+                        <th>subset</th>
+                        <th>user_name</th>
+                        <th>time_stamp</th>
+                        <th>init_lat</th>
+                        <th>init_lon</th>
+                        <th>Reports?</th>
+                        <th colspan="2" text-align="center">Actions</th>
+                    <tr>
+                </thead>
+                <tbody>
+                    
+                    {% for item in data.items %}
+                    <tr>
+                        <td class="sticky-col">{{item.id}}</td>
+                        <td>{{item.scenario_name}}</td>
+                        <td>{{item.days}}</td>
+                        <td>{{item.city}}</td>
+                        <td>{{item.subset}}</td>
+                        <td>{{item.user_name}}</td>
+                        <td>{{item.timestamp}}</td>
+                        <td>{{item.init_lat}}</td>
+                        <td>{{item.init_lon}}</td>
+                        <td>{{reports[item.id]}}</td>          
+                        <td><a class="btn btn-warning"
+                             href="{{ url_for('digitaltwin.clearData', id=item.id) }}"
+                             role="button">
+                             Clear</a></td> 
+                        <td><a class="btn btn-danger"
+                             href="{{ url_for('digitaltwin.deleteData', id=item.id) }}" role="button">
+                             Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                
+                </tbody>
+            </table>
+        </div>
+         {% if prev_url %}
+            <a href="{{ prev_url }}">Newer reports</a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}">Older reports</a>
+        {% endif %}
+    </div>
+</div>

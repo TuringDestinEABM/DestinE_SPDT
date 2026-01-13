@@ -1,6 +1,6 @@
 from ..digitaltwin import bp
 from flask import render_template, redirect, url_for, flash
-from ..library import scenarios, getData
+from ..library import dataManager, scenarios
 from ..library.forms import CreateScenarioForm
 
 ## original
@@ -17,14 +17,14 @@ def createScenario():
     form  = CreateScenarioForm()
     if form.validate_on_submit():
         scenario_name = scenarios.createNewScenario(form)
-        scenario = getData.findDBData('Scenario', scenario_name)
+        scenario = dataManager.findDBData('Scenario', scenario_name)
         # getData.calculateSubset(scenario.data_source, scenario.subset)
         return render_template("scenario_created.html", scenario_name = scenario_name, scenario = scenario)
     return render_template("create_scenario.html", form=form)
 
 @bp.route("/runscenario/<scenario_name>", methods = ['GET', 'POST'])
 def runScenario(scenario_name):
-    scenario = getData.findDBData('Scenario', scenario_name)
+    scenario = dataManager.findDBData('Scenario', scenario_name)
     scenarios.run(scenario_name) 
     return render_template("scenario_status.html", scenario_name = scenario_name)
 

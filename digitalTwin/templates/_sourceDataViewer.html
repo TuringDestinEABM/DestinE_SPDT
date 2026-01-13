@@ -1,0 +1,99 @@
+<!-- Table for managing scenarios -->
+<br>
+<div class="card shadow-md bg-body rounded border bg-light">
+    <div class="card-header"><h6>Reports</h6></div>
+    <div id="card-container">
+        
+        <div class="table-responsive">
+             <table class="table text-nowrap">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">id</th>
+                        <th>city</th>
+                        <th>UPRN</th>
+                        <th>lsoa_code</th>
+                        <th>local_authority</th>
+                        <th>ward_code</th>
+                        <th>habitable_rooms</th>
+                        <th>sap_rating</th>
+                        <th>floor_area_m2</th>
+                        <th>property_type</th>
+                        <th>property_age</th>
+                        <th>main_fuel_type</th>
+                        <th>main_heating_system</th>
+                        <th>sap_band_ord</th>
+                        <th>retrofit_envelope_score</th>
+                        <th>is_off_gas</th>
+                        <th>energy_demand_kwh</th>
+                        <th>factor</th>
+                        <th>energy_cal_kwh</th>
+                        <th>heating_controls</th>
+                        <th>meter_type</th>
+                        <th>cwi_flag</th>
+                        <th>swi_flag</th>
+                        <th>loft_ins_flag</th>
+                        <th>floor_ins_flag</th>
+                        <th>glazing_flag</th>
+                        <th>is_electric_heating</th>
+                        <th>is_gas</th>
+                        <th>is_oil</th>
+                        <th>is_solid_fuel</th>
+                        <th>epc_lodgement_date_year</th>
+                        <th>geometry_type</th>
+                        <th>geometry_coordinates_lat</th>
+                        <th>geometry_coordinates_lon</th>
+                    <tr>
+                </thead>
+                <tbody>
+                    
+                    {% for item in data2.items %}
+                    <tr>
+                        <td class="sticky-col">{{item.id}}</td>
+                        <td>{{item.city}}</td>
+                        <td>{{item.UPRN}}</td>
+                        <td>{{item.lsoa_code}}</td>
+                        <td>{{item.local_authority}}</td>
+                        <td>{{item.ward_code}}</td>
+                        <td>{{item.habitable_rooms}}</td>
+                        <td>{{item.sap_rating}}</td>
+                        <td>{{item.floor_area_m2}}</td>
+                        <td>{{item.property_type}}</td>
+                        <td>{{item.property_age}}</td>
+                        <td>{{item.main_fuel_type}}</td>
+                        <td>{{item.main_heating_system}}</td>
+                        <td>{{item.sap_band_ord}}</td>
+                        <td>{{item.retrofit_envelope_score}}</td>
+                        <td>{{item.is_off_gas}}</td>
+                        <td>{{item.energy_demand_kwh}}</td>
+                        <td>{{item.factor}}</td>
+                        <td>{{item.energy_cal_kwh}}</td>
+                        <td>{{item.heating_controls}}</td>
+                        <td>{{item.meter_type}}</td>
+                        <td>{{item.cwi_flag}}</td>
+                        <td>{{item.swi_flag}}</td>
+                        <td>{{item.loft_ins_flag}}</td>
+                        <td>{{item.floor_ins_flag}}</td>
+                        <td>{{item.glazing_flag}}</td>
+                        <td>{{item.is_electric_heating}}</td>
+                        <td>{{item.is_gas}}</td>
+                        <td>{{item.is_oil}}</td>
+                        <td>{{item.is_solid_fuel}}</td>
+                        <td>{{item.epc_lodgement_date_year}}</td>
+                        <td>{{item.geometry_type}}</td>
+                        <td>{{item.geometry_coordinates_lat}}</td>
+                        <td>{{item.geometry_coordinates_lon}}</td>
+                    
+                    </tr>
+                    {% endfor %}
+                
+                </tbody>
+            </table>
+        </div>
+         {% if prev_url2 %}
+            <a href="{{ prev_url2 }}">Previous</a>
+            {% endif %}
+            {% if next_url2 %}
+            <a href="{{ next_url2 }}">Next</a>
+        {% endif %}
+    </div>
+</div>

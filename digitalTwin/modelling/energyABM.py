@@ -27,12 +27,12 @@ import geopandas as gpd
 import pandas as pd
 
 from .model import EnergyModel
-from ..library import getData
+from ..library import dataManager
 
 # ──────────────────────────── main ────────────────────────────────
 def run(scenario) -> None:
 
-    gdf   = getData.loadGeoJSONDB(scenario.city, scenario.subset)
+    gdf   = dataManager.loadGeoJSONDB(scenario.city, scenario.subset)
     # gdf = gdf.head() # delete this
     # return gdf
 #     # return(gdf)

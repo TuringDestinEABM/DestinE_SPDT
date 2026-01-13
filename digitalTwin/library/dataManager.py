@@ -107,42 +107,113 @@ def calculateSubset(city, subset):
     selection = np.linspace(first,last, num, dtype=int)
     return(selection)
     
-def findMetadata(ID):
-    results_dir = Path(current_app.config['RESULTS_DIR'])
-    path = results_dir / ID / "metadata.json"
-    metadata = loadJSONdata(path)
-    return metadata
+# def findMetadata(ID):
+#     results_dir = Path(current_app.config['RESULTS_DIR'])
+#     path = results_dir / ID / "metadata.json"
+#     metadata = loadJSONdata(path)
+#     return metadata
 
-def listSummaryFigures(ID):
-    results_dir = Path(current_app.config['RESULTS_DIR'])
-    path = results_dir / ID
-    figures = dict(plot_day_hour = str(path /"plot_day_hour.png"),
-                   plot_hexbin = str(path /"plot_day_hour.png"),
-                   plot_prop_type = str(path /"plot_prop_type.png"),
-                   plot_wealth = str(path /"plot_wealth.png")
-                   )
-    return figures
+# def listSummaryFigures(ID):
+#     results_dir = Path(current_app.config['RESULTS_DIR'])
+#     path = results_dir / ID
+#     figures = dict(plot_day_hour = str(path /"plot_day_hour.png"),
+#                    plot_hexbin = str(path /"plot_day_hour.png"),
+#                    plot_prop_type = str(path /"plot_prop_type.png"),
+#                    plot_wealth = str(path /"plot_wealth.png")
+#                    )
+#     return figures
 
-def listAvailableReports(path):
-    folders = [x for x in path.iterdir() if x.is_dir()]
-    data = list()
+# def listAvailableReports(path):
+#     folders = [x for x in path.iterdir() if x.is_dir()]
+#     data = list()
 
-    for folder in folders:
-       mdPath = path / folder / "metadata.json"
-       metadata =  loadJSONdata(mdPath)
-       data.append(metadata) 
+#     for folder in folders:
+#        mdPath = path / folder / "metadata.json"
+#        metadata =  loadJSONdata(mdPath)
+#        data.append(metadata) 
 
-    data = dict(files = data)
-    # print(data)
-    return data
+#     data = dict(files = data)
+#     # print(data)
+#     return data
 
 
-def listAvailableScenarios(page):
-    query = sa.select(models.Scenario).order_by(models.Scenario.timestamp.desc())
+def listAvailableScenarios(page, order='asc'):
+    query = sa.select(models.Scenario)
+    
+    if order == 'desc':
+        query = query.order_by(models.Scenario.timestamp.desc())
+
     data = db.paginate(query, page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
     next_url = url_for('digitaltwin.reports', page=data.next_num) \
-        if data.has_next else None
+            if data.has_next else None
     prev_url = url_for('digitaltwin.reports', page=data.prev_num) \
-        if data.has_prev else None
+            if data.has_prev else None
+     
 
     return data, next_url, prev_url
+
+def manageScenarios(page, order='asc'):
+    query = sa.select(models.Scenario)
+    
+    if order == 'desc':
+        query = query.order_by(models.Scenario.timestamp.desc())
+
+    data = db.paginate(query, page=page, per_page=current_app.config['POSTS_PER_PAGE'], error_out=False)
+    next_url = url_for('digitaltwin.manageData', page1=data.next_num) \
+            if data.has_next else None
+    prev_url = url_for('digitaltwin.manageData', page1=data.prev_num) \
+            if data.has_prev else None
+    reports = findCorrespondingResults(data)
+
+    return data, next_url, prev_url, reports
+
+def viewSourceData(page):
+    query = sa.select(models.EPCABMdata)
+    data = db.paginate(query, page=page, per_page=50, error_out=False)
+    next_url = url_for('digitaltwin.manageData', page2=data.next_num, active_tab='sources') \
+            if data.has_next else None
+    prev_url = url_for('digitaltwin.manageData', page2=data.prev_num, active_tab='sources') \
+            if data.has_prev else None
+     
+
+    return data, next_url, prev_url
+
+def findCorrespondingResults(data):
+    responses = {}
+    for item in data.items:
+        id = item.id
+                
+        # look for corresponding results in the three tables
+        tables = [models.AgentTimeSeries, models.EnergyTimeSeries, models.ModelTimeSeries]
+        results = []
+        for table in tables:
+            result = bool(db.session.query(table.id).where(table.scenario_id == id).first()) # returns true if at least on, false if not
+            results.append(result)
+
+        # see if no results, three results or partial results
+        if sum(results ) == 0:
+            response = 'No results'
+        elif sum(results) == len(tables):
+            response = 'Full results'
+        else:
+            response = 'Partial results'
+        responses[int(id)] = response
+    
+    return responses
+
+def clearResults(id):
+    tables = [models.AgentTimeSeries, models.EnergyTimeSeries, models.ModelTimeSeries]
+    for table in tables:
+        print('clearing ' + str(table))
+        stmt = sa.delete(table).where(table.scenario_id == id)
+        db.session.execute(stmt)
+    db.session.commit()
+
+def deleteScenario(id):
+    scenario = db.session.get(models.Scenario, id)
+    
+    if scenario:
+        # This single line deletes the scenario AND all 3 time series tables automatically
+        db.session.delete(scenario)
+        db.session.commit()
+

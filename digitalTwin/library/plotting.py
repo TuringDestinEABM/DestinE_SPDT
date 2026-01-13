@@ -5,7 +5,7 @@ Figures are returned aas json dumps of plotly fig objects. GIS information retur
 '''
 
 from ..modelling import analyze
-from ..library import getData
+from . import dataManager
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
@@ -18,9 +18,9 @@ import sqlalchemy.orm as so
 from digitalTwin.models import models
 
 def prepare_data(scenario, jitterRadius=25):
-    hourly = getData.findDBData('EnergyTimeSeries', scenario.id)
-    model_ts = getData.findDBData('ModelTimeSeries', scenario.id)
-    a_ts = getData.findDBData('AgentTimeSeries', scenario.id)
+    hourly = dataManager.findDBData('EnergyTimeSeries', scenario.id)
+    model_ts = dataManager.findDBData('ModelTimeSeries', scenario.id)
+    a_ts = dataManager.findDBData('AgentTimeSeries', scenario.id)
     agent_ts = analyze.reset_agent_index(a_ts)
     hi = analyze.highUsage(scenario, agent_ts, 25) 
 
@@ -112,7 +112,7 @@ def timeline(scenario):
     # dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
       
     # combine agent data and energy usage timeseries into a single dataframe
-    agent_ts = analyze.reset_agent_index(getData.findDBData('AgentTimeSeries', scenario.id))
+    agent_ts = analyze.reset_agent_index(dataManager.findDBData('AgentTimeSeries', scenario.id))
     timeseries = analyze.allUsage_ts(scenario, agent_ts, 25)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
