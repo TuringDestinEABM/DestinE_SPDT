@@ -1,0 +1,50 @@
+<!-- Table for managing scenarios -->
+<br>
+<div class="card shadow-md bg-body rounded border bg-light">
+    
+    <div id="card-container">
+        
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="sticky-col">id</th>
+                        <th>Name</th>
+                        <th>Created</th>
+                        <th>User</th>
+                        <th>Description</th>
+                        <th colspan="2" text-align="center"></th>
+                    <tr>
+                </thead>
+
+                <tbody>
+                    {% for item in tab.tab_data %}
+                    <tr>
+                        <td class="sticky-col">{{item.id}}</td>
+                        <td>{{item.policy_name}}</td>
+                        <td>{{item.timestamp}}</td>
+                        <td>{{item.user_name}}</td>
+                        <td>{{item.description}}</td>
+                        <td><a class="btn btn-danger"
+                                href="{{ url_for('digitaltwin.deleteData', 
+                                                    table_id=tab.id, 
+                                                    id=item.id, 
+                                                    tab=tab.id, 
+                                                    **{('page_' ~ tab.id): request.args.get('page_' ~ tab.id, 1)}) 
+                                        }}" 
+                                role="button">
+                             Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                
+                </tbody>
+            </table>
+        </div>
+         {% if prev_url %}
+            <a href="{{ prev_url }}">Newer reports</a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}">Older reports</a>
+        {% endif %}
+    </div>
+</div>

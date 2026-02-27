@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container bg-light">
+        <h2 class="mb-4 text-center">New Population Model</h2>
+        
+        
+        <form method="POST" action="">
+            {{ popForm.hidden_tag() }}
+
+            <!-- Wards -->
+            <div class="mb-3">
+                {{ popForm.Wards.label(class="form-label") }}
+                
+                <div class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'wards-select')">
+                        Select All
+                    </button>
+                </div>
+
+                {% if popForm.Wards.errors %}
+                    {{ popForm.Wards(class="form-select is-invalid", size=8, id="wards-select") }}
+                    <div class="invalid-feedback">
+                        {% for error in popForm.Wards.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ popForm.Wards(class="form-select", size=8, id="wards-select") }}
+                {% endif %}
+                
+                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple wards.</div>
+            </div>
+
+            <!-- Property Types -->
+            <div class="mb-3">
+                {{ popForm.PropertyTypes.label(class="form-label") }}
+                
+                <div class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'property-types-select')">
+                        Select All
+                    </button>
+                </div>
+
+
+                {% if popForm.PropertyTypes.errors %}
+                    {{ popForm.PropertyTypes(class="form-select is-invalid", size=8, id="wards-select") }}
+                    <div class="invalid-feedback">
+                        {% for error in popForm.PropertyTypes.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ popForm.PropertyTypes(class="form-select", size=8, id="property-types-select") }}
+                {% endif %}
+                
+                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple property types.</div>
+            </div>
+
+            <!-- Occupant  Types -->
+            <div class="mb-3">
+                {{ popForm.OccupantTypes.label(class="form-label") }}
+                
+                <div class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'occupant-types-select')">
+                        Select All
+                    </button>
+                </div>
+
+                {% if popForm.OccupantTypes.errors %}
+                    {{ popForm.OccupantTypes(class="form-select is-invalid", size=8, id="wards-select") }}
+                    <div class="invalid-feedback">
+                        {% for error in popForm.OccupantTypes.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ popForm.OccupantTypes(class="form-select", size=8, id="occupant-types-select") }}
+                {% endif %}
+                
+                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple occupant types.</div>
+            </div>
+
+            <div class="d-grid gap-2">
+                {{ popForm.Submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block javascript %} 
+<script>
+    
+    function toggleSelectAll(btn, selectId) {
+        var selectBox = document.getElementById(selectId);
+        
+        if (!selectBox) {
+            console.error("Could not find element with id '" + selectId + "'");
+            return;
+        }
+
+        var options = selectBox.options;
+        
+        
+        var isSelectingAll = (btn.innerText.trim() === "Select All");
+
+        for (var i = 0; i < options.length; i++) {
+            options[i].selected = isSelectingAll;
+        }
+
+        if (isSelectingAll) {
+            btn.innerText = "Deselect All";
+        } else {
+            btn.innerText = "Select All";
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %} 

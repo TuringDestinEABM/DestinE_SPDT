@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-secondary">Review Scenario</h2>
+        <div class="btn-group shadow-sm">
+            <form method="POST" class="d-flex">
+                {{ submitForm.hidden_tag() }}
+                {{ submitForm.Save(class="btn btn-primary px-4") }}
+                {{ submitForm.Run(class="btn btn-success px-4") }}
+            </form>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 text-primary fw-bold">Scenario Information</h5>
+                    <a href="{{ url_for('digitaltwin.create_scenario_init') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2"><strong>Name:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Name') }}</span></div>
+                    <div class="mb-2"><strong>Days:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Days') }}</span></div>
+                    <div class="mb-2"><strong>City:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('City') }}</span></div>
+                    <div class="mb-2"><strong>Technology:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Technology') }}</span></div>
+                    {% if session.main_scenario_data.description %}
+                    <div class="small text-muted mt-2 border-top pt-2 italic">{{ session.get('main_scenario_data', {}).get('Description') }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 text-primary fw-bold">Policy Choices</h5>
+                    <a href="{{ url_for('digitaltwin.create_scenario_policy') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if session.get('policy_mode') == 'preset'%}
+                            <div class="col-6 mb-2"><strong>Policy:</strong> <br><span class="text-muted">{{policy_data.policy.policy_name}}</span></div>
+                            <div class="col-6 mb-2"><strong>Description:</strong> <br><span class="text-muted">{{policy_data.policy.description if policy_data.policy.description}}</span></div>
+                            <div class="col-6 mb-2"><strong>Rules:</strong> <br>
+                                {% for rule in policy_data.rules %}
+                                    <strong>No.</strong> {{ loop.index }}
+                                    {% if rule.qualifying_characteristics %} <strong>Q:</strong> {{ rule.qualifying_characteristics|join(', ') }}<br> {% endif %}
+                                    {% if rule.required_characteristics %} <strong>R:</strong> {{ rule.required_characteristics|join(', ') }}<br> {% endif %}
+                                    {% if rule.disqualifying_characteristics %} <strong>D:</strong> {{ rule.disqualifying_characteristics|join(', ') }} {% endif %}
+                                    <strong>AR:</strong>{{ rule.adoption_rate }}%                       
+                                {% endfor %}
+                        {% elif session.get('policy_mode') == 'new'%}
+                            <div class="alert alert-warning" role="alert"><b>Warning:</b> <br>Not yet implemented for policy_mode = 'new'
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+<div class="col">
+    <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0 text-primary fw-bold">Population</h5>
+            <a href="{{ url_for('digitaltwin.create_scenario_population') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+        </div>
+        <div class="card-body">
+            <div class="mb-2">
+                <strong>Wards:</strong>
+                <span class="text-muted small">
+                    {{ session.get('population_data', {}).get('Wards') }}
+                </span>
+            </div>
+            <div class="mb-2"><strong>Incomes:</strong> <span class="text-muted  ">{{session.get('population_data', {}).get('IncomeTypes') }}</span>
+            </div>
+            <div class="mb-2"><strong>Property Types:</strong> <span class="text-muted ">{{session.get('population_data', {}).get('PropertyTypes') }}></span>
+            </div>
+            <div class="mb-2"><strong>Schedules:</strong> <span class="text-muted ">{{ session.get('population_data', {}).get('ScheduleTypes') }}</span>
+            </div>
+                <div class="mt-2">
+                <strong>Subset:</strong>
+                <div class="text-muted small overflow-auto" style="max-height: 60px;">
+                    {{ session.get('population_data', {}).get('Subset') }} % 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+<style>
+    /* Styling to match homepage feel */
+    body { background-color: #f8f9fa; }
+    .card { transition: transform 0.2s; border-radius: 8px; }
+    .card:hover { transform: translateY(-2px); }
+    .card-title { font-size: 1.1rem; letter-spacing: 0.02em; }
+    .btn-outline-secondary { border-color: #dee2e6; color: #6c757d; font-size: 0.8rem; }
+</style>
+
+{% block javascript %}
+{% endblock %}
+{% endblock %}

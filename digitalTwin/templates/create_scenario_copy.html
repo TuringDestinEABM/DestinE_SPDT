@@ -1,0 +1,133 @@
+<!-- Page for creating a new scenario -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>New Scenario</h3>
+
+<div class="container">
+  <div class="row mb-4">
+    <div class="col">
+        <div class="alert alert-warning" role="alert"><b>Warning:</b> <br>Distributed task queuing is not implemented in the development version of the digital twin. The simulation takes a long time to run. We recommend using reduced datasets (e.g. '..._div100', which contains 1 % of the points from the main dataset) and short runs (less than 10 days). 
+        </div>
+    </div>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+        <div class="card shadow-md bg-body rounded border bg-light w-80">
+            <div class="card-header"><h5>Setup</h5></div>
+            <div class="card-body">
+            <mainForm action='' method="post">
+                {{ mainForm.hidden_tag() }}
+                <p>
+                    {{ mainForm.Name.label }}
+                    {{ mainForm.Name(size=32) }}
+                    {% for error in mainForm.Name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ mainForm.Days.label }}
+                    {{ mainForm.Days(size=32) }}
+                </p>
+                <p>{{ mainForm.City.label }}{{ mainForm.City() }} 
+                {{ mainForm.Subset.label }}{{ mainForm.Subset() }} </p>
+                <p>{{ mainForm.ClimateModel.label }}{{ mainForm.ClimateModel() }}
+                {{ mainForm.PolicyChoices.label }}{{ mainForm.PolicyChoices() }} </p>
+                <p>{{ mainForm.PopulationModel.label }}{{ mainForm.PopulationModel() }}
+                {{ mainForm.Submit() }}</p>
+            </mainForm>
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+    <div class="row mb-4">
+    <div class="card shadow-md bg-body rounded border bg-light w-80">
+        <div class="card-header"><h5>Climate Model</h5></div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col">
+                    <mainForm action='' method="post">
+                        <p>
+                            {{ climateForm.Name.label }}<br>
+                            {{ climateForm.Name(size=32) }}
+                        </p>
+                        <p>{{ climateForm.BaseData.label }}<br>{{ climateForm.BaseData() }}
+                        {{ climateForm.TemperatureVar.label }}{{ climateForm.TemperatureVar() }} </p>
+                        <p>{{ climateForm.TemperatureScale.label }}{{ climateForm.TemperatureScale() }} 
+                        {{ climateForm.Submit() }}</p>
+                    </mainForm>
+                </div>
+    
+                <div class="col">
+                    <img src="{{ url_for('static', filename='img/temp/climate.png') }}" 
+                                            class="img-fluid mx-auto d-block" 
+                                            style="width: 80%;">
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+  <div class="row mb-4">
+    <div class="card shadow-md bg-body rounded border bg-light w-80">
+        <div class="card-header"><h5>Population Model</h5></div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col">
+                [TODO: add options to this form]
+                <mainForm action='' method="post">
+                    
+                    <p>{{ popForm.Submit() }}</p>
+                </mainForm>
+            </div>
+    
+            <div class="col">
+                <img src="{{ url_for('static', filename='img/temp/population.png') }}" 
+                                        class="img-fluid mx-auto d-block" 
+                                        style="width: 80%;">
+            </div>
+        </div>
+    </div>
+</div>
+  <div class="row mb-4">
+    <div class="card shadow-md bg-body rounded border bg-light w-80">
+        <div class="card-header"><h5>Policy Choices</h5></div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col">
+                    <mainForm action='' method="post">
+                        <p>
+                            {{ policyForm.Name.label }}<br>
+                            {{ policyForm.Name(size=32) }}
+                        </p>
+                        <p>{{ policyForm.Technology.label }}{{ policyForm.Technology() }} 
+                        {{ policyForm.BaseCost.label }}{{ policyForm.BaseCost() }} </p>
+                        <p>{{ policyForm.CostMod.label }}{{ policyForm.CostMod() }} 
+                        {{ policyForm.CostModVal.label }}{{ policyForm.CostModVal() }} </p>
+                        <p>{{ policyForm.FundingMethod.label }}{{ policyForm.FundingMethod() }}
+                        {{ policyForm.FundingVal.label }}{{ policyForm.FundingVal() }} 
+                        {{ policyForm.Submit() }}</p>
+                    </mainForm>
+                </div>
+    
+                <div class="col">
+                    <img src="{{ url_for('static', filename='img/temp/policy.png') }}" 
+                                            class="img-fluid mx-auto d-block" 
+                                            style="width: 80%;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+    
+
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>New Scenario: set up</h3>
+
+<div class="container">
+  <div class="row mb-4">
+    <div class="col">
+        <div class="alert alert-warning" role="alert"><b>Warning:</b> <br>Distributed task queuing is not implemented in the development version of the digital twin. The simulation takes a long time to run. We recommend using reduced datasets (e.g. '..._div100', which contains 1 % of the points from the main dataset) and short runs (less than 10 days). 
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="col-md-12">
+    <div class="card p-4 shadow-sm">
+        <h4>Scenario Details</h4>
+        <form method="POST" action="">
+            {{ mainForm.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ mainForm.Name.label(class="form-label") }}
+                {{ mainForm.Name(class="form-control") }}
+                {% for error in mainForm.Name.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        {{ mainForm.Days.label(class="form-label") }}
+                        {{ mainForm.Days(class="form-control") }}
+                        {% for error in mainForm.Days.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        {{ mainForm.City.label(class="form-label") }}
+                        {{ mainForm.City(class="form-select") }}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="mb-3">
+                        {{ mainForm.Technology.label(class="form-label") }}
+                        {{ mainForm.Technology(class="form-select") }}
+                    </div>
+                </div>
+            </div>
+            
+            
+
+            <div class="mb-3">
+                {{ mainForm.Description.label(class="form-label") }}
+                {{ mainForm.Description(class="form-control", rows="4") }}
+            </div>
+            
+
+            
+            <div class="d-grid">
+                {{ mainForm.Submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+{% endblock %}

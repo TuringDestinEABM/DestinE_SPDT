@@ -2,6 +2,7 @@
 flask == 3.1.2
 flask-WTF == 1.2.0
 wtforms == 3.2.1
+wtforms_sqlalchemy ==0.4.2
 
 # Databasing
 Flask-SQLAlchemy == 3.1.1

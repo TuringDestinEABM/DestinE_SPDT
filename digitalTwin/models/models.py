@@ -1,14 +1,16 @@
 """Database models. For the other kinds of models (MABM, climate models etc) look in /modelling."""
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List
 import sqlalchemy as sa
 import sqlalchemy.orm as so
+from sqlalchemy.ext.mutable import MutableList
 from digitalTwin import db
 
 class Scenario(db.Model):
     __tablename__ = "scenario"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     scenario_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    description: so.Mapped[Optional[str]] = so.mapped_column()
     days: so.Mapped[int] = so.mapped_column()
     city: so.Mapped[str] = so.mapped_column(sa.String(64))
     subset: so.Mapped[int] = so.mapped_column()
@@ -17,6 +19,9 @@ class Scenario(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     init_lat: so.Mapped[int] = so.mapped_column()
     init_lon: so.Mapped[int] = so.mapped_column()
+    climate_model_id: so.Mapped[Optional[int]] = so.mapped_column()
+    policy_id: so.Mapped[Optional[int]] = so.mapped_column()
+    population_id: so.Mapped[Optional[int]] = so.mapped_column()
 
     agent_time_series: so.WriteOnlyMapped[Optional['AgentTimeSeries']] = so.relationship(
         back_populates="scenario", 
@@ -135,41 +140,123 @@ class EPCABMdata(db.Model):
     geometry_coordinates_lon: so.Mapped[float] = so.mapped_column()
 
     def __repr__(self):
-        return '<epc_abm_newcastle {}>'.format(self.id)    
+        return '<epc_abm_data {}>'.format(self.id)    
     
-# class EPCABMSunderland(db.Model):
-#     __tablename__ = "epc_abm_sunderland"
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     uprn: so.Mapped[int] = so.mapped_column()
-#     lsoa_code: so.Mapped[str] = so.mapped_column()
-#     local_authority: so.Mapped[str] = so.mapped_column()
-#     ward_code: so.Mapped[str] = so.mapped_column()
-#     habitable_rooms: so.Mapped[Optional[int]] = so.mapped_column()
-#     sap_rating: so.Mapped[int] = so.mapped_column()
-#     floor_area: so.Mapped[float] = so.mapped_column()
-#     property_type: so.Mapped[str] = so.mapped_column()
-#     property_age: so.Mapped[str] = so.mapped_column()
-#     main_fuel: so.Mapped[str] = so.mapped_column()
-#     main_heating_system: so.Mapped[str] = so.mapped_column()
-#     sap_band_ord: so.Mapped[int] = so.mapped_column()
-#     retrofit_envelope_score: so.Mapped[float] = so.mapped_column()
-#     is_off_gas: so.Mapped[Optional[bool]] = so.mapped_column()
-#     energy_demand_kwh: so.Mapped[float] = so.mapped_column()
-#     factor: so.Mapped[float] = so.mapped_column()
-#     energy_cal_kwh: so.Mapped[float] = so.mapped_column()
-#     heating_controls: so.Mapped[Optional[str]] = so.mapped_column()
-#     meter_type: so.Mapped[str] = so.mapped_column()
-#     cwi_flag: so.Mapped[bool] = so.mapped_column()
-#     swi_flag: so.Mapped[bool] = so.mapped_column()
-#     loft_ins_flag: so.Mapped[bool] = so.mapped_column()
-#     floor_ins_flag: so.Mapped[bool] = so.mapped_column()
-#     glazing_flag: so.Mapped[bool] = so.mapped_column()
-#     is_electric_heating: so.Mapped[Optional[bool]] = so.mapped_column()
-#     is_gas: so.Mapped[Optional[bool]] = so.mapped_column()
-#     is_oil: so.Mapped[Optional[bool]] = so.mapped_column()
-#     is_solid_fuel: so.Mapped[Optional[bool]] = so.mapped_column()
-#     epc_lodgement_date_year: so.Mapped[int] = so.mapped_column()
-#     geometry: so.Mapped[dict] = so.mapped_column()
+class UPRNdata(db.Model):
+    # __bind_key__ = "gis"
+    __tablename__ = "uprn_data"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    city: so.Mapped[str] = so.mapped_column()
+    UPRN: so.Mapped[int] = so.mapped_column()
+    lsoa_code: so.Mapped[str] = so.mapped_column()
+    dwelling_bucket: so.Mapped[Optional[str]] = so.mapped_column()
+    tenure: so.Mapped[Optional[str]] = so.mapped_column()
+    size_band: so.Mapped[Optional[int]] = so.mapped_column()
+    hidp: so.Mapped[Optional[int]] = so.mapped_column()
+    hh_n_people: so.Mapped[Optional[int]] = so.mapped_column()
+    hh_children: so.Mapped[Optional[bool]] = so.mapped_column()
+    hh_income: so.Mapped[Optional[float]] = so.mapped_column()
+    hh_income_band: so.Mapped[Optional[str]] = so.mapped_column()
+    schedule_type: so.Mapped[Optional[str]] = so.mapped_column()
+    hh_edu_detail: so.Mapped[Optional[str]] = so.mapped_column()
+   
+    def __repr__(self):
+        return '<uprn_data {}>'.format(self.id)    
+    
+class ClimateModel(db.Model):
+    __tablename__ = "climate_model"
+    
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    timestamp: so.Mapped[datetime] = so.mapped_column(
+        index=True, default=lambda: datetime.now(timezone.utc))
+    model_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    user_name: so.Mapped[str] = so.mapped_column(sa.String(64))
+    base_data: so.Mapped[str] = so.mapped_column()
+    temp_var_Type: so.Mapped[str] = so.mapped_column()
+    # temp_var_vals: so.Mapped[List[int]] = so.mapped_column(MutableList.as_mutable(sa.PickleType))
+    temp_scale: so.Mapped[Optional[float]] = so.mapped_column()
+    
+    def __repr__(self):
+        return '<climate_model {}>'.format(self.id)    
 
-#     def __repr__(self):
-#         return '<epc_abm_sunderland {}>'.format(self.id)    
+class Population(db.Model):
+    __tablename__ = "population"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    timestamp: so.Mapped[datetime] = so.mapped_column(
+        index=True, default=lambda: datetime.now(timezone.utc))
+    user_name: so.Mapped[str] = so.mapped_column(sa.String(64))
+    wards: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
+    property_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
+    income_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    schedule_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))  
+
+    def __repr__(self):
+        return '<population {}>'.format(self.id)    
+   
+
+    def __repr__(self):
+        return '<population {}>'.format(self.id)        
+
+class PolicyChoices(db.Model):
+    __tablename__ = "policy_choices"
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    timestamp: so.Mapped[datetime] = so.mapped_column(
+        index=True, default=lambda: datetime.now(timezone.utc))
+    policy_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    description: so.Mapped[Optional[str]] = so.mapped_column()
+    user_name: so.Mapped[str] = so.mapped_column(sa.String(64))
+    rules: so.Mapped[List['Rules']] = so.relationship(
+        back_populates="policy_choice", 
+        cascade="all, delete-orphan",
+        passive_deletes=True
+    )
+
+    def __repr__(self):
+        return '<policy_choices {}>'.format(self.id)    
+
+class Rules(db.Model):
+    __tablename__ = "rules"
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    policy_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey("policy_choices.id", ondelete="CASCADE"), 
+        index=True
+    )
+    policy_choice: so.Mapped['PolicyChoices'] = so.relationship(
+        back_populates="rules"
+    )
+    qualifying_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    required_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    disqualifying_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    wards: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
+    property_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
+    income_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    schedule_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
+    adoption_rate: so.Mapped[int] = so.mapped_column()
+
+    def __repr__(self):
+    # Required fields
+        parts = [
+            f"id={self.id}",
+            f"policy_id={self.policy_id}",
+            f"adoption_rate={self.adoption_rate}"
+        ]
+
+        optional_fields = [
+            "qualifying_characteristics",
+            "required_characteristics",
+            "disqualifying_characteristics",
+            "wards",
+            "property_types",
+            "income_types",
+            "schedule_types"
+        ]
+
+    # Append any optional fields which exist
+        for field in optional_fields:
+            value = getattr(self, field)
+            if value is not None:
+                parts.append(f"{field}={value}")
+
+        return f"<Rules({', '.join(parts)})>"

@@ -1,47 +1,76 @@
 <!-- Table for managing scenarios -->
 <br>
 <div class="card shadow-md bg-body rounded border bg-light">
-    <div class="card-header"><h6>Reports</h6></div>
+    
     <div id="card-container">
         
         <div class="table-responsive">
-             <table class="table text-nowrap">
+            <table class="table table-hover align-middle">
                 <thead>
                     <tr>
-                        <th class="sticky-col">id</th>
-                        <th>scenario_name</th>
-                        <th>days</th>
-                        <th>city</th>
-                        <th>subset</th>
-                        <th>user_name</th>
-                        <th>time_stamp</th>
-                        <th>init_lat</th>
-                        <th>init_lon</th>
-                        <th>Reports?</th>
-                        <th colspan="2" text-align="center">Actions</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                        <th>City</th>
+                        <th>User</th>
+                        <th>Agents</th>
+                        <th>Policy</th>
+                        <th class="text-center">Agent Results</th>
+                        <th class="text-center">Energy Results</th>
+                        <th class="text-center">Model Results</th>
+                        <th></th>
                     <tr>
                 </thead>
+
                 <tbody>
-                    
-                    {% for item in data.items %}
+                    {% for item in tab.tab_data %}
                     <tr>
-                        <td class="sticky-col">{{item.id}}</td>
-                        <td>{{item.scenario_name}}</td>
-                        <td>{{item.days}}</td>
-                        <td>{{item.city}}</td>
-                        <td>{{item.subset}}</td>
-                        <td>{{item.user_name}}</td>
-                        <td>{{item.timestamp}}</td>
-                        <td>{{item.init_lat}}</td>
-                        <td>{{item.init_lon}}</td>
-                        <td>{{reports[item.id]}}</td>          
+                        <td>{{item[0].scenario_name}}</td>
+                        <td>{{item[0].description}}</td>
+                        <td>{{item[0].timestamp}}</td>
+                        <td>{{item[0].city}}</td>
+                        <td>{{item[0].user_name}}</td>
+                        <td>{{item[0].population_id}}</td>
+                        <td>{{item[0].policy_id}}</td>
+                        <td class="text-center">
+                            {% if item[1] %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary opacity-50">Missing</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if item[2] %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary opacity-50">Missing</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if item[3] %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-secondary opacity-50">Missing</span>
+                            {% endif %}
+                        </td>    
                         <td><a class="btn btn-warning"
-                             href="{{ url_for('digitaltwin.clearData', id=item.id) }}"
+                             href="{{ url_for('digitaltwin.clearData', 
+                                                    id=item[0].id, 
+                                                    tab=tab.id, 
+                                                    **{('page_' ~ tab.id): request.args.get('page_' ~ tab.id, 1)}) 
+                                        }}" 
                              role="button">
                              Clear</a></td> 
                         <td><a class="btn btn-danger"
-                             href="{{ url_for('digitaltwin.deleteData', id=item.id) }}" role="button">
-                             Delete</a></td>
+                                href="{{ url_for('digitaltwin.deleteData', 
+                                                    table_id=tab.id, 
+                                                    id=item[0].id, 
+                                                    tab=tab.id, 
+                                                    **{('page_' ~ tab.id): request.args.get('page_' ~ tab.id, 1)}) 
+                                        }}" 
+                                role="button">
+                             Delete</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 

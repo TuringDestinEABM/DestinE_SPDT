@@ -58,15 +58,16 @@ def reset_agent_index(df: pd.DataFrame) -> pd.DataFrame:
     )
     
 
-def allUsage_ts(scenario, timeseries, jitterRadius):
+def allUsage_ts(scenario, timeseries, jitterRadius =25):
     # a. keep only household rows (energy == 0 means PersonAgent)
+
     ts = timeseries[
         (timeseries["energy"] == 0) &
         (timeseries["energy_consumption"] > 0)
     ]
 
     columns = ["UPRN", "property_type"]
-    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.subset, columns)
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.population_id, columns)
     gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     ts["agent_id"] = ts["agent_id"].astype(str)
     ts = gdf.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")
@@ -88,8 +89,8 @@ def highUsage(scenario, timeseries, jitterRadius):
 
     # c. attach geometry + property_type from GeoJSON
     columns = ["UPRN", "property_type"]
-    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.subset, columns)
-    
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.policy_id, columns)
+
     gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     totals["agent_id"] = totals["agent_id"].astype(str)
     gdf = gdf.rename(columns={"UPRN": "agent_id"}).merge(totals, on="agent_id")

@@ -26,6 +26,7 @@ def prepare_data(scenario, jitterRadius=25):
 
     model_ts, prop_cols, wealth_cols= analyze.prepTimeSeries(model_ts)
     return hi, model_ts, prop_cols, wealth_cols, hourly
+    # return model_ts, prop_cols, wealth_cols, hourly
 
 
 # TODO: Fix this
@@ -58,6 +59,9 @@ def prepare_data(scenario, jitterRadius=25):
     
 # script for bar chart showing mean energy usage by different property types.
 def dailyByPropTypePX(timeseries, prop_cols):
+    prop_cols.remove('id')
+    prop_cols.remove('scenario_id')
+    timeseries.drop(['id', 'scenario_id'], axis=1)
     daily_type = timeseries.groupby("day")[prop_cols].sum()
     mean_daily_type = daily_type.mean().sort_values(ascending=False)
 
@@ -109,11 +113,9 @@ def temporalHeatMap(timeseries):
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
 def timeline(scenario):
-    # dataPath = Path(__file__).parents[1] /"data/synthetic_data" / scenario.data_source
-      
     # combine agent data and energy usage timeseries into a single dataframe
     agent_ts = analyze.reset_agent_index(dataManager.findDBData('AgentTimeSeries', scenario.id))
-    timeseries = analyze.allUsage_ts(scenario, agent_ts, 25)
+    timeseries = analyze.allUsage_ts(scenario, agent_ts)
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
 
@@ -123,17 +125,21 @@ def timeline(scenario):
                     "max": round(ec.max(),3)
                     }
 
+    print('energy_range')
+    print(energy_range)
+
     # create list of number of steps                
     stepArray = []
     for step in pd.unique(timeseries['step']):
         stepArray.append(int(step))
 
     steps = {
-       "min": min(stepArray),
+       "min": 0,
        "max": max(stepArray),
        "steps": stepArray
     }
 
-    
-  
+    print('steps')
+    print(steps)
+
     return steps, timeseries_js, energy_range

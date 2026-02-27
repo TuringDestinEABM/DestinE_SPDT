@@ -1,7 +1,12 @@
 <!-- Table for accessing reports -->
 
-<div class="card shadow-md bg-body rounded border bg-light">
-    <div class="card-header"><h6>Reports</h6></div>
+<div class="card shadow-md bg-body rounded border bg-light ">
+    <div class="card-header">
+        <div class="card-header bg-light border-0 pt-3 d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 fw-bold">Reports</h5>
+                    <a href="{{ url_for('digitaltwin.manageData') }}" class="btn btn-sm btn-outline-secondary">Manage</a>
+                     </div>
+        </div>
     <div id="card-container">
         
         <table class="table">
@@ -11,18 +16,25 @@
                     <th>Created</th>
                     <th>City</th>
                     <th>User</th>
-                    <th>Report</th>
+                    <th>Status</th>
+                    <th>View</th>
                 <tr>
             </thead>
             <tbody>
                 
-                {% for item in data.items %}
+                {% for row in scenario_data %}
+                {% set item = row['scenario'] %}
                 <tr>
                     <td>{{item.scenario_name}}</td>
                     <td>{{item.timestamp}}</td>
-                     <td>{{item.city}}</td>
+                    <td>{{item.city}}</td>
                     <td>{{item.user_name}}</td>
-                    <td><a href="{{ url_for('digitaltwin.specific_report', scenario_name=item.scenario_name) }}">.../reports/{{item.scenario_name}}</a></td>
+                    <td>{{row['reports']}}</td>
+                    {% if row['reports'] == 'Full results' %}
+                        <td><a href="{{ url_for('digitaltwin.specific_report', scenario_name=item.scenario_name) }}"><button class="btn btn-primary my-2">View Results</button></a></td>
+                    {% else %}
+                            <td><a href="{{ url_for('digitaltwin.runScenario', scenario_name=item.scenario_name) }}"><button class="btn btn-success my-2">Run</button></a></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
                

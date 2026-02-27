@@ -28,23 +28,44 @@ import pandas as pd
 
 from .model import EnergyModel
 from ..library import dataManager
+from digitalTwin.config import Config
 
 # ──────────────────────────── main ────────────────────────────────
-def run(scenario) -> None:
+def run(scenario, log_callback=print) -> None:
 
-    gdf   = dataManager.loadGeoJSONDB(scenario.city, scenario.subset)
-    # gdf = gdf.head() # delete this
-    # return gdf
-#     # return(gdf)
-    model = EnergyModel(gdf)
+    fields = [
+    "UPRN","property_type","sap_rating","energy_cal_kwh","energy_demand_kwh",
+    "floor_area_m2","property_age","main_fuel_type","main_heating_system",
+    "retrofit_envelope_score",
+    "heating_controls","meter_type",
+    "cwi_flag","swi_flag","loft_ins_flag","floor_ins_flag","glazing_flag",
+    "is_electric_heating","is_gas","is_oil","is_solid_fuel","is_off_gas"
+    ]
+   
+    gdf   = dataManager.loadGeoJSONDB(scenario.city, scenario.population_id, scenario.subset, fields) # geodataframe  
+    log_callback('data loaded')
+    climate_path = Config.CLIMATE_DATA
+
+    model = EnergyModel(gdf=gdf,
+                        climate_parquet= climate_path,
+                        climate_start="2022-07-15", # to do make changeable
+                        local_tz="Europe/London",
+                        collect_agent_level=True,   # keep per-household traces
+                        agent_collect_every=24      # once per day
+                    )
+    log_callback('model created')
 
     # 2 ─ run simulation ----------------------------------------------
     steps   = scenario.days * 24 #TODO: make this user input
     records = []                                    # per-hour summary rows
-
+    log_callback(f'Running model. {steps} steps to go...')
     for step in range(steps):
-        model.step()
 
+        # call back every 10 steps
+        if step % 10 ==0:
+            log_callback(f'Running model. {step} out of {steps}.')
+
+        model.step()
         tot = sum(h.energy_consumption for h in model.household_agents)
         records.append(
             dict(
@@ -57,18 +78,4 @@ def run(scenario) -> None:
         )
     
     return model, records
-# ---
-
-    # 3 ─ write outputs ----------------------------------------------
-    # 3-a CSV with hourly totals
-    # df = pd.DataFrame(records)
-    # csv_path = outdir / "energy_timeseries.csv"
-    # df.to_csv(csv_path, index=False)
-
-    # 3-b Parquet tables from Mesa’s DataCollector
-    # model_parquet  = outdir / "model_timeseries.parquet"
-    # agent_parquet  = outdir / "agent_timeseries.parquet"
-    # model.datacollector.get_model_vars_dataframe().to_parquet(model_parquet)
-    # model.datacollector.get_agent_vars_dataframe().to_parquet(agent_parquet)
-
 
