@@ -46,30 +46,36 @@ def clearTable(tableName, conn):
     conn.commit()
 
 def populateEPC(conn, schema):
-    sql, att_keys =  generate_sql(schema) 
+    
     cur = conn.cursor()
     # First get the data into a geojson, then fix the row code (iterate ove att_keys)
-    filepath = Config.INITIAL_DATA_LOC + '/epc_abm_data.geojson'
-    with open(filepath, "r") as file: 
-        data = geojson.load(file)
-    cnt = 0
-    for feature in data['features']:
-        properties = feature['properties']
-        row = []
-        
-        # append features to row
-        for att_key in att_keys:
-            row.append(properties[att_key])
+    cities = [{'name':'newcastle', 'file':"/epc_abm_newcastle.geojson"},
+              {'name':'newcastle', 'file':"/epc_abm_newcastle.geojson"}]
+
+    for city in cities:
+        filepath = Config.INITIAL_DATA_LOC + city['file']
+        with open(filepath, "r") as file: 
+            data = geojson.load(file)
+
+        sql, att_keys =  generate_sql(schema, ) 
+        cnt = 0
+        for feature in data['features']:
+            properties = feature['properties']
+            row = [city['name']]
             
-        #append geometry
-        geometry = feature['geometry']
-        row.append(geometry['type'])
-        for i in range(2):
-            row.append(geometry['coordinates'][i])
-        row = tuple(row)
-        cur.execute(sql, row)
-        cnt+=1
-        print(cnt)
+            # append features to row
+            for att_key in att_keys:
+                row.append(properties[att_key])
+                
+            #append geometry
+            geometry = feature['geometry']
+            row.append(geometry['type'])
+            for i in range(2):
+                row.append(geometry['coordinates'][i])
+            row = tuple(row)
+            cur.execute(sql, row)
+            cnt+=1
+            print(cnt)
     conn.commit()
         
 def populateUPRN(conn):  
@@ -143,18 +149,18 @@ def generate_sql(schema):
     # In future, this will need to be redone with a dedicated gis database
     try:
         att_keys = []
-        msg = '('
+        msg = '(city,'
         mapper = inspect(schema)
         for attribute in mapper.attrs:
             att_key = str(attribute.key)
-            if not att_key=='id':
+            if (not att_key=='id') and not(att_key=='city'):
                 msg += att_key + ','
                 if not att_key in ['geometry_type', 'geometry_coordinates_lat', 'geometry_coordinates_lon']:
                     att_keys.append(att_key)
             
         
         msg = msg[:-1] + ')'
-        sql = ''' INSERT INTO epc_abm_data''' +msg +'''VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+        sql = ''' INSERT INTO epc_abm_data''' +msg +'''VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
         
         return sql, att_keys
 

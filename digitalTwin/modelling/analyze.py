@@ -68,6 +68,7 @@ def allUsage_ts(scenario, timeseries, jitterRadius =25):
 
     columns = ["UPRN", "property_type"]
     gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.population_id, columns)
+    print(gdf.head())
     gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     ts["agent_id"] = ts["agent_id"].astype(str)
     ts = gdf.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")

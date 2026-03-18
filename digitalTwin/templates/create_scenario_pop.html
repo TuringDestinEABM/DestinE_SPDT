@@ -1,105 +1,117 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>New Scenario: Agents</h3>
-<form method="POST" action="">
-            {{ popForm.hidden_tag() }}
+<br>
+<div class="col-md-12">
+    <div class=row><h3>New Scenario: Agents</h3>
+        <div class="mb-2 d-flex justify-content-end mt-1">
+        <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple options.</small>
+        </div>
+    </div>
 
-            <!-- Wards -->
-            <div class="mb-3">
-                {{ popForm.Wards.label(class="form-label") }}
-                
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'wards-select')">
-                        Select All
-                    </button>
+    <div class="card p-4 shadow-sm">
+        <form method="POST" action="">
+                {{ popForm.hidden_tag() }}
+            <div class="row"> 
+                    
+                    <!-- Wards -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h4>{{ popForm.Wards.label(class="form-label") }}</h4>
+                        
+                        {% if popForm.Wards.errors %}
+                            {{ popForm.Wards(class="form-select is-invalid", size=8, id="wards-select") }}
+                            <div class="invalid-feedback">
+                                {% for error in popForm.Wards.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ popForm.Wards(class="form-select", size=8, id="wards-select") }}
+                        {% endif %}
+
+                        <div class="mb-2 d-flex justify-content-end mt-1">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleSelectAll(this, 'wards-select')">
+                                Select All
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                {% if popForm.Wards.errors %}
-                    {{ popForm.Wards(class="form-select is-invalid", size=8, id="wards-select") }}
-                    <div class="invalid-feedback">
-                        {% for error in popForm.Wards.errors %}
-                            {{ error }}
-                        {% endfor %}
+                <!-- Property Types -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h4>{{ popForm.PropertyTypes.label(class="form-label") }}</h4>
+                        
+                        {% if popForm.PropertyTypes.errors %}
+                            {{ popForm.PropertyTypes(class="form-select is-invalid", size=8, id="property-types-select") }}
+                            <div class="invalid-feedback">
+                                {% for error in popForm.PropertyTypes.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ popForm.PropertyTypes(class="form-select", size=8, id="property-types-select") }}
+                        {% endif %}
+                        
+                        <div class="mb-2 d-flex justify-content-end mt-1">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleSelectAll(this, 'property-types-select')">
+                                Select All
+                            </button>
+                        </div>
                     </div>
-                {% else %}
-                    {{ popForm.Wards(class="form-select", size=8, id="wards-select") }}
-                {% endif %}
-                
-                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple wards.</div>
+                </div>
             </div>
 
-            <!-- Property Types -->
-            <div class="mb-3">
-                {{ popForm.PropertyTypes.label(class="form-label") }}
-                
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'property-types-select')">
-                        Select All
-                    </button>
-                </div>
+            <div class="row"> 
 
+                <!-- Occupant  Types -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h4>{{ popForm.IncomeTypes.label(class="form-label") }}</h4>
+                        
+                        {% if popForm.IncomeTypes.errors %}
+                            {{ popForm.IncomeTypes(class="form-select is-invalid", size=8, id="occupant-types-select") }}
+                            <div class="invalid-feedback">
+                                {% for error in popForm.IncomeTypes.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ popForm.IncomeTypes(class="form-select", size=8, id="occupant-types-select") }}
+                        {% endif %}
 
-                {% if popForm.PropertyTypes.errors %}
-                    {{ popForm.PropertyTypes(class="form-select is-invalid", size=8, id="wards-select") }}
-                    <div class="invalid-feedback">
-                        {% for error in popForm.PropertyTypes.errors %}
-                            {{ error }}
-                        {% endfor %}
+                        <div class="mb-2 d-flex justify-content-end mt-1">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleSelectAll(this, 'occupant-types-select')">
+                                Select All
+                            </button>
+                        </div>
                     </div>
-                {% else %}
-                    {{ popForm.PropertyTypes(class="form-select", size=8, id="property-types-select") }}
-                {% endif %}
-                
-                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple property types.</div>
-            </div>
-
-            <!-- Occupant  Types -->
-            <div class="mb-3">
-                {{ popForm.IncomeTypes.label(class="form-label") }}
-                
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'occupant-types-select')">
-                        Select All
-                    </button>
                 </div>
-
-                {% if popForm.IncomeTypes.errors %}
-                    {{ popForm.IncomeTypes(class="form-select is-invalid", size=8, id="wards-select") }}
-                    <div class="invalid-feedback">
-                        {% for error in popForm.IncomeTypes.errors %}
-                            {{ error }}
-                        {% endfor %}
+                        
+                <!-- Income  Types -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <h4>{{ popForm.ScheduleTypes.label(class="form-label") }}</h4>
+                        
+                        {% if popForm.ScheduleTypes.errors %}
+                            {{ popForm.ScheduleTypes(class="form-select is-invalid", size=8, id="income-types-select") }}
+                            <div class="invalid-feedback">
+                                {% for error in popForm.ScheduleTypes.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ popForm.ScheduleTypes(class="form-select", size=8, id="income-types-select") }}
+                        {% endif %}
+                        
+                        <div class="mb-2 d-flex justify-content-end mt-1">
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="toggleSelectAll(this, 'income-types-select')">
+                                Select All
+                            </button>
+                        </div>
                     </div>
-                {% else %}
-                    {{ popForm.IncomeTypes(class="form-select", size=8, id="occupant-types-select") }}
-                {% endif %}
-                
-                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple options.</div>
-            </div>
-
-            <!-- Occupant  Types -->
-            <div class="mb-3">
-                {{ popForm.ScheduleTypes.label(class="form-label") }}
-                
-                <div class="mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'income-types-select')">
-                        Select All
-                    </button>
                 </div>
-
-                {% if popForm.ScheduleTypes.errors %}
-                    {{ popForm.ScheduleTypes(class="form-select is-invalid", size=8, id="wards-select") }}
-                    <div class="invalid-feedback">
-                        {% for error in popForm.ScheduleTypes.errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ popForm.ScheduleTypes(class="form-select", size=8, id="income-types-select") }}
-                {% endif %}
-                
-                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple occupant types.</div>
             </div>
 
             <div class="d-grid gap-2">
@@ -108,6 +120,8 @@
         </form>
     </div>
 </div>
+
+
 <!-- scripts used on this page-->
 {% block javascript %}
 <script>

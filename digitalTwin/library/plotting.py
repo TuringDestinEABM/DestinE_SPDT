@@ -115,7 +115,9 @@ def temporalHeatMap(timeseries):
 def timeline(scenario):
     # combine agent data and energy usage timeseries into a single dataframe
     agent_ts = analyze.reset_agent_index(dataManager.findDBData('AgentTimeSeries', scenario.id))
+    print(f"agent_ts: {agent_ts}")
     timeseries = analyze.allUsage_ts(scenario, agent_ts)
+    print(f"timeseries: {timeseries}")
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
 

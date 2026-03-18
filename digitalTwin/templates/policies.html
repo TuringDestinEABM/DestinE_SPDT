@@ -26,7 +26,6 @@
         <div class="row g-4">
             
             <div class="col-lg-5">
-                
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Policy Details</h5>
@@ -39,13 +38,40 @@
                                 <div class="text-danger small">{{ policyForm.Name.errors[0] }}</div>
                             {% endif %}
                         </div>
-
                         <div class="mb-3">
                             {{ policyForm.Description.label(class="form-label") }}
                             {{ policyForm.Description(class="form-control", rows="3") }}
                             {% if policyForm.Description.errors %}
                                 <div class="text-danger small">{{ policyForm.Description.errors[0] }}</div>
                             {% endif %}
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                {{ policyForm.AdoptionRate.label(class="form-label fw-bold small") }}
+                                <div class="input-group">
+                                    {{ policyForm.AdoptionRate(class="form-control") }}
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                {% if policyForm.AdoptionRate.description %}
+                                    <div class="form-text text-muted">
+                                        <small>{{ policyForm.AdoptionRate.description }}</small>
+                                    </div>
+                                {% endif %}
+                                {% if policyForm.AdoptionRate.errors %}
+                                    <div class="text-danger small">{{ policyForm.AdoptionRate.errors[0] }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-8">
+                                {{ policyForm.CandidateClasses.label(class="form-label fw-bold small") }}
+                                <div class="input-group">
+                                    {{ policyForm.CandidateClasses(class="form-select") }}
+                                </div>
+                                {% if policyForm.CandidateClasses.errors %}
+                                    <div class="text-danger small">{{ policyForm.CandidateClasses.errors[0] }}</div>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <div class="d-grid">
@@ -123,27 +149,18 @@
                         
                         <h6 class="border-bottom pb-2 mb-3">Logic Triggers</h6>
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 {{ rulesForm.QualifyingCharacteristics.label(class="form-label fw-bold small") }}
-                                {{ rulesForm.QualifyingCharacteristics(class="form-select", size=4) }}
+                                {{ rulesForm.QualifyingCharacteristics(class="form-check", size=4) }}
                                 {% if rulesForm.QualifyingCharacteristics.description %}
                                     <div class="form-text text-muted">
                                         <small>{{ rulesForm.QualifyingCharacteristics.description }}</small>
                                     </div>
                                 {% endif %}
                             </div>
-                            <div class="col-md-4">
-                                {{ rulesForm.RequiredCharacteristics.label(class="form-label fw-bold small") }}
-                                {{ rulesForm.RequiredCharacteristics(class="form-select", size=4) }}
-                                {% if rulesForm.RequiredCharacteristics.description %}
-                                    <div class="form-text text-muted">
-                                        <small>{{ rulesForm.RequiredCharacteristics.description }}</small>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 {{ rulesForm.DisqualifyingCharacteristics.label(class="form-label fw-bold small") }}
-                                {{ rulesForm.DisqualifyingCharacteristics(class="form-select", size=4) }}
+                                {{ rulesForm.DisqualifyingCharacteristics(class="form-check", size=4) }}
                                 {% if rulesForm.DisqualifyingCharacteristics.description %}
                                     <div class="form-text text-muted">
                                         <small>{{ rulesForm.DisqualifyingCharacteristics.description }}</small>
@@ -158,29 +175,29 @@
                         <h6 class="border-bottom pb-2 mb-3 mt-4">Criteria Parameters</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
-                                {{ rulesForm.Wards.label(class="form-label") }}
+                                {{ rulesForm.Wards.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.Wards(class="form-select", size=7, id="ward-select") }}
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'ward-select')">
                                     Select All
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                {{ rulesForm.IncomeTypes.label(class="form-label") }}
+                                {{ rulesForm.IncomeTypes.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.IncomeTypes(class="form-select", size=7, id="income-select") }}
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'income-select')">
                                     Select All
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                {{ rulesForm.ScheduleTypes.label(class="form-label") }}
+                                {{ rulesForm.ScheduleTypes.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.ScheduleTypes(class="form-select", size=7, id="schedule-select") }}
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'schedule-select')">
                                     Select All
                                 </button>
                             </div>
                             <div class="col-md-6">
-                                {{ rulesForm.PropertyTypes.label(class="form-label") }}
-                                {{ rulesForm.PropertyTypes(class="form-select", size=7, id="property-select") }}
+                                {{ rulesForm.TenureTypes.label(class="form-label fw-bold small") }}
+                                {{ rulesForm.TenureTypes(class="form-select", size=7, id="property-select") }}
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'property-select')">
                                     Select All
                                 </button>
@@ -188,21 +205,7 @@
                         </div>
 
                         <div class="row mt-4">
-                            <div class="col-md-6">
-                                {{ rulesForm.AdoptionRate.label(class="form-label fw-bold") }}
-                                <div class="input-group">
-                                    {{ rulesForm.AdoptionRate(class="form-control") }}
-                                    <span class="input-group-text">%</span>
-                                </div>
-                                {% if rulesForm.AdoptionRate.description %}
-                                    <div class="form-text text-muted">
-                                        <small>{{ rulesForm.AdoptionRate.description }}</small>
-                                    </div>
-                                {% endif %}
-                                {% if rulesForm.AdoptionRate.errors %}
-                                    <div class="text-danger small">{{ rulesForm.AdoptionRate.errors[0] }}</div>
-                                {% endif %}
-                            </div>
+                            
                             <div class="col-md-6 d-flex align-items-end">
                                 {{ rulesForm.Submit(class="btn btn-outline-success w-100") }}
                             </div>

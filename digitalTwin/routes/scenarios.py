@@ -133,7 +133,7 @@ def create_scenario_policy():
             if selectPresets.validate():
                 selected_obj = selectPresets.selected_policy_id.data
                 if selected_obj:
-                    # Store the CHOICE in session
+                    # Store the choice in session
                     session['policy_mode'] = 'preset'
                     session['selected_policy_id'] = selected_obj.id
                     session['policy_data'] = None # Clear conflicting data

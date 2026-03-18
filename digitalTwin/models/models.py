@@ -19,6 +19,9 @@ class Scenario(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     init_lat: so.Mapped[int] = so.mapped_column()
     init_lon: so.Mapped[int] = so.mapped_column()
+    start_day: so.Mapped[datetime] = so.mapped_column()
+    simulation_step: so.Mapped[int] = so.mapped_column()
+    record_every: so.Mapped[int] = so.mapped_column()
     climate_model_id: so.Mapped[Optional[int]] = so.mapped_column()
     policy_id: so.Mapped[Optional[int]] = so.mapped_column()
     population_id: so.Mapped[Optional[int]] = so.mapped_column()
@@ -123,6 +126,8 @@ class EPCABMdata(db.Model):
     energy_demand_kwh: so.Mapped[float] = so.mapped_column()
     factor: so.Mapped[float] = so.mapped_column()
     energy_cal_kwh: so.Mapped[float] = so.mapped_column()
+    is_heatpump_candidate: so.Mapped[bool] = so.mapped_column()
+    heatpump_candidate_class: so.Mapped[bool] = so.mapped_column()
     heating_controls: so.Mapped[Optional[str]] = so.mapped_column()
     meter_type: so.Mapped[str] = so.mapped_column()
     cwi_flag: so.Mapped[bool] = so.mapped_column()
@@ -211,6 +216,8 @@ class PolicyChoices(db.Model):
         cascade="all, delete-orphan",
         passive_deletes=True
     )
+    adoption_rate: so.Mapped[int] = so.mapped_column()
+    candidate_classes: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
 
     def __repr__(self):
         return '<policy_choices {}>'.format(self.id)    
@@ -227,20 +234,17 @@ class Rules(db.Model):
         back_populates="rules"
     )
     qualifying_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
-    required_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
     disqualifying_characteristics: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
     wards: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
-    property_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
+    tenure_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON)) 
     income_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
     schedule_types: so.Mapped[Optional[List[str]]] = so.mapped_column(MutableList.as_mutable(sa.JSON))
-    adoption_rate: so.Mapped[int] = so.mapped_column()
 
     def __repr__(self):
     # Required fields
         parts = [
             f"id={self.id}",
-            f"policy_id={self.policy_id}",
-            f"adoption_rate={self.adoption_rate}"
+            f"policy_id={self.policy_id}"
         ]
 
         optional_fields = [
@@ -250,7 +254,7 @@ class Rules(db.Model):
             "wards",
             "property_types",
             "income_types",
-            "schedule_types"
+            "schedule_types",
         ]
 
     # Append any optional fields which exist

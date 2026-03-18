@@ -1,10 +1,14 @@
 # Development Quick Launch 
 ## First time initalisation
+``` py -m venv .env```
+
+```py -m pip install --upgrade pip```
+
 ```.env\Scripts\activate ```
 
-```set FLASK_APP=digitalTwin.py```
-
 ```pip install -r requirements.txt```
+
+```set FLASK_APP=digitalTwin.py```
 
 ```flask db init```
 
@@ -20,6 +24,8 @@
 
 ## Once initialised
 ```.env\Scripts\activate ```
+
+```set FLASK_APP=digitalTwin.py```
 
 ```flask run```
 

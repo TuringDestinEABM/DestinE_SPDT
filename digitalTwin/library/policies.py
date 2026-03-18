@@ -19,6 +19,8 @@ def savePolicy(policyForm, rules):
                                   description = policyForm.Description.data,
                                   user_name = dataManager.getUserName(),
                                   timestamp = datetime.datetime.now(datetime.timezone.utc),
+                                  adoption_rate = policyForm.AdoptionRate.data,
+                                  candidate_classes =policyForm.CandidateClasses.data,
                                   rules = []            
                                 ) 
     
@@ -29,10 +31,9 @@ def savePolicy(policyForm, rules):
             {'old': "RequiredCharacteristics",'new': "required_characteristics"},
             {'old': "DisqualifyingCharacteristics",'new': "disqualifying_characteristics"},
             {'old': "Wards",'new': "wards"},
-            {'old': "PropertyTypes",'new': "property_types"},
+            {'old': "TenureTypes",'new': "tenure_types"},
             {'old': "IncomeTypes",'new': "income_types"},
-            {'old': "ScheduleTypes",'new': "schedule_types"},
-            {'old': "AdoptionRate",'new': "adoption_rate"}
+            {'old': "ScheduleTypes",'new': "schedule_types"}
         ]
 
         mapping = {key['old']: key['new'] for key in keys}

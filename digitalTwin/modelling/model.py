@@ -30,7 +30,7 @@ import math
 
 from .climate import ClimateField
 from .agent import HouseholdAgent, PersonAgent, PROPERTY_TYPES, SCHEDULE_PROFILES
-from .config import load_config, ModelConfig
+from .modelConfig import load_config, ModelConfig
 
 # ------------------------------------------------------------------
 # Schedule archetypes (hour-level, simple) used when schedule_type

@@ -74,7 +74,66 @@ def findDBData(DBmodel, identifier=''):
 
     return data
 
-def loadGeoJSONDB(city: str, popID, subset, columns: Optional[List[str]]=None, includeGeometry=True):
+def loadAndMerge(city: str, popID, epc_columns: Optional[List[str]]=None, hidp_columns: Optional[List[str]]=None, includeGeometry=True):
+
+    if includeGeometry ==True: 
+        geometry = ['geometry_type',
+                    'geometry_coordinates_lon',
+                    'geometry_coordinates_lat']
+    else: geometry = []
+
+    #Handle columns
+    if epc_columns is None:
+        # User didn't pass anything -> Select All
+        epc_query = sa.select(models.EPCABMdata)
+    else:
+        # User passed a list -> Select Specific
+        # Add non-optional geometry columns
+        if isinstance(epc_columns, str):
+            epc_columns = [columns]
+        target_columns = epc_columns + geometry
+        
+        cols_to_select = [getattr(models.EPCABMdata, col) for col in target_columns]
+        epc_query = sa.select(*cols_to_select)
+
+    if hidp_columns is None:
+        # User didn't pass anything -> Select All
+        hidp_query = sa.select(models.EPCABMdata)
+    else:
+        # User passed a list -> Select Specific
+        # Add non-optional geometry columns
+        if isinstance(hidp_columns, str):
+            hidp_columns = [columns]
+        
+        cols_to_select = [getattr(models.UPRNdata, col) for col in hidp_columns]
+        hidp_query = sa.select(*cols_to_select)
+        
+    epc_mask = epcMask(popID) # wards and property types
+    hidp_mask = hidpMask(epc_mask, popID) # schedules and incomes
+
+    epc_query = epc_query.where(models.EPCABMdata.UPRN.in_(hidp_mask))
+    hidp_query = hidp_query.where(models.UPRNdata.UPRN.in_(hidp_mask))
+
+    with db.engine.connect() as conn:
+        print('loading epc data')
+        epc_df = pd.read_sql(epc_query, conn) # load from db to data frame
+        # print('loading uprn data')
+        # hidp_df = pd.read_sql(hidp_query, conn) # load from db to data frame
+    
+    # print('merging data frames')
+    # df = epc_df.merge(hidp_df, on='UPRN')
+    # for col in df.columns:
+    #     print(col)
+
+    # this broke my pc
+
+    gdf = geopandas.GeoDataFrame(epc_df, 
+                                 geometry=geopandas.points_from_xy( epc_df.geometry_coordinates_lat, epc_df.geometry_coordinates_lon),
+                                  crs="EPSG:4326") # convert to geodataframe
+    gdf = gdf.drop(columns=geometry)
+    return gdf
+
+def loadGeoJSONDB(city: str, popID, columns: Optional[List[str]]=None, includeGeometry=True):
 
     # number of rows for context
     # total_count = db.session.scalar(sa.select(sa.func.count(models.EPCABMdata)))
@@ -99,25 +158,6 @@ def loadGeoJSONDB(city: str, popID, subset, columns: Optional[List[str]]=None, i
         cols_to_select = [getattr(models.EPCABMdata, col) for col in target_columns]
         query = sa.select(*cols_to_select)
 
-    # # row numbers for subset
-    # row_num_col = sa.func.row_number().over(order_by=models.EPCABMdata.UPRN).label("rn")
-    # inner_query = sa.select(*cols_to_select, row_num_col)
-    
-    # filter by uprn
-    subquery_mask = uprnMask(popID)
-    mask_query = query.where(models.EPCABMdata.UPRN.in_(subquery_mask))
-    print('Matching back to uprn data')
-    countMatches(mask_query)
-
-    # stmt = inner_query.mask_query()
-
-    # # filter by subset
-    # query = sa.select(stmt).where(stmt.c.rn % int(subset) == 1) #  5
-    # print(f"Filtering by subset: {subset}%")
-    # countMatches(query)
-
-    # print(f"Selecting {filtered_count} out of {total_count}")
-
     with db.engine.connect() as conn:
         df = pd.read_sql(query, conn) # load from db to data frame
     
@@ -127,43 +167,46 @@ def loadGeoJSONDB(city: str, popID, subset, columns: Optional[List[str]]=None, i
     gdf = gdf.drop(columns=geometry)
     return gdf
 
-def uprnMask(popID):
+def epcMask(popID):
     pop = findDBData('Population', popID)
-    uprn = models.UPRNdata
-    
+        
     # Filter by wards and property types using EPC data
     ward_codes = dataConv.WardNamesToCodes(pop.wards)
-    subquery = sa.select(models.EPCABMdata.UPRN).where(models.EPCABMdata.ward_code.in_(ward_codes))
+    query = sa.select(models.EPCABMdata.UPRN).where(models.EPCABMdata.ward_code.in_(ward_codes))
     print(f'Filtering by wards: {pop.wards}')
-    countMatches(subquery)
+    countMatches(query)
+
     if pop.property_types:
         # include null if all wards selected
         if len(pop.property_types) == 7:
-            subquery = subquery.where(sa.or_(
+            query = query.where(sa.or_(
                 models.EPCABMdata.property_type.in_(pop.property_types),
                 models.EPCABMdata.property_type==0)
             )
         else:
-            subquery = subquery.where(models.EPCABMdata.property_type.in_(pop.property_types))
+            query = query.where(models.EPCABMdata.property_type.in_(pop.property_types))
         print(f'Filtering by properties {pop.property_types}')
-        countMatches(subquery)
+        countMatches(query)
+    
+    return query
 
-    # now other parameters using UPRNdata
-    query = sa.select(uprn.UPRN).where(uprn.UPRN.in_(subquery))
-    print('Matching to uprn data')
-    countMatches(subquery)
+def hidpMask(epc_mask, popID):
+    pop = findDBData('Population', popID)   
+    hidp = models.UPRNdata
+    # Only look at matching wards
+    query = sa.select(hidp.UPRN).where(hidp.UPRN.in_(epc_mask))
+    print('Matching to hidp data')
+    countMatches(query)
 
     if pop.income_types:
         incomes = dataConv.incomeBands(pop.income_types, 'hidp')
         if len(incomes) == 5:
-            print('5*5*5*')
             query = query.where(
-                sa.or_(uprn.hh_income_band.in_(incomes),
-                uprn.hh_income_band == None)
+                sa.or_(hidp.hh_income_band.in_(incomes),
+                hidp.hh_income_band == None)
             )
         else:
-            query = query.where(uprn.hh_income_band.in_(incomes))
-
+            query = query.where(hidp.hh_income_band.in_(incomes))
         print(f'Filtering by incomes: {incomes}')
         countMatches(query)
     
@@ -171,16 +214,13 @@ def uprnMask(popID):
         schedules = dataConv.schedules(pop.schedule_types, 'hidp')
         if len(schedules) == 7:
             query = query.where(
-                sa.or_(uprn.schedule_type.in_(schedules),
-                uprn.schedule_type == None)
+                sa.or_(hidp.schedule_type.in_(schedules),
+                hidp.schedule_type == None)
             )
         else:
-            query = query.where(uprn.schedule_type.in_(schedules))
-
-
+            query = query.where(hidp.schedule_type.in_(schedules))
         print(f'Filtering by schedules: {schedules}')
         countMatches(query)
-    
     return query
 
 def calculateSubset(city, subset):

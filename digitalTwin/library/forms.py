@@ -1,20 +1,21 @@
 ''' Forms to enable user submitted information to flask. Default method for selecting options'''
 
 from flask_wtf import FlaskForm
-from wtforms import FloatField, StringField, SubmitField, SelectField, SelectMultipleField, IntegerField, DecimalField, HiddenField, TextAreaField
+from wtforms import FloatField, StringField, SubmitField, SelectField, SelectMultipleField, IntegerField, DecimalField, HiddenField, TextAreaField, DateField, RadioField
 from wtforms.validators import DataRequired, Length, NumberRange, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 from digitalTwin import db
 from digitalTwin.models import models
 from . import dataManager, populations 
 import sqlalchemy as sa
-import string
+import string, datetime
+
 
 
 
 class CreateScenarioForm(FlaskForm):
     Name = StringField('Scenario Name', validators=[DataRequired(), Length(1,32)])
-    Days = IntegerField('Days', validators=[DataRequired(), NumberRange(1, 9125)] )
+    # Days = IntegerField('Days', validators=[DataRequired(), NumberRange(1, 9125)] )
     # TODO: change to start date, finish date
     City = SelectField('City', choices = ["newcastle",
                                          "sunderland"],
@@ -22,9 +23,25 @@ class CreateScenarioForm(FlaskForm):
     Technology = SelectField('Technology', choices = ["Heat pumps"],
                                                 validators=[DataRequired()])
     
-    Description = TextAreaField('Description', [Length(min=0, max=45)])
-    
-
+    Description = TextAreaField('Description', [Length(min=0, max=200)])
+    StartDay = DateField('Start Date', 
+                         format='%Y-%m-%d', 
+                         default=datetime.date.today, 
+                         validators=[DataRequired()],
+                         render_kw={"type": "date"})
+    EndDay = DateField('End Date', 
+                         format='%Y-%m-%d', 
+                         default=datetime.date.today() + datetime.timedelta(days=1) , 
+                         validators=[DataRequired()],
+                         render_kw={"type": "date"})
+    SimStep = RadioField('Step size (hrs)',
+                         choices = [1, 2, 4, 12, 24],
+                         default = 1,
+                         validators = [DataRequired()] )
+    RecordEvery = RadioField('Record every (hrs)',
+                         choices = [1, 2, 4, 12, 24],
+                         default= 1,
+                         validators = [DataRequired()] )
 
     def validate_Name(self, Name):
         # check valid characters (needs to work in a url)
@@ -37,6 +54,8 @@ class CreateScenarioForm(FlaskForm):
             models.Scenario.scenario_name == Name.data))
         if scenario is not None:
             raise ValidationError('This scenario name is already in use. Please use a unique value.')
+
+            # TODO: check EndDay after StartDay, check both within range
         
                 
     Submit = SubmitField('Continue')
@@ -127,6 +146,18 @@ class SelectPresetsPolicy(FlaskForm):
 class PolicyChoicesForm(FlaskForm):
     Name = StringField('Model Name', validators=[DataRequired(), Length(1,32)])
     Description = TextAreaField('Description', [Length(min=0, max=45)])
+    AdoptionRate = IntegerField('Adoption Rate (%)', 
+                          default = 100,
+                          validators = [DataRequired(), NumberRange(0,100)],
+                          description = 'Percentage of eligible agents who will adopt the technology')
+    CandidateClasses = SelectMultipleField('Candidates',
+                            choices =['priority',
+                                    'possible',
+                                    'difficult',
+                                    'non-possible'],
+                            default = ['priority','possible'],
+                            validators = [DataRequired()],
+                            description = 'Candidates for converting to heat pumps')
 
     def validate_Name(self, Name):
         # check valid characters (needs to work in a url)
@@ -146,26 +177,16 @@ class PolicyRulesForm(FlaskForm):
     QualifyingCharacteristics = SelectMultipleField('Qualifying',
                                                     choices =['Ward',
                                                             'Income',
-                                                            'Property',
+                                                            'Tenure',
                                                             'Schedule'
                                                             ],
                                                     description = 'Agents must meet at least one qualifying characteristic'                                                    
                                                 )
-    
-    RequiredCharacteristics = SelectMultipleField('Required',
-                                                    choices =['Ward',
-                                                            'Income',
-                                                            'Property',
-                                                            'Schedule'
-                                                            ],
-                                                    description = 'Agents must meet *all* required characteristics'
-                                                )
-    
-    
+        
     DisqualifyingCharacteristics = SelectMultipleField('Disqualifying',
                                                     choices =['Ward',
                                                             'Income',
-                                                            'Property',
+                                                            'Tenure',
                                                             'Schedule'
                                                             ],
                                                     description = 'Agents must not meet any disqualifying characteristic'
@@ -182,19 +203,21 @@ class PolicyRulesForm(FlaskForm):
                                         validators=[DataRequired()])
     ScheduleTypes = SelectMultipleField('Schedule',
                                         choices =['dual earner',
-                                                  'family with children'
+                                                  'family with children',
                                                   'retired household',
                                                   'single parent with children',
                                                   'student',
                                                   'unemployed_or_inactive',
                                                   'working adult'],
                                             validators=[DataRequired()])
-    PropertyTypes = SelectMultipleField('Property Types',
-                                        choices = [])
-    AdoptionRate = IntegerField('Adoption Rate (%)', 
-                          default = 100,
-                          validators = [DataRequired(), NumberRange(0,100)],
-                          description = 'Percentage of eligible agents who will adopt the technology')
+    TenureTypes = SelectMultipleField('Tenure',
+                            choices =['owner_occupied',
+                                    'private_rent',
+                                    'social_rent'],
+                            default = ['owner_occupied',
+                                    'private_rent',
+                                    'social_rent'])
+    
     
     Submit = SubmitField('Add to policy selection')
     
@@ -205,9 +228,6 @@ class PolicyRulesForm(FlaskForm):
         wards = populations.wardNames('newcastle')
         self.Wards.choices = [(ward, ward) for ward in wards if ward]
 
-        # populate Property types
-        propertyTypes = populations.propertyTypes('newcastle')
-        self.PropertyTypes.choices = [(ptype, ptype) for ptype in propertyTypes if ptype]
 
     def validate(self, extra_validators=None):
         
@@ -216,7 +236,7 @@ class PolicyRulesForm(FlaskForm):
 
         # --- Rule 1: At least one Characteristic must be selected ---
         selected_triggers = set()
-        for field in [self.QualifyingCharacteristics, self.RequiredCharacteristics, self.DisqualifyingCharacteristics]:
+        for field in [self.QualifyingCharacteristics, self.DisqualifyingCharacteristics]:
             if field.data:
                 selected_triggers.update(field.data)
 
@@ -231,7 +251,7 @@ class PolicyRulesForm(FlaskForm):
         field_map = {
             'Ward':     self.Wards,
             'Income':   self.IncomeTypes,
-            'Property': self.PropertyTypes,
+            'Tenure': self.TenureTypes,
             'Schedule': self.ScheduleTypes
         }
 

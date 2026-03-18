@@ -18,7 +18,7 @@ plotly == 6.3.1
 # Filetype and data handling requirements
 geopandas == 1.1.1
 pandas == 2.3.2
-
+geojson == 3.2.0
 
 # Model requirements
 fastparquet == 2024.11.0

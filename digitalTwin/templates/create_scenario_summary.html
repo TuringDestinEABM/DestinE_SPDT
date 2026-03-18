@@ -3,14 +3,15 @@
 {% block content %}
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-secondary">Review Scenario</h2>
-        <div class="btn-group shadow-sm">
-            <form method="POST" class="d-flex">
+        <h3>Review Scenario</h3>
+        <div class="shadow-sm">
+            <form method="POST" class="d-flex gap-2"> 
                 {{ submitForm.hidden_tag() }}
-                {{ submitForm.Save(class="btn btn-primary px-4") }}
+                {{ submitForm.Save(class="btn btn-primary px-4") }} 
                 {{ submitForm.Run(class="btn btn-success px-4") }}
             </form>
         </div>
+
     </div>
 
     <div class="row row-cols-1 row-cols-md-2 g-4">
@@ -18,12 +19,13 @@
         <div class="col">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0 text-primary fw-bold">Scenario Information</h5>
+                    <h5 class="card-title mb-0 fw-bold">Scenario Information</h5>
                     <a href="{{ url_for('digitaltwin.create_scenario_init') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </div>
                 <div class="card-body">
                     <div class="mb-2"><strong>Name:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Name') }}</span></div>
-                    <div class="mb-2"><strong>Days:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Days') }}</span></div>
+                    <div class="mb-2"><strong>Start Date:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('StartDay')[:16] }}</span></div>
+                    <div class="mb-2"><strong>Finish Date:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('EndDay')[:16] }}</span></div>
                     <div class="mb-2"><strong>City:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('City') }}</span></div>
                     <div class="mb-2"><strong>Technology:</strong> <span class="text-muted">{{ session.get('main_scenario_data', {}).get('Technology') }}</span></div>
                     {% if session.main_scenario_data.description %}
@@ -36,7 +38,7 @@
         <div class="col">
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0 text-primary fw-bold">Policy Choices</h5>
+                    <h5 class="card-title mb-0 fw-bold">Policy Choices</h5>
                     <a href="{{ url_for('digitaltwin.create_scenario_policy') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                 </div>
                 <div class="card-body">
@@ -67,27 +69,38 @@
 <div class="col">
     <div class="card h-100 border-0 shadow-sm">
         <div class="card-header bg-white border-0 pt-3 d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0 text-primary fw-bold">Population</h5>
+            <h5 class="card-title mb-0 fw-bold">Agents</h5>
             <a href="{{ url_for('digitaltwin.create_scenario_population') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
         </div>
         <div class="card-body">
             <div class="mb-2">
                 <strong>Wards:</strong>
-                <span class="text-muted small">
-                    {{ session.get('population_data', {}).get('Wards') }}
-                </span>
+                
+                {% for item in session.get('population_data', {}).get('Wards') %}
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                {% endfor %}
+                
             </div>
-            <div class="mb-2"><strong>Incomes:</strong> <span class="text-muted  ">{{session.get('population_data', {}).get('IncomeTypes') }}</span>
+            <div class="mb-2"><strong>Incomes:</strong> 
+                {% for item in session.get('population_data', {}).get('IncomeTypes') %}
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                {% endfor %}
             </div>
-            <div class="mb-2"><strong>Property Types:</strong> <span class="text-muted ">{{session.get('population_data', {}).get('PropertyTypes') }}></span>
+            <div class="mb-2"><strong>Property Types:</strong>
+                {% for item in session.get('population_data', {}).get('PropertyTypes') %}
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                {% endfor %}
             </div>
-            <div class="mb-2"><strong>Schedules:</strong> <span class="text-muted ">{{ session.get('population_data', {}).get('ScheduleTypes') }}</span>
+            <div class="mb-2"><strong>Schedules:</strong> 
+                {% for item in session.get('population_data', {}).get('ScheduleTypes') %}
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                {% endfor %}
             </div>
                 <div class="mt-2">
-                <strong>Subset:</strong>
-                <div class="text-muted small overflow-auto" style="max-height: 60px;">
-                    {{ session.get('population_data', {}).get('Subset') }} % 
-                </div>
+                <strong>Income:</strong>
+                    {% for item in session.get('population_data', {}).get('IncomeTypes') %}
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                    {% endfor %}
             </div>
         </div>
     </div>

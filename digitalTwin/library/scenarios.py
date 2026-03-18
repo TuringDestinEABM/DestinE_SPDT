@@ -5,10 +5,13 @@ This functionality to be replaced with databasing in the deployment version'''
 from ..modelling import energyABM, climate
 from ..models import models
 from . import dataManager, populations
-import datetime
+
 from digitalTwin import db
 from flask import session
 from digitalTwin.config import Config
+
+from datetime import datetime, date, time, timezone
+from email.utils import parsedate_to_datetime
 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
@@ -88,6 +91,9 @@ def run_and_save_scenario(scenario_name, log_callback=print):
     db.session.bulk_save_objects(agent_objects)
     db.session.commit()
     log_callback('Agent time series saved. Process entirely finished!')
+
+# creates a temporary config file, copying values from config_defaults.yaml and overwriting them based on the values supplied by the policy_choices table
+# def createConfig(policy):
 
 # def run(scenario_name):
 #     scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
@@ -192,14 +198,24 @@ def saveScenario(session):
     scenario_name = mainScenarioData.get('Name')
     init_lat_lon = setInitLatLon(mainScenarioData.get('City'))
 
+    startDay = parsedate_to_datetime(mainScenarioData.get('StartDay'))
+    endDay = parsedate_to_datetime(mainScenarioData.get('EndDay'))
+
+    days = endDay - startDay
+    days = int(days.days)
+
     scenario = models.Scenario(scenario_name = scenario_name,
-                days = mainScenarioData.get('Days'),
+                days = days,
                 city = mainScenarioData.get('City'),
                 subset = popData.get('Subset'),
                 user_name = dataManager.getUserName(),
-                timestamp = datetime.datetime.now(datetime.timezone.utc),
+                timestamp = datetime.now(timezone.utc),
                 init_lat = init_lat_lon[0],
                 init_lon = init_lat_lon[1],
+                start_day = datetime.combine(startDay, datetime.min.time()), # force to 00:00:00
+                # simulation_step=mainScenarioData.get('SimStep'),
+                simulation_step=1,
+                record_every=mainScenarioData.get('RecordEvery'),
                 policy_id = policyID,
                 population_id = popID              
                 ) 
@@ -216,7 +232,7 @@ def saveScenario(session):
 def createPopulation(formData):
 
     # create model
-    population = models.Population(timestamp = datetime.datetime.now(datetime.timezone.utc),
+    population = models.Population(timestamp = datetime.now(timezone.utc),
                     user_name=dataManager.getUserName(),
                     wards=formData.get('Wards'),
                     property_types=formData.get('PropertyTypes'), 
@@ -314,7 +330,6 @@ def clearSession(session):
 
 
 def setInitLatLon(city):
-    print(city)
     if city == 'newcastle':
         lon = -1.65260
         lat = 55.01802
