@@ -26,13 +26,3 @@ mesa == 3.3.0
 mesa-geo == 0.9.1
 pyarrow == 21.0.0
 shapely == 2.1.2
-
-# Networking requirements
-
-
-
-# Testing requirements
-
-
-
-# Other
