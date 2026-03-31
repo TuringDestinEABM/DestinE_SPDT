@@ -33,6 +33,7 @@ import matplotlib.ticker as mtick
 from shapely.geometry import Point
 import contextily as cx  
 
+from ..library import dataManager
 
 # ────────────────────── geometry helpers ────────────────────────
 def jitter(geom, r: float) -> Point:
@@ -57,21 +58,24 @@ def reset_agent_index(df: pd.DataFrame) -> pd.DataFrame:
     )
     
 
-def allUsage_ts(sourceData, timeseries, jitterRadius):
+def allUsage_ts(scenario, timeseries, jitterRadius =25):
     # a. keep only household rows (energy == 0 means PersonAgent)
+
     ts = timeseries[
         (timeseries["energy"] == 0) &
         (timeseries["energy_consumption"] > 0)
     ]
 
-    geom = gpd.read_file(sourceData)[["UPRN", "geometry", "property_type"]]
-    geom["UPRN"] = geom["UPRN"].astype(str)      # unify dtype with totals
+    columns = ["UPRN", "property_type"]
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.population_id, columns)
+    print(gdf.head())
+    gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     ts["agent_id"] = ts["agent_id"].astype(str)
-    ts = geom.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")
+    ts = gdf.rename(columns={"UPRN": "agent_id"}).merge(ts, on="agent_id")
 
     return ts    
 
-def highUsage(sourceData, timeseries, jitterRadius):
+def highUsage(scenario, timeseries, jitterRadius):
     # ── 2. Build *high-usage* household slice ────────────────────
     # a. keep only household rows (energy == 0 means PersonAgent)
     houses = timeseries[
@@ -85,11 +89,12 @@ def highUsage(sourceData, timeseries, jitterRadius):
                      .rename(columns={"energy_consumption": "total_energy"}))
 
     # c. attach geometry + property_type from GeoJSON
-    gdf = gpd.read_file(sourceData)[["UPRN", "geometry", "property_type"]]
-    gdf["UPRN"]         = gdf["UPRN"].astype(str)      # unify dtype with totals
+    columns = ["UPRN", "property_type"]
+    gdf = dataManager.loadGeoJSONDB(scenario.city, scenario.policy_id, columns)
+
+    gdf["UPRN"] = gdf["UPRN"].astype(str)      # unify dtype with totals
     totals["agent_id"] = totals["agent_id"].astype(str)
     gdf = gdf.rename(columns={"UPRN": "agent_id"}).merge(totals, on="agent_id")
-
     # d. take top quartile (fallback to top-half for tiny samples)
     q75 = gdf["total_energy"].quantile(0.75)
     hi  = gdf[gdf["total_energy"] >= q75]
@@ -100,7 +105,6 @@ def highUsage(sourceData, timeseries, jitterRadius):
     hi        = hi.to_crs(3857)                 # metres for hexbin
     hi["geometry"] = hi["geometry"].apply(lambda g: jitter(g, jitterRadius))
     hi_latlon = hi.to_crs(4326)                 # WGS-84 for Leaflet pop-ups
-    
     return hi
 
     # print("Sample of high-usage homes\n", hi.head()[["agent_id", "total_energy"]])
@@ -221,15 +225,15 @@ def leafletMap():
 
 # ───────────────────────────────────────────────────────────────
 # ────────────────────────── main ────────────────────────────────
-def analyze(sourceData, outdir, jitterRadius=25, map =  True) -> None:
+def analyze(scenario, outdir, jitterRadius=25, map =  True) -> None:
     # ── 1. Load simulation outputs ───────────────────────────────
-    dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
+    # dataPath = Path(__file__).parents[1] /"data/ncc_data" / sourceData
 
-    hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
-    model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
-    agent_ts = reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
-   
-    hi = highUsage(dataPath, agent_ts, 25)
+    hourly = dataManager.findDBData('EnergyTimeSeries', scenario.name)
+    model_ts = dataManager.findDBData('ModelTimeSeries', scenario.name)
+    agent_ts = dataManager.findDBData('AgentTimeSeries', scenario.name)
+ 
+    hi = highUsage(scenario, agent_ts, 25)
     model_ts, prop_cols, wealth_cols = prepTimeSeries(model_ts)
 
     # spatialHexBin(hi, outdir)

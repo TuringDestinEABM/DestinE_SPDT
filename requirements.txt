@@ -2,7 +2,12 @@
 flask == 3.1.2
 flask-WTF == 1.2.0
 wtforms == 3.2.1
+wtforms_sqlalchemy ==0.4.2
 
+# Databasing
+Flask-SQLAlchemy == 3.1.1
+Flask-Migrate == 4.1.0
+psycopg2-binary == 2.9.11
 
 # Plotting and front end requirements
 bootstrap-flask == 2.5.0
@@ -13,7 +18,7 @@ plotly == 6.3.1
 # Filetype and data handling requirements
 geopandas == 1.1.1
 pandas == 2.3.2
-
+geojson == 3.2.0
 
 # Model requirements
 fastparquet == 2024.11.0
@@ -21,13 +26,3 @@ mesa == 3.3.0
 mesa-geo == 0.9.1
 pyarrow == 21.0.0
 shapely == 2.1.2
-
-# Networking requirements
-
-
-
-# Testing requirements
-
-
-
-# Other

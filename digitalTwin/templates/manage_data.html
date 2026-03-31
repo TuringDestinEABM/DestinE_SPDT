@@ -1,0 +1,73 @@
+<!-- Wraps around '_reports.html to allow list to be seen in its own page' -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Data Management</h2>
+
+    <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+        {% for tab in tabs_data %}
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ 'active' if tab.is_active else '' }}" 
+                    id="{{ tab.id }}-tab" 
+                    data-bs-toggle="tab" 
+                    data-bs-target="#{{ tab.id }}" 
+                    type="button" 
+                    role="tab" 
+                    aria-controls="{{ tab.id }}" 
+                    aria-selected="{{ 'true' if tab.is_active else 'false' }}">
+                {{ tab.id|replace('_', ' ')|title }} 
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content border border-top-0 p-3" id="dataTabsContent">
+        
+        {% for tab in tabs_data %}
+        <div class="tab-pane fade {{ 'show active' if tab.is_active else '' }}" 
+             id="{{ tab.id }}" 
+             role="tabpanel" 
+             aria-labelledby="{{ tab.id }}-tab">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>{{ tab.id|replace('_', ' ')|title }}</h4>
+            </div>
+                {% if tab.id == 'scenarios' %}
+                {% include "_scenariosManager.html" %}
+
+                {% elif tab.id == 'policy_choices' %}
+                {% include "_policyChoicesManager.html" %}
+
+                {% elif tab.id == 'population' %}
+                {% include "_populationManager.html" %}
+
+                {% else %}
+                {% include "_sourceDataViewer.html" %}
+                {% endif %}
+
+            <nav aria-label="Table navigation" class="mt-3">
+                <ul class="pagination justify-content-center">
+                    
+                    <li class="page-item {{ 'disabled' if not tab.prev_url }}">
+                        <a class="page-link" href="{{ tab.prev_url or '#' }}" tabindex="-1">Previous</a>
+                    </li>
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link">
+                            Page {{ tab.tab_data.page }} of {{ tab.tab_data.pages }}
+                        </span>
+                    </li>
+
+                    <li class="page-item {{ 'disabled' if not tab.next_url }}">
+                        <a class="page-link" href="{{ tab.next_url or '#' }}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Create Scenario</h2>
+
+<div class="col-md-6">
+            
+            <div class="card p-4 shadow-sm mb-4">
+                <h4>Select Existing Climate</h4>
+                <form method="POST" action="">
+                    {{ selectPresets.hidden_tag() }}
+                    
+                    <div class="input-group mb-3">
+                        {{ selectPresets.selected_climate_id(class="form-select") }}
+                        {{ selectPresets.Submit(class="btn btn-secondary") }}
+                    </div>
+                </form>
+            </div>
+
+            <div class="card p-4 shadow-sm">
+                <h4>Create New Climate</h4>
+                <form method="POST" action="">
+                    {{ climateForm.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ climateForm.Name.label(class="form-label") }}
+                        {{ climateForm.Name(class="form-control") }}
+                        {% for error in climateForm.Name.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ climateForm.BaseData.label(class="form-label") }}
+                        {{ climateForm.BaseData(class="form-select") }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            {{ climateForm.TemperatureVar.label(class="form-label") }}
+                            {{ climateForm.TemperatureVar(class="form-select") }}
+                        </div>
+                        <div class="col-6 mb-3">
+                            {{ climateForm.temp_scale.label(class="form-label") }}
+                            {{ climateForm.temp_scale(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        {{ climateForm.Submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+
+        </div>
+<!-- scripts used on this page-->
+{% block javascript %}
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,42 @@
+<!-- This is a placeholder page for features which have not yet been implements -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-md bg-body rounded border bg-light ">
+    <div class="card-header"><h5>Climate data</h5></div>
+    <div id="card-container">
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Temperature (&deg C)</th>
+                    <th>Timestamp</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                <tr>
+            </thead>
+            <tbody>
+                
+                {% for item in data.items %}
+                <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.temp_c}}</td>
+                     <td>{{item.timestamp}}</td>
+                    <td>{{item.geometry_coordinates_lat}}</td>
+                    <td>{{item.geometry_coordinates_lon}}</td>
+                </tr>
+                {% endfor %}
+               
+            </tbody>
+        </table>
+         {% if prev_url %}
+            <a href="{{ prev_url }}">Newer reports</a>
+            {% endif %}
+            {% if next_url %}
+            <a href="{{ next_url }}">Older reports</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

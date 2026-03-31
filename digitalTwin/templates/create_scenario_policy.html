@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br>
+<h3>Create Scenario: Select Policy</h3>
+
+    <div class="row"> 
+        <div class="col-md-4">
+            <div class="card p-4 shadow-sm mb-4">
+                <h4>Select Existing Policy</h4>
+                <form method="POST" action="">
+                    {{ selectPresets.hidden_tag() }}
+                    
+                    <div class="input-group mb-3">
+                        {{ selectPresets.selected_policy_id(class="form-select") }}
+                        {{ selectPresets.View(class="btn btn-secondary") }}
+                        {{ selectPresets.Submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+
+            <div class="card p-4 shadow-sm mb-4">
+                <a href="url_for(digitalTwin.create_policy)"><h4>Create a new policy</h4></a>
+                (Opens in a new page, progress will be lost)
+            </div>
+        </div>
+    
+
+        <div class="col-md-8">
+            {% if policy_data %}
+                <div class="card shadow-sm mb-4 d-inline-block">
+                    
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                        <div>
+                            <h4 class="mb-0 text-primary">Selected policy: {{ policy_data.policy.policy_name }}</h4>
+                            <small class="text-muted">Created by {{ policy_data.policy.user_name }} on {{ policy_data.policy.timestamp.strftime('%Y-%m-%d') }}</small>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {% if policy_data.policy.description %}
+                                        <div class="mb-4">
+                                            <h6 class="fw-bold text-uppercase small text-muted">Description</h6>
+                                            <p class="card-text">{{ policy_data.policy.description }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold text-uppercase small text-muted">Candidates</h6>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for item in policy_data.policy.candidate_classes %}
+                                                <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ item }}</span>
+                                            {% endfor %}
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% for rule in policy_data.rules %}
+                            {% set characteristics = [
+                                ('Qualifying', rule.qualifying_characteristics, 'info'),
+                                ('Disqualifying', rule.disqualifying_characteristics, 'danger')
+                            ] %}
+
+                            {% set attributes = [
+                                ('Wards', rule.wards, 'Ward'),
+                                ('Property Types', rule.property_types, 'Property Types'),
+                                ('Income Types', rule.income_types, 'Income'),
+                                ('Schedule Types', rule.schedule_types, 'Schedule')
+                            ] %}
+
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="p-2 border rounded-6 bg-white h-100">
+                                        <h7 class="fw-bold text-uppercase small text-muted">Rule {{ loop.index }}</h7>
+                                    
+                                        {% for label, characteristic, style in characteristics %}
+                                            {% if characteristic %}
+                                                <div class="fw-bold text-{{style}}-emphasis small mb-2">{{ label }}</div>
+                                                
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    {% for label, attr, description in attributes %}
+                                                        {% if attr and description in characteristic %}
+                                                            <div class="mb-3">
+                                                                <div class="p-2 border rounded-3 bg-white h-100 d-inline-block" style="min-width: 150px; max-width: 100%;">
+                                                                    <div class="fw-bold small mb-2">{{ label }}</div>
+                                                                    <div class="d-flex flex-wrap gap-1">
+                                                                        {% for item in attr %}
+                                                                            <span class="badge bg-{{style}}-subtle text-{{style}}-emphasis border">{{ item }}</span>
+                                                                        {% endfor %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                                                        
+                                        <div class="fw-bold small mb-2">
+                                            Adoption rate: {{ policy_data.policy.adoption_rate }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+<!-- scripts used on this page-->
+{% block javascript %}
+<script>
+    
+    function toggleSelectAll(btn, selectId) {
+        var selectBox = document.getElementById(selectId);
+        
+        if (!selectBox) {
+            console.error("Could not find element with id '" + selectId + "'");
+            return;
+        }
+
+        var options = selectBox.options;
+        
+        
+        var isSelectingAll = (btn.innerText.trim() === "Select All");
+
+        for (var i = 0; i < options.length; i++) {
+            options[i].selected = isSelectingAll;
+        }
+
+        if (isSelectingAll) {
+            btn.innerText = "Deselect All";
+        } else {
+            btn.innerText = "Select All";
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

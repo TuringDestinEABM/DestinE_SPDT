@@ -5,24 +5,28 @@ Figures are returned aas json dumps of plotly fig objects. GIS information retur
 '''
 
 from ..modelling import analyze
+from . import dataManager
 from pathlib import Path
 import pandas as pd
 import plotly.express as px
 import plotly
 import json
 
-# generic script to prepare the data for each of the figures
-def prepare_data(sourceData, outdir, jitterRadius=25):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    outdir = Path(outdir)
+from digitalTwin import db, routes
+import sqlalchemy as sa
+import sqlalchemy.orm as so
+from digitalTwin.models import models
 
-    hourly   = pd.read_csv(outdir / "energy_timeseries.csv")
-    model_ts = pd.read_parquet(outdir / "model_timeseries.parquet")
-    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
-   
-    hi = analyze.highUsage(dataPath, agent_ts, 25) #
+def prepare_data(scenario, jitterRadius=25):
+    hourly = dataManager.findDBData('EnergyTimeSeries', scenario.id)
+    model_ts = dataManager.findDBData('ModelTimeSeries', scenario.id)
+    a_ts = dataManager.findDBData('AgentTimeSeries', scenario.id)
+    agent_ts = analyze.reset_agent_index(a_ts)
+    hi = analyze.highUsage(scenario, agent_ts, 25) 
+
     model_ts, prop_cols, wealth_cols= analyze.prepTimeSeries(model_ts)
     return hi, model_ts, prop_cols, wealth_cols, hourly
+    # return model_ts, prop_cols, wealth_cols, hourly
 
 
 # TODO: Fix this
@@ -55,6 +59,9 @@ def prepare_data(sourceData, outdir, jitterRadius=25):
     
 # script for bar chart showing mean energy usage by different property types.
 def dailyByPropTypePX(timeseries, prop_cols):
+    prop_cols.remove('id')
+    prop_cols.remove('scenario_id')
+    timeseries.drop(['id', 'scenario_id'], axis=1)
     daily_type = timeseries.groupby("day")[prop_cols].sum()
     mean_daily_type = daily_type.mean().sort_values(ascending=False)
 
@@ -105,33 +112,36 @@ def temporalHeatMap(timeseries):
     return figJSON
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
-def timeline(sourceData, outdir):
-    dataPath = Path(__file__).parents[1] /"data/synthetic_data" / sourceData
-    outdir = Path(outdir)
-    
+def timeline(scenario):
     # combine agent data and energy usage timeseries into a single dataframe
-    agent_ts = analyze.reset_agent_index(pd.read_parquet(outdir / "agent_timeseries.parquet"))
-    timeseries = analyze.allUsage_ts(dataPath, agent_ts, 25)
+    agent_ts = analyze.reset_agent_index(dataManager.findDBData('AgentTimeSeries', scenario.id))
+    print(f"agent_ts: {agent_ts}")
+    timeseries = analyze.allUsage_ts(scenario, agent_ts)
+    print(f"timeseries: {timeseries}")
     timeseries.drop('energy', axis = 1)
     timeseries_js = timeseries.to_json()
-    
+
     # Get min and max data usage to help define colors in the maplibre GIS
     ec = timeseries['energy_consumption'] 
     energy_range = {"min":round(ec.min(),3), 
                     "max": round(ec.max(),3)
                     }
 
+    print('energy_range')
+    print(energy_range)
+
     # create list of number of steps                
     stepArray = []
-    for step in pd.unique(timeseries['Step']):
+    for step in pd.unique(timeseries['step']):
         stepArray.append(int(step))
 
     steps = {
-       "min": min(stepArray),
+       "min": 0,
        "max": max(stepArray),
        "steps": stepArray
     }
 
-    
-  
+    print('steps')
+    print(steps)
+
     return steps, timeseries_js, energy_range

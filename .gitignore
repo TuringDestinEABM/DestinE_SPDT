@@ -4,11 +4,14 @@ ForProduction/*
 #local only files
 .env/
 *cache
-digitalTwin/data/geo_data/results/
-!digitalTwin/data/geo_data/results/.gitkeep
+digitalTwin/data/*
 
 digitalTwin/data/synthetic_data/*
 !digitalTwin/data/synthetic_data/.gitkeep
+
+#databasing
+digitalTwin/app.db
+migrations/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

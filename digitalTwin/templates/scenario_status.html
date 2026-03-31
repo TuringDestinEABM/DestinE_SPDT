@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-sm">
+                <div class="card-body py-5">
+                    <h2 class="card-title mb-4">Running Simulation: <span class="text-primary">{{ scenario_name }}</span></h2>
+                    
+                    <div id="status-container">
+                        <p id="status-message" class="lead text-muted mb-4">
+                            Model is executing in the background...
+                        </p>
+                        
+                        <div id="loading-spinner" class="spinner-border text-primary mb-4" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+
+                        <div class="text-start bg-dark text-light p-3 rounded mb-4 shadow-inner" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9em;" id="log-box">
+                            Waiting for logs...
+                        </div>
+
+                        <div id="success-alert" class="alert alert-success d-none mx-auto" role="alert">
+                            <h4 class="alert-heading mb-1">Simulation Complete!</h4>
+                        </div>
+
+                        <div id="error-alert" class="alert alert-danger d-none mx-auto" role="alert">
+                            <h4 class="alert-heading mb-1">Simulation Failed</h4>
+                            <p class="mb-0 small">Check the logs above or your server console for details.</p>
+                        </div>
+
+                        <a href="{{ url_for('digitaltwin.specific_report', scenario_name=scenario_name) }}" id="results-btn" class="btn btn-success mt-2 d-none">
+                            View Results
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascript %}
+<script>
+    const logBox = document.getElementById("log-box");
+
+    function checkSimulationStatus() {
+        fetch(`/check_status/{{ scenario_name }}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update the logs box with the array of messages
+                if (data.logs && data.logs.length > 0) {
+                    logBox.innerText = data.logs.join('\n');
+                    // Auto-scroll to bottom of logs
+                    logBox.scrollTop = logBox.scrollHeight; 
+                }
+
+                // Handle Completion
+                if (data.status === "completed") {
+                    document.getElementById("status-message").classList.add("d-none");
+                    document.getElementById("loading-spinner").classList.add("d-none");
+                    document.getElementById("success-alert").classList.remove("d-none");
+                    document.getElementById("results-btn").classList.remove("d-none");
+                    clearInterval(pollingInterval);
+                }
+                
+                //Handle Failure (Code Crashed!)
+                else if (data.status === "failed") {
+                    document.getElementById("status-message").classList.add("d-none");
+                    document.getElementById("loading-spinner").classList.add("d-none");
+                    document.getElementById("error-alert").classList.remove("d-none");
+                    clearInterval(pollingInterval);
+                }
+            })
+            .catch(error => {
+                // Triggers if the server crashes, is turned off, or network drops
+                console.error("Error checking status:", error);
+                
+                clearInterval(pollingInterval);
+                
+                // Hide the loading UI
+                document.getElementById("status-message").classList.add("d-none");
+                document.getElementById("loading-spinner").classList.add("d-none");
+                
+                // Error alert
+                const errorAlert = document.getElementById("error-alert");
+                errorAlert.classList.remove("d-none");
+                errorAlert.querySelector("h4").innerText = "Connection Lost";
+                errorAlert.querySelector("p").innerText = "The server stopped responding. The app may have been shut down or restarted.";
+            });
+    }
+
+    const pollingInterval = setInterval(checkSimulationStatus, 3000); // Checked every 3 seconds now
+</script>
+{% endblock %}
+
+{% endblock %}

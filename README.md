@@ -1,3 +1,35 @@
+# Development Quick Launch 
+## First time initalisation
+``` py -m venv .env```
+
+```py -m pip install --upgrade pip```
+
+```.env\Scripts\activate ```
+
+```pip install -r requirements.txt```
+
+```set FLASK_APP=digitalTwin.py```
+
+```flask db init```
+
+```flask db migrate -m "first migration"```
+
+```flask db upgrade```
+
+```py populateDB.py```
+
+```set FLASK_DEBUG=1```
+
+```flask run```
+
+## Once initialised
+```.env\Scripts\activate ```
+
+```set FLASK_APP=digitalTwin.py```
+
+```flask run```
+
+
 # DestinE_SPDT
 This is the public relase of the development version of the Scenario Planning Digital Twin web app for the [Earth observation-informed agent-based models for scenario planning digital twins](https://www.turing.ac.uk/research/research-projects/earth-observation-informed-agent-based-models-scenario-planning-digital) project. 
 
