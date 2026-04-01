@@ -66,7 +66,7 @@ def run(scenario, log_callback=print) -> None:
     log_callback('Updating to match policy')
     gdf = policies.applyPolicy(gdf, scenario.policy_id)
 
-     # update gdf based on policies
+    # update gdf based on policies
     gdf_updated = policies.applyPolicy(gdf, scenario.policy_id, log_callback=log_callback)
 
     model = EnergyModel(gdf=gdf_updated ,

@@ -29,34 +29,6 @@ def prepare_data(scenario, jitterRadius=25):
     # return model_ts, prop_cols, wealth_cols, hourly
 
 
-# TODO: Fix this
-# # script for spatial hexbin figure
-# def spatialHexBin(df):    
-#     fig, ax = plt.subplots(figsize=(6, 6))
-
-#     hb = ax.hexbin(
-#         df.geometry.x, # x cordianates
-#         df.geometry.y, # y cordianates
-#         C=df["total_energy"], # total enercy, z cord
-#         reduce_C_function=sum, 
-#         gridsize=40,
-#         mincnt=1,
-#     )
-
-#     # ▼  add an OSM/CartoDB background  ▼
-#     cx.add_basemap(
-#         ax,
-#         crs="EPSG:3857",
-#         source=cx.providers.CartoDB.Positron,   # light-grey background
-#         attribution=False,                      # omit tiny © text
-#     )
-
-#     ax.set_axis_off()
-#     fig.colorbar(hb, label="aggregated kWh")
-#     ax.set_title("High-usage homes (jittered)")
-#     fig.tight_layout()
-#     return fig
-    
 # script for bar chart showing mean energy usage by different property types.
 def dailyByPropTypePX(timeseries, prop_cols):
     prop_cols.remove('id')
@@ -113,35 +85,64 @@ def temporalHeatMap(timeseries):
 
 # Produces the data for the maplibre GIS. Returns steps (an array of each time step), timeseries_js (geo_json containing the data), and energy_range (dict of min and max energy usage)
 def timeline(scenario):
-    # combine agent data and energy usage timeseries into a single dataframe
-    agent_ts = analyze.reset_agent_index(dataManager.findDBData('AgentTimeSeries', scenario.id))
-    print(f"agent_ts: {agent_ts}")
-    timeseries = analyze.allUsage_ts(scenario, agent_ts)
-    print(f"timeseries: {timeseries}")
-    timeseries.drop('energy', axis = 1)
-    timeseries_js = timeseries.to_json()
+
+    # get static data
+    # uprns = dataManager.getUPRNs(scenario)
+    epc_columns = ["UPRN",
+                    "property_type",
+                    "property_age",
+                    "sap_band_ord"]
+    # hidp_columns = ["UPRN",
+    #                 "tenure",
+    #                 "hh_n_people",
+    #                 "hh_income_band",
+    #                 "schedule_type"]
+    # gdf_static = dataManager.loadGeoJSONSubset(uprns,
+    #                                             epc_columns,
+    #                                             hidp_columns)
+    # print(gdf_static.head())
+
+    gdf_static = dataManager.loadGeoJSONDB('newcastle', scenario.population_id, epc_columns)
+    gdf_static_js = gdf_static.to_json()
 
     # Get min and max data usage to help define colors in the maplibre GIS
-    ec = timeseries['energy_consumption'] 
-    energy_range = {"min":round(ec.min(),3), 
-                    "max": round(ec.max(),3)
+    eRange = dataManager.getEnergyRange(scenario.id) 
+    energy_range = {"min":round(eRange[0],3), 
+                    "max": round(eRange[1],3)
                     }
 
-    print('energy_range')
-    print(energy_range)
+    # create hour array based on how often recorded
+    hourArray=[]
+    hour = 0
+    while hour < 23:
+        hourArray.append(hour)
+        hour += scenario.record_every
 
-    # create list of number of steps                
-    stepArray = []
-    for step in pd.unique(timeseries['step']):
-        stepArray.append(int(step))
+    return hourArray, gdf_static_js, energy_range
 
-    steps = {
-       "min": 0,
-       "max": max(stepArray),
-       "steps": stepArray
-    }
+def timeline_daily(scenario, day):
+    
+    # work out which steps are needed
+    stepsToPoll = []
+    step = day - 1
+    while step < day + 22:
+        stepsToPoll.append(step)
+        step += scenario.record_every
 
-    print('steps')
-    print(steps)
+    # call and flatten dataframe
+    target_columns = ['energy_consumption',
+                      'step',
+                      'Agent_id'
+                    ]
+    agent_df = dataManager.getEnergyDaily(scenario, stepsToPoll, target_columns)
+    agent_df = analyze.reset_agent_index(agent_df)
+    # print('---')
+    # print(agent_df.head)
+    # print('---')
 
-    return steps, timeseries_js, energy_range
+    # reshape into list of dicts
+    df_sorted = agent_df.sort_values(by=['agent_id', 'step'])
+    energy_data = df_sorted.groupby('agent_id')['energy_consumption'].apply(list).to_dict()
+    energy_data = {str(k): v for k, v in energy_data.items()} # force strings to make jsonify happy
+
+    return energy_data

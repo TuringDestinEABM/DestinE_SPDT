@@ -166,6 +166,57 @@ def loadGeoJSONDB(city: str, popID, columns: Optional[List[str]]=None, includeGe
     gdf = gdf.drop(columns=geometry)
     return gdf
 
+# def loadGeoJSONSubset(uprns,
+#                       epc_columns: Optional[List[str]]=None,
+#                       hidp_columns: Optional[List[str]]=None,
+#                       includeGeometry=True):
+
+#     if includeGeometry ==True: 
+#         geometry = ['geometry_type',
+#                     'geometry_coordinates_lon',
+#                     'geometry_coordinates_lat']
+#     else: geometry = []
+
+#     # epc query
+#     # Handle columns
+#     if epc_columns is None:
+#         # User didn't pass anything -> Select All
+#         query = sa.select(models.EPCABMdata)
+#     else:
+#         # User passed a list -> Select Specific
+#         # Add non-optional geometry columns
+#         if isinstance(epc_columns, str):
+#             epc_columns = [epc_columns]
+#         target_columns = epc_columns + geometry
+        
+#         cols_to_select = [getattr(models.EPCABMdata, col) for col in target_columns]
+#         query = sa.select(*cols_to_select)
+#         query = query.where(models.EPCABMdata.UPRN.in_(uprns))
+
+#     with db.engine.connect() as conn:
+#         df = pd.read_sql(query, conn) # load from db to data frame  
+#         gdf = geopandas.GeoDataFrame(df, 
+#                                 geometry=geopandas.points_from_xy( df.geometry_coordinates_lat, df.geometry_coordinates_lon),
+#                                 crs="EPSG:4326") # convert to geodataframe
+#         gdf = gdf.drop(columns=geometry)
+
+#     # optional hidp data query
+#     if hidp_columns is not None:
+#         if isinstance(hidp_columns, str):
+#             columns = [hidp_columns]
+
+#         cols_to_select = [getattr(models.UPRNdata, col) for col in hidp_columns]
+#         query = sa.select(*cols_to_select)
+#         query = query.where(models.UPRNdata.UPRN.in_(uprns))
+
+#         with db.engine.connect() as conn:
+#             hidp_df = pd.read_sql(query, conn) # load from db to data frame
+
+#         gdf = gdf.merge(hidp_df, on='UPRN') #merge
+
+#     return gdf
+
+
 def epcMask(popID):
     pop = findDBData('Population', popID)
         
@@ -397,3 +448,49 @@ def countMatches(query):
 
     print(f"Returning {filtered_rows} rows.")
     print('------')
+
+'''return the minimum and maximum energy consumption for the scenario'''
+def getEnergyRange(scenario_id):
+    min = db.first_or_404(
+        sa.select(
+            models.AgentTimeSeries.energy_consumption).order_by(
+                models.AgentTimeSeries.energy_consumption.asc().nullslast()).where(
+                    models.AgentTimeSeries.scenario_id == scenario_id)
+                    )
+
+    max = db.first_or_404(
+        sa.select(
+            models.AgentTimeSeries.energy_consumption).order_by(
+                models.AgentTimeSeries.energy_consumption.desc().nullslast()).where(
+                    models.AgentTimeSeries.scenario_id == scenario_id)
+                    )
+
+    range = [min, max]
+
+    return range
+
+def getEnergyDaily(scenario, stepsToPoll, target_columns):
+    query = sa.Select(models.AgentTimeSeries)
+    query = query.where(models.AgentTimeSeries.scenario_id == scenario.id)
+    query = query.where(models.AgentTimeSeries.step.in_(stepsToPoll))
+
+    cols_to_select = [getattr(models.AgentTimeSeries, col) for col in target_columns]
+    query = sa.select(*cols_to_select)
+
+    with db.engine.connect() as conn:
+        data = pd.read_sql(query, conn)
+
+    return data
+
+def getUPRNs(scenario):
+    query = (
+        sa.select(models.AgentTimeSeries.Agent_id)
+        .where(models.AgentTimeSeries.scenario_id == scenario.id)
+        .distinct()
+    )
+
+    with db.engine.connect() as conn:
+        data = conn.execute(query).scalars().all()
+        print(data)
+    
+    return data
