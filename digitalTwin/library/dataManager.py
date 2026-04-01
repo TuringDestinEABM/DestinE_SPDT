@@ -64,7 +64,7 @@ def findDBData(DBmodel, identifier=''):
     elif DBmodel == 'PolicyChoices':
         query  = sa.select(models.PolicyChoices)
         if identifier:
-            query= query.where(models.PolicyChoices.id == identifier)
+            query = query.where(models.PolicyChoices.id == identifier)
             data = db.session.scalars(query).first()
         else:
             data = db.session.scalars(query).all()
@@ -98,7 +98,7 @@ def loadAndMerge(city: str, popID, epc_columns: Optional[List[str]]=None, hidp_c
 
     if hidp_columns is None:
         # User didn't pass anything -> Select All
-        hidp_query = sa.select(models.EPCABMdata)
+        hidp_query = sa.select(models.UPRNdata)
     else:
         # User passed a list -> Select Specific
         # Add non-optional geometry columns
@@ -111,26 +111,25 @@ def loadAndMerge(city: str, popID, epc_columns: Optional[List[str]]=None, hidp_c
     epc_mask = epcMask(popID) # wards and property types
     hidp_mask = hidpMask(epc_mask, popID) # schedules and incomes
 
-    epc_query = epc_query.where(models.EPCABMdata.UPRN.in_(hidp_mask))
+    epc_query = epc_query.where(models.EPCABMdata.UPRN.in_(epc_mask))
     hidp_query = hidp_query.where(models.UPRNdata.UPRN.in_(hidp_mask))
 
     with db.engine.connect() as conn:
         print('loading epc data')
         epc_df = pd.read_sql(epc_query, conn) # load from db to data frame
-        # print('loading uprn data')
-        # hidp_df = pd.read_sql(hidp_query, conn) # load from db to data frame
-    
-    # print('merging data frames')
-    # df = epc_df.merge(hidp_df, on='UPRN')
-    # for col in df.columns:
-    #     print(col)
-
-    # this broke my pc
-
-    gdf = geopandas.GeoDataFrame(epc_df, 
+        epc_gdf = geopandas.GeoDataFrame(epc_df, 
                                  geometry=geopandas.points_from_xy( epc_df.geometry_coordinates_lat, epc_df.geometry_coordinates_lon),
                                   crs="EPSG:4326") # convert to geodataframe
-    gdf = gdf.drop(columns=geometry)
+        epc_gdf = epc_gdf.drop(columns=geometry)
+        
+        print('loading uprn data')
+        hidp_df = pd.read_sql(hidp_query, conn) # load from db to data frame
+        
+    
+    print('merging data frames')
+
+    gdf = epc_gdf.merge(hidp_df, on='UPRN')
+
     return gdf
 
 def loadGeoJSONDB(city: str, popID, columns: Optional[List[str]]=None, includeGeometry=True):

@@ -249,10 +249,9 @@ class Rules(db.Model):
 
         optional_fields = [
             "qualifying_characteristics",
-            "required_characteristics",
             "disqualifying_characteristics",
             "wards",
-            "property_types",
+            "tenure_types",
             "income_types",
             "schedule_types",
         ]
