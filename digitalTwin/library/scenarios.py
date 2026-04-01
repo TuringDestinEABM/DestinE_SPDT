@@ -30,6 +30,7 @@ def run_and_save_scenario(scenario_name, log_callback=print):
     model, records = energyABM.run(scenario, log_callback=log_callback) 
     log_callback("Model run complete. Preparing database records...")
 
+
     # Save energy time series
     energy_objects = []
     for entry in records:
@@ -46,7 +47,7 @@ def run_and_save_scenario(scenario_name, log_callback=print):
     db.session.commit()
     log_callback('Energy time series saved.')
 
-    # Save model time series
+    #Save model time series
     model_df = model.datacollector.get_model_vars_dataframe() 
     model_dict = model_df.to_dict('records') 
     
@@ -92,82 +93,6 @@ def run_and_save_scenario(scenario_name, log_callback=print):
     db.session.commit()
     log_callback('Agent time series saved. Process entirely finished!')
 
-# creates a temporary config file, copying values from config_defaults.yaml and overwriting them based on the values supplied by the policy_choices table
-# def createConfig(policy):
-
-# def run(scenario_name):
-#     scenario = db.first_or_404(sa.select(models.Scenario).where(models.Scenario.scenario_name == scenario_name))
-#     model, records = energyABM.run(scenario) # run the model
-#     print('model run')
-#     add_log(scenario_name, 'model run')
-#     # pass the energy time series to the database
-#     energy_objects = []
-#     for entry in records:
-#         energy_ts = models.EnergyTimeSeries(
-#             scenario_id=scenario.id,
-#             step=entry["step"],
-#             hour=entry["hour"],
-#             day=entry["day"],
-#             total_energy=entry["total_energy"],
-#             average_energy=entry["avg_energy"]
-#         )
-#         energy_objects.append(energy_ts)
-        
-#     db.session.bulk_save_objects(energy_objects)
-#     db.session.commit()
-#     print('energy_ts saved')
-#     # pass the model time series to the database
-#     model_df = model.datacollector.get_model_vars_dataframe() 
-#     model_dict = model_df.to_dict('records') 
-    
-#     model_objects = []
-#     for row in model_dict:
-#         model_ts = models.ModelTimeSeries(
-#             scenario_id=scenario.id,
-#             mid_terraced_house=row["mid-terraced house"],
-#             semi_detached_house=row["semi-detached house"],
-#             flats_small=row["small block of flats/dwelling converted in to flats"],
-#             flats_large=row["large block of flats"],
-#             flats_block=row["block of flats"],
-#             end_terrace_house=row["end-terraced house"],
-#             detached_house=row["detached house"],
-#             flat_mixed_use=row["flat in mixed use building"],
-#             high=row["high"],
-#             medium=row["medium"],
-#             low=row["low"],
-#             total_energy=row["total_energy"],
-#             cumulative_energy=row["cumulative_energy"]
-#         )
-#         model_objects.append(model_ts)
-        
-#     db.session.bulk_save_objects(model_objects)
-#     db.session.commit()
-#     print('model_ts saved')
-
-#    # pass the agent time series to the database
-#     agent_df = model.agent_dc.get_agent_vars_dataframe() 
-#     agent_list = agent_df.reset_index().values.tolist()# convert to list for quicker iteration
-#     print('---')
-#     print(agent_list[0])
-#     print(agent_list[1])
-#     print('---')
-#     # Create a list of objects in memory
-#     agent_objects = []
-#     for row in agent_list:
-#         # Assuming row order: [step, Agent_id, energy, energy_consumption] based on your code
-#         agent_ts = models.AgentTimeSeries(
-#             scenario_id=scenario.id,
-#             step=row[0],
-#             Agent_id=row[1],
-#             energy=row[2],
-#             energy_consumption=row[3]
-#         )
-#         agent_objects.append(agent_ts)
-        
-#     # Bulk save to the database (much faster!)
-#     db.session.bulk_save_objects(agent_objects)
-#     db.session.commit()
-#     print('agent_ts saved')
 
 
 def saveScenario(session):
@@ -179,13 +104,6 @@ def saveScenario(session):
     popData = session.get('population_data', {})
     popID = createPopulation(popData)
     
-    # either get ID for climate data, or create a new entry
-    # if session['climate_mode'] == 'preset':
-    #     climateID = session.get('selected_preset_id', {})
-    # elif session['climate_mode'] == 'new':
-    #     climateData = session.get('climate_data', {})
-    #     climateID = createClimateModel(climateData)
-
     # either get ID for policy data, or create a new entry
     if session['policy_mode'] == 'preset':
         policyID = session.get('selected_policy_id', {})

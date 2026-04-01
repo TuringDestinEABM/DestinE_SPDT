@@ -38,7 +38,7 @@ def run(scenario, log_callback=print) -> None:
 
     # load gdf for only the selected agents
     epc_columns = [
-    "UPRN","property_type","sap_rating","energy_cal_kwh","energy_demand_kwh",
+    "UPRN","ward_code","property_type","sap_rating","energy_cal_kwh","energy_demand_kwh",
     "floor_area_m2","property_age","main_fuel_type","main_heating_system",
     "retrofit_envelope_score","is_heatpump_candidate", "heatpump_candidate_class",
     "heating_controls","meter_type",
@@ -56,18 +56,20 @@ def run(scenario, log_callback=print) -> None:
     print('-----------')
     print(gdf.head())
     print('-----------')
+    print("The column headers :")
+    print(gdf.columns.tolist())
 
 
     climate_path = Config.CLIMATE_DATA
 
-    # create config file
-    log_callback('Creating config file from policy selection')
-    # createPolicyConfig(gdf, scenario.policy_id, log_callback=log_callback)
+    # update to match policy
+    log_callback('Updating to match policy')
+    gdf = policies.applyPolicy(gdf, scenario.policy_id)
 
-    # # update gdf based on policies
-    # gdf_updated = switchToHeatpump(gdf, scenario.policy_id, log_callback=log_callback)
+     # update gdf based on policies
+    gdf_updated = policies.applyPolicy(gdf, scenario.policy_id, log_callback=log_callback)
 
-    model = EnergyModel(gdf=gdf,
+    model = EnergyModel(gdf=gdf_updated ,
                         climate_parquet= climate_path,
                         climate_start=scenario.start_day, # to do make changeable
                         local_tz="Europe/London",
@@ -100,15 +102,6 @@ def run(scenario, log_callback=print) -> None:
         )
     
     return model, records
-
-# def switchToHeatpump(gdf, policy_id, log_callback=print):
-
-#     # policy_choices = dataManager.findDBData('PolicyChoices', policy_id)
-#     policy_data = policies.getPolicy(f'policy_choices: {policy_choices}')
-#     print(f'policy_choices: {policy_choices}')
-
-#     return gdf
-
 
 
 def createPolicyConfig(gdf, policy_id, log_callback=print):
