@@ -37,7 +37,7 @@
                     
 
                     <div class="card-body">
-                        <a href="{{ url_for('digitaltwin.create_policy') }}" data-bs-toggle="tooltip" title="Create new scenario">
+                        <a href="{{ url_for('digitaltwin.create_policy', new=1) }}" data-bs-toggle="tooltip" title="Create new scenario">
                             <img src="{{ url_for('static', filename='img/policy.png') }}" 
                                 class="img-fluid mx-auto d-block" 
                                 alt="create new" >
@@ -54,7 +54,16 @@
 
 <!-- Table for loading reports -->
 <div class = "w-80">
-{% include "_scenariosSummary.html" %}
+{% if scenario_data %}
+    {% include "_scenariosSummary.html" %}
+{% else%}
+<div class="alert alert-info" role="alert">
+  <h4 class="alert-heading">Quick start guide</h4>
+  <p>Your scenarios will appear here once you've created them.</p>
+  <p>Get started using the buttons above. First create a policy selection, and then create and run a new scenario.</p>
+</div>
+{% endif %}
+
 </div>
 <!-- scripts used on this page-->
 {% block javascript %}

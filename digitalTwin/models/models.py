@@ -147,9 +147,9 @@ class EPCABMdata(db.Model):
     def __repr__(self):
         return '<epc_abm_data {}>'.format(self.id)    
     
-class UPRNdata(db.Model):
+class HIDPdata(db.Model):
     # __bind_key__ = "gis"
-    __tablename__ = "uprn_data"
+    __tablename__ = "hidp_data"
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     city: so.Mapped[str] = so.mapped_column()
     UPRN: so.Mapped[int] = so.mapped_column()

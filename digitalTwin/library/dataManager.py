@@ -98,21 +98,21 @@ def loadAndMerge(city: str, popID, epc_columns: Optional[List[str]]=None, hidp_c
 
     if hidp_columns is None:
         # User didn't pass anything -> Select All
-        hidp_query = sa.select(models.UPRNdata)
+        hidp_query = sa.select(models.HIDPdata)
     else:
         # User passed a list -> Select Specific
         # Add non-optional geometry columns
         if isinstance(hidp_columns, str):
             hidp_columns = [columns]
         
-        cols_to_select = [getattr(models.UPRNdata, col) for col in hidp_columns]
+        cols_to_select = [getattr(models.HIDPdata, col) for col in hidp_columns]
         hidp_query = sa.select(*cols_to_select)
         
     epc_mask = epcMask(popID) # wards and property types
     hidp_mask = hidpMask(epc_mask, popID) # schedules and incomes
 
     epc_query = epc_query.where(models.EPCABMdata.UPRN.in_(epc_mask))
-    hidp_query = hidp_query.where(models.UPRNdata.UPRN.in_(hidp_mask))
+    hidp_query = hidp_query.where(models.HIDPdata.UPRN.in_(hidp_mask))
 
     with db.engine.connect() as conn:
         print('loading epc data')
@@ -205,9 +205,9 @@ def loadGeoJSONDB(city: str, popID, columns: Optional[List[str]]=None, includeGe
 #         if isinstance(hidp_columns, str):
 #             columns = [hidp_columns]
 
-#         cols_to_select = [getattr(models.UPRNdata, col) for col in hidp_columns]
+#         cols_to_select = [getattr(models.HIDPdata, col) for col in hidp_columns]
 #         query = sa.select(*cols_to_select)
-#         query = query.where(models.UPRNdata.UPRN.in_(uprns))
+#         query = query.where(models.HIDPdata.UPRN.in_(uprns))
 
 #         with db.engine.connect() as conn:
 #             hidp_df = pd.read_sql(query, conn) # load from db to data frame
@@ -242,7 +242,7 @@ def epcMask(popID):
 
 def hidpMask(epc_mask, popID):
     pop = findDBData('Population', popID)   
-    hidp = models.UPRNdata
+    hidp = models.HIDPdata
     # Only look at matching wards
     query = sa.select(hidp.UPRN).where(hidp.UPRN.in_(epc_mask))
     print('Matching to hidp data')

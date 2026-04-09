@@ -3,15 +3,18 @@
 
 {% block content %}
 <div class="wrapper">
-    <h2>Placeholder</h2>
-    {{id}}
-    <div class="alert alert-warning" role="alert">
-    This feature has not yet been implemented
-    </div>
+    <h2>Policy created</h2>
 
-    <p>This page is a placeholder and should be replaced before production. </p>
-    <br>
-    <p> <a href="/home">Return home</a>.</p>
+    <div class="col-md-12">
+    {% if policy_data %}
+        {% include "_policySummary.html" %}
+    {% endif %}
+        
+    
+    <div class="d-flex justify-content-end">
+        <a href="{{ url_for('digitaltwin.create_policy', new=1)  }}"><button class="btn btn-secondary my-2">Create another</button></a> 
+        <a href="{{ url_for('digitaltwin.home') }}"><button class="btn btn-primary my-2">Home</button></a>
+  </div>
 
 </div>
 
