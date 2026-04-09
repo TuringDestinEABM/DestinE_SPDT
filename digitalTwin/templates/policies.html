@@ -73,10 +73,6 @@
                                 {% endif %}
                             </div>
                         </div>
-
-                        <div class="d-grid">
-                            {{ policyForm.Submit(class="btn btn-primary btn-lg") }}
-                        </div>
                     </div>
                 </div>
 
@@ -141,7 +137,7 @@
             </div>
 
             <div class="col-lg-7">
-                <div class="card shadow-sm">
+                <div class="card shadow-sm mb-4">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">Add Rule to Policy</h5>
                     </div>
@@ -177,50 +173,69 @@
                             <div class="col-md-6">
                                 {{ rulesForm.Wards.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.Wards(class="form-select", size=7, id="ward-select") }}
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'ward-select')">
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="toggleSelectAll(this, 'ward-select')">
                                     Select All
                                 </button>
+                                {% if rulesForm.Wards.errors %}
+                                    <div class="text-danger small mt-1 fw-bold">{{ rulesForm.Wards.errors[0] }}</div>
+                                {% endif %}
                             </div>
+                            
                             <div class="col-md-6">
                                 {{ rulesForm.IncomeTypes.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.IncomeTypes(class="form-select", size=7, id="income-select") }}
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'income-select')">
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="toggleSelectAll(this, 'income-select')">
                                     Select All
                                 </button>
+                                {% if rulesForm.IncomeTypes.errors %}
+                                    <div class="text-danger small mt-1 fw-bold">{{ rulesForm.IncomeTypes.errors[0] }}</div>
+                                {% endif %}
                             </div>
+                            
                             <div class="col-md-6">
                                 {{ rulesForm.ScheduleTypes.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.ScheduleTypes(class="form-select", size=7, id="schedule-select") }}
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'schedule-select')">
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="toggleSelectAll(this, 'schedule-select')">
                                     Select All
                                 </button>
+                                {% if rulesForm.ScheduleTypes.errors %}
+                                    <div class="text-danger small mt-1 fw-bold">{{ rulesForm.ScheduleTypes.errors[0] }}</div>
+                                {% endif %}
                             </div>
+                            
                             <div class="col-md-6">
                                 {{ rulesForm.TenureTypes.label(class="form-label fw-bold small") }}
                                 {{ rulesForm.TenureTypes(class="form-select", size=7, id="property-select") }}
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll(this, 'property-select')">
+                                <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="toggleSelectAll(this, 'property-select')">
                                     Select All
                                 </button>
+                                {% if rulesForm.TenureTypes.errors %}
+                                    <div class="text-danger small mt-1 fw-bold">{{ rulesForm.TenureTypes.errors[0] }}</div>
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="row mt-4">
-                            
                             <div class="col-md-6 d-flex align-items-end">
-                                {{ rulesForm.Submit(class="btn btn-outline-success w-100") }}
+                                {{ rulesForm.Submit(class="btn btn-outline-success w-100", formnovalidate=True) }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-12 d-grid">
+                {{ policyForm.Submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </div>
+
     </form>
 </div>
 
-<!-- scripts used on this page-->
 {% block javascript %}
 <script>
-    
     function toggleSelectAll(btn, selectId) {
         var selectBox = document.getElementById(selectId);
         
@@ -230,8 +245,6 @@
         }
 
         var options = selectBox.options;
-        
-        
         var isSelectingAll = (btn.innerText.trim() === "Select All");
 
         for (var i = 0; i < options.length; i++) {

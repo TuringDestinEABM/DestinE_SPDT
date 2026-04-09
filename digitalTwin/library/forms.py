@@ -172,13 +172,42 @@ class PolicyChoicesForm(FlaskForm):
             raise ValidationError('This scenario name is already in use. Please use a unique value.') 
         
     Submit = SubmitField('Submit')
+
+class PolicyChoicesForm(FlaskForm):
+    Name = StringField('Policy Name', validators=[DataRequired(), Length(1,32)])
+    Description = TextAreaField('Description', [Length(min=0, max=45)])
+    AdoptionRate = IntegerField('Adoption Rate (%)', 
+                          default = 100,
+                          validators = [DataRequired(), NumberRange(0,100)],
+                          description = 'Percentage of eligible agents who will adopt the technology')
+    CandidateClasses = SelectMultipleField('Candidates',
+                            choices =['priority',
+                                    'possible',
+                                    'difficult',
+                                    'non-possible'],
+                            default = ['priority','possible'],
+                            validators = [DataRequired()],
+                            description = 'Candidates for converting to heat pumps')
+
+    def validate_Name(self, Name):
+        valid_chars = list(string.ascii_letters) + list(string.digits) + ['-', '_']
+        for s in str(Name.data):
+            if s not in valid_chars:
+                raise ValidationError('Please only use alphanumeric characters, hyphens or underscores (a-z, A-Z, 0-9, -, _).')
+        
+        PolicyChoice = db.session.scalar(sa.select(models.PolicyChoices).where(
+            models.PolicyChoices.policy_name == Name.data))
+        if PolicyChoice is not None:
+            raise ValidationError('This scenario name is already in use. Please use a unique value.') 
+        
+    Submit = SubmitField('Submit')
     
 class PolicyRulesForm(FlaskForm):
     QualifyingCharacteristics = SelectMultipleField('Qualifying',
                                                     choices =['Ward',
                                                             'Income',
-                                                            'Tenure',
-                                                            'Schedule'
+                                                            'Schedule',
+                                                            'Tenure'
                                                             ],
                                                     description = 'Agents must meet at least one qualifying characteristic'                                                    
                                                 )
@@ -186,8 +215,8 @@ class PolicyRulesForm(FlaskForm):
     DisqualifyingCharacteristics = SelectMultipleField('Disqualifying',
                                                     choices =['Ward',
                                                             'Income',
-                                                            'Tenure',
-                                                            'Schedule'
+                                                            'Schedule',
+                                                            'Tenure'
                                                             ],
                                                     description = 'Agents must not meet any disqualifying characteristic'
                                                 )
@@ -199,8 +228,7 @@ class PolicyRulesForm(FlaskForm):
                                                   'second lowest quintile',
                                                   'median quintile',
                                                   'second highest quintile',
-                                                  'highest quintile'],
-                                        validators=[DataRequired()])
+                                                  'highest quintile'])
     ScheduleTypes = SelectMultipleField('Schedule',
                                         choices =['dual earner',
                                                   'family with children',
@@ -208,8 +236,7 @@ class PolicyRulesForm(FlaskForm):
                                                   'single parent with children',
                                                   'student',
                                                   'unemployed_or_inactive',
-                                                  'working adult'],
-                                            validators=[DataRequired()])
+                                                  'working adult'])
     TenureTypes = SelectMultipleField('Tenure',
                             choices =['owner_occupied',
                                     'private_rent',
@@ -218,36 +245,30 @@ class PolicyRulesForm(FlaskForm):
                                     'private_rent',
                                     'social_rent'])
     
-    
     Submit = SubmitField('Add to policy selection')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # populate wards
         wards = populations.wardNames('newcastle')
         self.Wards.choices = [(ward, ward) for ward in wards if ward]
-
 
     def validate(self, extra_validators=None):
         
         if not super().validate(extra_validators=extra_validators):
             return False
 
-        # --- Rule 1: At least one Characteristic must be selected ---
         selected_triggers = set()
         for field in [self.QualifyingCharacteristics, self.DisqualifyingCharacteristics]:
             if field.data:
                 selected_triggers.update(field.data)
 
         if not selected_triggers:
-            # Attach error to the first field to make it visible
             self.QualifyingCharacteristics.errors.append(
                 'You must select at least one option from within Qualifying, Required, or Disqualifying.'
             )
             return False
 
-        # --- Rule 2: If a Characteristic is selected, its detail field must have data ---
         field_map = {
             'Ward':     self.Wards,
             'Income':   self.IncomeTypes,
@@ -257,7 +278,6 @@ class PolicyRulesForm(FlaskForm):
 
         validation_passed = True
         
-        # Check each selected trigger
         for trigger in selected_triggers:
             target_field = field_map.get(trigger)
 
@@ -268,8 +288,6 @@ class PolicyRulesForm(FlaskForm):
                 validation_passed = False
 
         return validation_passed
-
-
 
 class SubmitForm(FlaskForm):
     Save = SubmitField('Save')

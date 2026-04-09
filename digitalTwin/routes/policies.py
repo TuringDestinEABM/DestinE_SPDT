@@ -1,33 +1,43 @@
-from flask import render_template, redirect, url_for, session, request
+from flask import render_template, redirect, url_for, session, request, flash
 from ..digitaltwin import bp
 from ..library import policies, forms
 import time
 
 @bp.route("/create-policy", methods=['GET', 'POST'])
 def create_policy():
+    
+    # session cleanup on arrival
+    # make sure to include the flag new=1 in url_for()
+    if request.method == 'GET':
+        is_new_link = request.args.get('new') == '1'
+        is_direct_typing = request.referrer is None
 
+        if is_new_link or is_direct_typing:
+            session.pop('rules', None)
+            session.pop('staged_policy', None)
+            session.modified = True
+            
+            if is_new_link:
+                return redirect(url_for('digitaltwin.create_policy'))
+    # get wtforms
     policyForm = forms.PolicyChoicesForm(prefix="policy")
     rulesForm = forms.PolicyRulesForm(prefix="rules")
 
-    # Ensure rules list exists in session
     if 'rules' not in session:
         session['rules'] = []
 
-    #  Handle data preservation (Run on every POST)
     if request.method == 'POST':
         session['staged_policy'] = {
             'Name': policyForm.Name.data,
             'Description': policyForm.Description.data
         }
-        # Print what button triggered the POST
-        # print(f"[DEBUG] POST Action: {request.form.get('btn_action', 'Regular Submit')}")
 
     action = request.form.get('btn_action', '')
     
+    # delete logic
     if action == 'delete_all':
         session['rules'] = []
         session.modified = True  
-        print("[DEBUG] All rules deleted.")
         return redirect(url_for('digitaltwin.create_policy'))
         
     elif action.startswith('delete_rule_'):
@@ -35,21 +45,20 @@ def create_policy():
             rule_id_to_delete = int(action.split('_')[-1])
             existing_rules = session.get('rules', [])
             
-            # Filter out the rule
             updated_rules = [r for r in existing_rules if r['temp_id'] != rule_id_to_delete]
             
             session['rules'] = updated_rules
             session.modified = True 
         except ValueError:
-            print("[DEBUG] Error parsing rule ID")
+            pass
             
         return redirect(url_for('digitaltwin.create_policy'))
 
-    # Handle "Add Rule" 
+    # submit logic (rules)
     if rulesForm.Submit.data:  
         if rulesForm.validate():
             new_rule = {
-                'temp_id': int(time.time() * 100000), # Unique ID
+                'temp_id': int(time.time() * 100000), 
                 'data': rulesForm.data
             }
             
@@ -58,29 +67,24 @@ def create_policy():
             session['rules'] = rules_list
             session.modified = True 
             
-            print(f"[DEBUG] New rule added. ID: {new_rule['temp_id']}")
             return redirect(url_for('digitaltwin.create_policy'))
-        else:
-            for field, errors in rulesForm.errors.items():
-                for error in errors:
-                    print('error')
     
-    # Handle "Save Policy" 
-    if policyForm.Submit.data and policyForm.validate():
+    # submit logic (policy)
+    if policyForm.Submit.data:
         rules = session.get('rules', [])
         
-        # Save to DB
-        policy_id = policies.savePolicy(policyForm, rules)
-        print(f"[DEBUG] Policy Saved! ID: {policy_id}")
+        if not rules:
+            flash('You must add at least one rule to the policy before saving.', 'danger')
+        elif policyForm.validate():
+            policy_id = policies.savePolicy(policyForm, rules)
 
-        # Cleanup Session
-        session.pop('rules', None)
-        session.pop('staged_policy', None)
-        session.modified = True
-        
-        return redirect(url_for('digitaltwin.policy_created', id=policy_id))
+            session.pop('rules', None)
+            session.pop('staged_policy', None)
+            session.modified = True
+            
+            return redirect(url_for('digitaltwin.policy_created', id=policy_id))
 
-    # Restore preserved data on page load
+    # staged policy logic
     if 'staged_policy' in session:
         if not policyForm.Name.data:
             policyForm.Name.data = session['staged_policy'].get('Name')
@@ -93,5 +97,7 @@ def create_policy():
 
 @bp.route("/policy-created/<id>")
 def policy_created(id):
-    return render_template("policy_created.html", 
+    policy_data = policies.getPolicy(id)
+    return render_template("policy_created.html",
+                           policy_data=policy_data,
                            id=id)

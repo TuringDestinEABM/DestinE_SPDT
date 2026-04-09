@@ -9,6 +9,9 @@ digitalTwin/data/*
 digitalTwin/data/synthetic_data/*
 !digitalTwin/data/synthetic_data/.gitkeep
 
+# data folder
+digitalTwin/data
+
 #databasing
 digitalTwin/app.db
 migrations/*

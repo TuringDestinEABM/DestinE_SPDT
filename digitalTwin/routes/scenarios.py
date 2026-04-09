@@ -64,55 +64,6 @@ def create_scenario_population():
                            popForm = popForm)
         
 
-### Deprecated, for extension
-# @bp.route("/createscenario/climate", methods=['GET', 'POST'])
-# def create_scenario_climate():
-    
-#     if session.get('scenario_progress', 0) < 2:
-#         return redirect(url_for('digitaltwin.create_scenario_population'))
-
-#     climateForm = forms.ClimateModelForm(prefix="climate")
-#     selectPresets = forms.SelectPresetsClimate(prefix="preset")
-
-#     # Check for return from later
-#     if request.method == 'GET':
-#         if 'climate_data' in session:
-#             climateForm.process(data=session['climate_data'])
-    
-#     if request.method == 'POST':
-#         # Handle Select Preset Submission
-#         if selectPresets.Submit.data and selectPresets.validate():
-#             selected_obj = selectPresets.selected_climate_id.data
-#             if selected_obj:
-#                 # Store the choice in session
-#                 session['climate_mode'] = 'preset'
-#                 session['selected_preset_id'] = selected_obj.id
-#                 session['climate_data'] = None # Clear conflicting data
-
-#                 session['scenario_progress'] = 3
-#                 return redirect(url_for('digitaltwin.create_scenario_policy'))
-
-#         # Handle "Create New Climate" Submission
-#         elif climateForm.Submit.data and climateForm.validate():
-#             # Store the form data in session
-#             session['climate_mode'] = 'new'
-#             session['climate_data'] = climateForm.data # Serializes form data to dict
-#             session['selected_preset_id'] = None # Clear conflicting data
-
-#             session['scenario_progress'] = 3
-#             return redirect(url_for('digitaltwin.create_scenario_policy'))
-        
-#         # handle validation errors    
-#     if climateForm.errors:
-#         print("Validation Errors:", climateForm.errors)
-#     if selectPresets.errors:
-#         print("Validation Errors:", selectPresets.errors)
-    
-
-#     return render_template("create_scenario_climate.html", 
-#                            selectPresets=selectPresets, 
-#                            climateForm=climateForm)
-
 @bp.route("/createscenario/policy", methods=['GET', 'POST'])
 def create_scenario_policy():
     

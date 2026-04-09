@@ -78,7 +78,7 @@ def populateEPC(conn, schema):
             print(cnt)
     conn.commit()
         
-def populateUPRN(conn):  
+def populateHIDP(conn):  
     cur = conn.cursor()
     keys = [{'att_key':'UPRN','key':'uprn_chr'},
             {'att_key':'lsoa_code','key':'lsoa_code'},
@@ -107,7 +107,7 @@ def populateUPRN(conn):
         qmarks = 'VALUES(?,'
 
     
-        sql = ''' INSERT INTO uprn_data''' +msg +'''VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
+        sql = ''' INSERT INTO hidp_data''' +msg +'''VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '''
         
         # append features to row
         for k in keys:
@@ -118,7 +118,7 @@ def populateUPRN(conn):
 
         msg = msg[:-1] + ')'
         qmarks = qmarks[:-1] + ')'
-        sql = ''' INSERT INTO uprn_data''' + msg + qmarks
+        sql = ''' INSERT INTO hidp_data''' + msg + qmarks
 
         row = tuple(row)
         cur.execute(sql, row)
@@ -184,26 +184,16 @@ if __name__ == "__main__":
             print("Failed to populate "+ str(tableName))
 
         # UPRN data
-        tableName = models.UPRNdata.__tablename__
+        tableName = models.HIDPdata.__tablename__
         response = checkPopulated(tableName,conn)
 
         if response == True:
             print("Populating " + str(tableName))
-            populateUPRN(conn)
+            populateHIDP(conn)
             print("Populated successfully :)")
         else:
             print("Failed to populate "+ str(tableName))
 
-        #temperature time series
-        # tableName = models.TemperatureTimeSeries.__tablename__ 
-        # response = checkPopulated(tableName,conn)
-
-        # if response == True:
-        #     print("Populating " + str(tableName))
-        #     populateTemperature(conn, models.TemperatureTimeSeries)
-        #     print("Populated successfully :)")
-        # else:
-        #     print("Failed to populate "+ str(tableName))
 
 
 
